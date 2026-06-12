@@ -1,0 +1,24 @@
+/* Bold — near-black/white poster energy, oversized display */
+.theme-bold {
+  --ms-bg: oklch(0.05 0 0);
+  --ms-bg-elevated: oklch(0.12 0 0);
+  --ms-text: oklch(0.98 0 0);
+  --ms-text-muted: oklch(0.65 0 0);
+  --ms-border: oklch(0.25 0 0);
+  --ms-border-subtle: oklch(0.18 0 0);
+  --ms-overlay: oklch(0.05 0 0 / 0.65);
+  --ms-font-wonk: 0;
+  --ms-display-scale: 1.12;
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+}
+
+.theme-bold .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}
+
+.theme-bold .minisite-display {
+  font-size: calc(1em * var(--ms-display-scale));
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}

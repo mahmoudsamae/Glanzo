@@ -1,0 +1,18 @@
+/* Midnight — dashboard warm-dark; shop accent replaces brass on CTA */
+.theme-midnight {
+  --ms-bg: oklch(0.16 0.008 75);
+  --ms-bg-elevated: oklch(0.2 0.01 75);
+  --ms-text: oklch(0.97 0.005 75);
+  --ms-text-muted: oklch(0.65 0.015 75);
+  --ms-border: oklch(0.32 0.012 75);
+  --ms-border-subtle: oklch(0.24 0.01 75);
+  --ms-overlay: oklch(0.12 0.01 75 / 0.72);
+  --ms-font-wonk: 0;
+  --ms-display-scale: 1;
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+}
+
+.theme-midnight .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}

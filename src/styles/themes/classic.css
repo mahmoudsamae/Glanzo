@@ -1,0 +1,18 @@
+/* Classic — warm paper, ink text, engraved hairlines */
+.theme-classic {
+  --ms-bg: oklch(0.95 0.02 85);
+  --ms-bg-elevated: oklch(0.97 0.015 85);
+  --ms-text: oklch(0.22 0.02 75);
+  --ms-text-muted: oklch(0.45 0.02 75);
+  --ms-border: oklch(0.82 0.03 80);
+  --ms-border-subtle: oklch(0.88 0.025 82);
+  --ms-overlay: oklch(0.35 0.04 75 / 0.55);
+  --ms-font-wonk: 0.9;
+  --ms-display-scale: 1;
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+}
+
+.theme-classic .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}

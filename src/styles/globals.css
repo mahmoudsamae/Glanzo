@@ -1,0 +1,702 @@
+@import "tailwindcss";
+
+/* Glanzo design tokens — single source of truth for color, type, spacing, motion */
+:root {
+  /* Surfaces (dark-first warm palette, OKLCH) */
+  --ink-0: oklch(0.16 0.008 75);
+  --ink-1: oklch(0.2 0.01 75);
+  --ink-2: oklch(0.24 0.01 75);
+  --ink-3: oklch(0.32 0.012 75);
+  --ink-4: oklch(0.45 0.014 75);
+
+  /* Text */
+  --text-2: oklch(0.65 0.015 75);
+  --text-1: oklch(0.88 0.01 75);
+  --text-0: oklch(0.97 0.005 75);
+
+  /* Accent */
+  --brass: oklch(0.78 0.13 75);
+  --brass-dim: oklch(0.6 0.1 75);
+
+  /* Signals */
+  --signal-ok: oklch(0.72 0.14 150);
+  --signal-warn: oklch(0.75 0.14 60);
+  --signal-bad: oklch(0.62 0.18 25);
+
+  /* Spacing scale: 4/8/12/16/24/32/48/64/96 */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /*
+   * Motion durations for CSS transitions — mirror of `duration` in `src/lib/motion.ts`.
+   * Framer uses seconds; CSS uses milliseconds.
+   */
+  --t-instant: 100ms;
+  --t-fast: 200ms;
+  --t-smooth: 300ms;
+  --t-expressive: 600ms;
+
+  /* Cinema layer (DESIGN-VISION §15) — mirror cinema tokens in lib/motion.ts */
+  --anim-rise: 24px;
+  --anim-cascade: 60ms;
+  --anim-ken-burns: 20s;
+  --anim-sheen: 6s;
+  --anim-book-pulse: 8s;
+
+  /*
+   * Motion easings for CSS — mirror of `easing` in `src/lib/motion.ts`.
+   */
+  --ease-enter: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* shadcn semantic mappings (restyled once at install) */
+  --background: var(--ink-0);
+  --foreground: var(--text-1);
+  --card: var(--ink-1);
+  --card-foreground: var(--text-1);
+  --popover: var(--ink-1);
+  --popover-foreground: var(--text-1);
+  --primary: var(--brass);
+  --primary-foreground: var(--ink-0);
+  --secondary: var(--ink-2);
+  --secondary-foreground: var(--text-1);
+  --muted: var(--ink-2);
+  --muted-foreground: var(--text-2);
+  --accent: var(--ink-2);
+  --accent-foreground: var(--text-0);
+  --destructive: var(--signal-bad);
+  --destructive-foreground: var(--text-0);
+  --border: var(--ink-3);
+  --input: var(--ink-3);
+  --ring: var(--brass);
+  --radius: 0.375rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Typography families — set by next/font/local on `<html>` via --font-display / --font-sans */
+
+  /* Type scale: 12 / 13 / 14 / 16 / 20 / 28 / 40 / 64 px */
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-3xl: 4rem;
+
+  --font-size-xs: var(--text-xs);
+  --font-size-sm: var(--text-sm);
+  --font-size-base: var(--text-base);
+  --font-size-md: var(--text-md);
+  --font-size-lg: var(--text-lg);
+  --font-size-xl: var(--text-xl);
+  --font-size-2xl: var(--text-2xl);
+  --font-size-3xl: var(--text-3xl);
+}
+
+@utility font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-variation-settings: "SOFT" 0, "WONK" 0;
+  font-optical-sizing: auto;
+}
+
+@utility font-sans {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@utility text-data {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply min-h-full bg-background text-foreground antialiased font-sans text-md;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display;
+    color: var(--text-0);
+    font-weight: 500;
+  }
+}
+
+@layer utilities {
+  /* Display tracking per DESIGN-VISION (28px+ / 40px+) */
+  .text-xl {
+    letter-spacing: -0.015em;
+  }
+
+  .text-2xl,
+  .text-3xl {
+    letter-spacing: -0.025em;
+  }
+
+  @keyframes cut-line-reveal {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes shimmer-once {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
+  .cut-line {
+    position: relative;
+    margin-top: var(--space-3);
+    height: 1px;
+    width: 100%;
+  }
+
+  .cut-line__track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: var(--brass);
+    transform-origin: left center;
+    animation: cut-line-reveal var(--t-smooth) var(--ease-enter) both;
+  }
+
+  .cut-line__notch {
+    position: absolute;
+    top: 50%;
+    left: 12%;
+    height: 0.5rem;
+    width: 0.5rem;
+    translate: 0 -50%;
+    rotate: 45deg;
+    border: 1px solid var(--brass);
+    background: var(--ink-0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cut-line__track {
+      animation: none;
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes booking-lands-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes booking-lands-pulse {
+    0%,
+    100% {
+      box-shadow: inset 0 0 0 0 transparent;
+    }
+    50% {
+      box-shadow: inset 0 0 0 1px var(--brass);
+    }
+  }
+
+  .booking-lands {
+    animation:
+      booking-lands-in var(--t-fast) var(--ease-enter) both,
+      booking-lands-pulse 600ms var(--ease-enter) 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .booking-lands {
+      animation: none;
+    }
+  }
+
+  /* -------------------------------------------------------------------------
+   * Cinema layer (DESIGN-VISION §15) — public mini-site depth + scroll timeline
+   * ------------------------------------------------------------------------- */
+
+  @keyframes ms-ken-burns {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes ms-sheen {
+    0%,
+    88%,
+    100% {
+      background-position: -120% 0;
+    }
+    92% {
+      background-position: 220% 0;
+    }
+  }
+
+  @keyframes ms-rise-fade {
+    from {
+      opacity: 0;
+      transform: translateY(var(--anim-rise));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ms-leader-draw {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes ms-book-bar-in {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ms-book-pulse {
+    0%,
+    92%,
+    100% {
+      transform: scale(1);
+    }
+    96% {
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes ms-brass-shimmer {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
+
+  @keyframes ms-slot-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes ms-booking-step-in {
+    from {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .ms-cinema-cover-wrap {
+    overflow: hidden;
+  }
+
+  .ms-cinema-cover {
+    transform: scale(1);
+    will-change: transform;
+  }
+
+  .ms-cinema-ready .ms-cinema-cover {
+    animation: ms-ken-burns var(--anim-ken-burns) ease-out forwards;
+  }
+
+  @supports (animation-timeline: view()) {
+    .ms-cinema-cover-wrap {
+      animation: ms-parallax linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes ms-parallax {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(12%);
+      }
+    }
+  }
+
+  .ms-cinema-scrim {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--ms-bg) 10%, transparent) 0%,
+      color-mix(in oklch, var(--ms-bg) 55%, transparent) 45%,
+      color-mix(in oklch, var(--ms-bg) 92%, transparent) 100%
+    );
+  }
+
+  .ms-cinema-hero-plane {
+    transform-style: preserve-3d;
+    transition: transform var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-cinema-word {
+    display: inline-block;
+    opacity: 0;
+    animation: ms-rise-fade var(--t-expressive) var(--ease-enter) forwards;
+  }
+
+  .ms-cinema-ready .ms-cinema-word {
+    animation-delay: calc(var(--word-i, 0) * 80ms);
+  }
+
+  .ms-cinema-logo-chip {
+    filter: drop-shadow(0 4px 12px color-mix(in oklch, var(--ms-bg) 40%, transparent));
+  }
+
+  .ms-cinema-section {
+    opacity: 0;
+    transform: translateY(var(--anim-rise));
+  }
+
+  @supports (animation-timeline: view()) {
+    .ms-cinema-section {
+      animation: ms-rise-fade var(--t-smooth) var(--ease-enter) both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .ms-cinema-section--visible {
+    animation: ms-rise-fade var(--t-smooth) var(--ease-enter) forwards;
+  }
+
+  .ms-cinema-section--visible .ms-cinema-cascade > * {
+    opacity: 0;
+    animation: ms-rise-fade var(--t-smooth) var(--ease-enter) forwards;
+    animation-delay: calc(var(--cascade-i, 0) * var(--anim-cascade));
+  }
+
+  .ms-cinema-ornament {
+    position: relative;
+    height: 3px;
+    width: 4rem;
+    margin-inline: auto;
+  }
+
+  .ms-cinema-ornament::before,
+  .ms-cinema-ornament::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: color-mix(in oklch, var(--ms-accent-on-bg) 70%, transparent);
+  }
+
+  .ms-cinema-ornament::before {
+    top: 0;
+  }
+
+  .ms-cinema-ornament::after {
+    bottom: 0;
+    opacity: 0.5;
+  }
+
+  .ms-cinema-price-row {
+    transition:
+      transform var(--t-fast) var(--ease-enter),
+      color var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-cinema-price-row:hover,
+  .ms-cinema-price-row:focus-within {
+    transform: translateY(-2px);
+  }
+
+  .ms-cinema-price-row:hover .ms-cinema-leader,
+  .ms-cinema-price-row:focus-within .ms-cinema-leader {
+    background: color-mix(in oklch, var(--ms-accent) 55%, var(--ms-border-subtle));
+  }
+
+  .ms-cinema-price-row:hover .ms-cinema-price,
+  .ms-cinema-price-row:focus-within .ms-cinema-price {
+    font-weight: 600;
+  }
+
+  .ms-cinema-leader {
+    transform-origin: left center;
+    animation: ms-leader-draw var(--t-smooth) var(--ease-enter) both;
+    animation-delay: calc(var(--cascade-i, 0) * var(--anim-cascade) + 80ms);
+  }
+
+  .ms-cinema-team-card {
+    perspective: 800px;
+    transition: transform var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-cinema-team-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .ms-cinema-team-inner {
+    transition: transform var(--t-fast) var(--ease-enter);
+    transform-style: preserve-3d;
+  }
+
+  .ms-cinema-team-card:hover .ms-cinema-team-inner {
+    transform: rotateX(2deg) rotateY(-4deg);
+  }
+
+  .ms-cinema-team-cta {
+    transform: translateY(4px);
+    opacity: 0.92;
+    transition:
+      transform var(--t-smooth) var(--ease-enter),
+      opacity var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-cinema-team-card:hover .ms-cinema-team-cta,
+  .ms-cinema-team-card:focus-within .ms-cinema-team-cta {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .ms-cinema-gallery {
+    columns: 2;
+    column-gap: var(--space-2);
+  }
+
+  @media (min-width: 640px) {
+    .ms-cinema-gallery {
+      columns: 3;
+    }
+  }
+
+  .ms-cinema-gallery-item {
+    break-inside: avoid;
+    margin-bottom: var(--space-2);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+  }
+
+  .ms-cinema-gallery-item img {
+    transition:
+      transform var(--t-smooth) var(--ease-enter),
+      filter var(--t-smooth) var(--ease-enter);
+  }
+
+  .ms-cinema-gallery-item:hover img,
+  .ms-cinema-gallery-item:focus-within img {
+    transform: scale(1.03);
+    filter: brightness(1.06);
+  }
+
+  .ms-cinema-book-cta {
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--t-instant) var(--ease-enter);
+  }
+
+  .ms-cinema-book-cta:active {
+    transform: scale(0.98);
+  }
+
+  .ms-cinema-book-cta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      color-mix(in oklch, var(--ms-on-accent) 35%, transparent) 50%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: ms-sheen var(--anim-sheen) ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .ms-cinema-book-bar {
+    opacity: 0;
+    transform: translateY(100%);
+    backdrop-filter: blur(16px);
+    background: color-mix(in oklch, var(--ms-bg) 78%, transparent);
+  }
+
+  .ms-cinema-book-bar--visible {
+    animation: ms-book-bar-in var(--t-smooth) cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  }
+
+  .ms-cinema-book-bar--visible .ms-cinema-book-cta {
+    animation: ms-book-pulse var(--anim-book-pulse) ease-in-out infinite;
+  }
+
+  .ms-cinema-book-bar--interacted .ms-cinema-book-cta {
+    animation: none;
+  }
+
+  .ms-booking-step {
+    animation: ms-booking-step-in var(--t-fast) var(--ease-enter) both;
+  }
+
+  .ms-slot-chip {
+    animation: ms-slot-pop var(--t-fast) var(--ease-enter) both;
+    animation-delay: calc(var(--slot-i, 0) * 30ms);
+  }
+
+  .ms-booking-celebrate .cut-line__track {
+    animation: cut-line-reveal var(--t-smooth) var(--ease-enter) both;
+  }
+
+  .ms-booking-celebrate__shimmer {
+    animation: ms-brass-shimmer 800ms var(--ease-enter) 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ms-cinema-ready .ms-cinema-cover,
+    .ms-cinema-cover-wrap,
+    .ms-cinema-word,
+    .ms-cinema-section,
+    .ms-cinema-section--visible,
+    .ms-cinema-section--visible .ms-cinema-cascade > *,
+    .ms-cinema-leader,
+    .ms-cinema-book-cta::after,
+    .ms-cinema-book-bar--visible,
+    .ms-cinema-book-bar--visible .ms-cinema-book-cta,
+    .ms-booking-step,
+    .ms-slot-chip,
+    .ms-booking-celebrate__shimmer {
+      animation: none !important;
+      transform: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    .ms-cinema-hero-plane,
+    .ms-cinema-team-inner,
+    .ms-cinema-price-row,
+    .ms-cinema-team-card {
+      transform: none !important;
+      transition: opacity var(--t-fast) var(--ease-enter);
+    }
+
+    .ms-cinema-book-bar {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Dashboard precision motion (DESIGN-VISION §15 Part C) */
+  @keyframes dash-metric-settle {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.02);
+    }
+  }
+
+  .dash-metric-settle {
+    animation: dash-metric-settle var(--t-smooth) var(--ease-enter) 1;
+    animation-delay: 420ms;
+  }
+
+  .dash-today-header .cut-line__track {
+    animation: cut-line-reveal 500ms var(--ease-enter) both;
+  }
+
+  .dash-ledger-row:hover {
+    transform: translateY(-1px);
+  }
+
+  .dash-appt-block:hover {
+    transform: translateY(-1px);
+    border-color: var(--brass);
+  }
+
+  .dash-sheet {
+    animation-timing-function: var(--ease-enter);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dash-metric-settle,
+    .dash-today-header .cut-line__track {
+      animation: none;
+    }
+
+    .dash-ledger-row:hover,
+    .dash-appt-block:hover {
+      transform: none;
+    }
+  }
+}
