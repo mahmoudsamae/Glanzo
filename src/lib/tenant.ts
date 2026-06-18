@@ -35,6 +35,25 @@ export type ResolveTenantOptions = {
 
 const VERCEL_PREVIEW_SUFFIX = ".vercel.app";
 
+/** Path-based mini-sites (`/s/{slug}`) — localhost dev and Vercel default domains (no wildcard DNS). */
+export function allowsDirectTenantPaths(rootDomain: string): boolean {
+  const normalized = rootDomain.trim().toLowerCase();
+  return normalized.includes("localhost") || normalized.endsWith(VERCEL_PREVIEW_SUFFIX);
+}
+
+function isVercelPreviewHost(hostname: string, rootHostname: string): boolean {
+  if (!hostname.endsWith(VERCEL_PREVIEW_SUFFIX)) {
+    return false;
+  }
+  if (hostname === rootHostname || hostname === `www.${rootHostname}`) {
+    return false;
+  }
+  if (hostname.endsWith(`.${rootHostname}`)) {
+    return false;
+  }
+  return true;
+}
+
 function parseHostParts(host: string): { hostname: string; port: string | null } {
   const normalized = host.trim().toLowerCase();
   if (!normalized) {
@@ -98,8 +117,8 @@ export function resolveTenant(host: string, options: ResolveTenantOptions = {}):
     return { kind: "invalid" };
   }
 
-  // Vercel preview URLs exercise the root app — tenant testing uses ?shop= in dev/non-prod.
-  if (hostname.endsWith(VERCEL_PREVIEW_SUFFIX)) {
+  // Random Vercel preview URLs (not subdomains of the configured root) use the root app.
+  if (isVercelPreviewHost(hostname, root.hostname)) {
     return applyDevShopOverride({ kind: "root" }, options, nodeEnv);
   }
 

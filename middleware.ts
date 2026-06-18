@@ -5,6 +5,7 @@ import { refreshSupabaseSession } from "@/lib/supabase/middleware";
 import {
   buildTenantRewritePath,
   isDirectTenantPath,
+  allowsDirectTenantPaths,
   resolveTenant,
   TENANT_NOT_FOUND_SLUG,
   TENANT_PATH_FORBIDDEN_SLUG,
@@ -22,7 +23,12 @@ function resolveTenantResponse(request: NextRequest): NextResponse {
     nodeEnv: process.env.NODE_ENV,
   });
 
-  if (isProduction && resolution.kind === "root" && isDirectTenantPath(pathname)) {
+  if (
+    isProduction &&
+    resolution.kind === "root" &&
+    isDirectTenantPath(pathname) &&
+    !allowsDirectTenantPaths(clientEnv.NEXT_PUBLIC_ROOT_DOMAIN)
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = buildTenantRewritePath(TENANT_PATH_FORBIDDEN_SLUG, "/");
     return NextResponse.rewrite(url);

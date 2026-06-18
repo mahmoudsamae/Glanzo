@@ -1,5 +1,3 @@
-"use server";
-
 import { redirect } from "next/navigation";
 
 import { revalidateShopPublic } from "@/lib/minisite/revalidate-shop-public";

@@ -1,10 +1,10 @@
 import { AuthShell } from "@/features/auth";
 import { OnboardingWizard } from "@/features/onboarding";
+import { requireOnboardingAccess } from "@/server/modules/shops/create-shop.service";
 import {
   checkShopSlugAvailability,
   createShopAndRedirect,
-  requireOnboardingAccess,
-} from "@/server/modules/shops/create-shop.service";
+} from "@/server/modules/shops/create-shop.actions";
 
 export default async function OnboardingPage() {
   await requireOnboardingAccess();

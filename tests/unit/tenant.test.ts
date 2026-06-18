@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveTenant } from "@/lib/tenant";
+import { allowsDirectTenantPaths, resolveTenant } from "@/lib/tenant";
 
 const ROOT = "localhost:3000";
 const PROD_ROOT = "glanzo.app";
@@ -70,6 +70,21 @@ describe("resolveTenant", () => {
     expect(resolveTenant("glanzo-git-main-acme.vercel.app", { rootDomain: PROD_ROOT })).toEqual({
       kind: "root",
     });
+  });
+
+  it("resolves tenant subdomain on configured vercel root domain", () => {
+    const vercelRoot = "glanzo.vercel.app";
+    expect(resolveTenant("demo-barber-a.glanzo.vercel.app", { rootDomain: vercelRoot })).toEqual({
+      kind: "tenant",
+      slug: "demo-barber-a",
+    });
+    expect(resolveTenant("glanzo.vercel.app", { rootDomain: vercelRoot })).toEqual({ kind: "root" });
+  });
+
+  it("allowsDirectTenantPaths for localhost and vercel.app roots", () => {
+    expect(allowsDirectTenantPaths("localhost:3000")).toBe(true);
+    expect(allowsDirectTenantPaths("glanzo.vercel.app")).toBe(true);
+    expect(allowsDirectTenantPaths("glanzo.app")).toBe(false);
   });
 
   it("rejects slug that is too short", () => {

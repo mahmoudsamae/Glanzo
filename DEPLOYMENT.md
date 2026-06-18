@@ -14,6 +14,10 @@ Required environment variables (Project → Settings → Environment Variables):
 | `EMAIL_FROM` | `Glanzo <termine@glanzo.app>` | after Resend domain verify |
 | `RESEND_API_KEY` | `re_…` | optional until live email |
 
+**Using the default Vercel URL (`*.vercel.app`) without a custom domain:** set `NEXT_PUBLIC_ROOT_DOMAIN` to your production hostname exactly (e.g. `glanzo.vercel.app`). Mini-sites are served at `https://glanzo.vercel.app/s/{shop-slug}` — wildcard subdomains are not available on `*.vercel.app`.
+
+**Custom domain (recommended for launch):** point `glanzo.app` and `*.glanzo.app` (wildcard) to Vercel, then set `NEXT_PUBLIC_ROOT_DOMAIN=glanzo.app`. Mini-sites become `https://{slug}.glanzo.app`.
+
 **Build failure `CRON_SECRET String must contain at least 16`:** remove the variable or set a longer secret (placeholder values like `dev` fail validation).
 
 Local dev keeps `NEXT_PUBLIC_ROOT_DOMAIN=localhost:3000` in `.env.local` only — do not use that on Vercel production.
