@@ -1,4 +1,4 @@
-import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
+import type { MinisiteContent } from "@/lib/validations/public-shop";
 
 import { resolveNicolesGalleryImage } from "./nicoles-stock-images";
 

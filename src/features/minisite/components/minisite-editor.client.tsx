@@ -7,7 +7,7 @@ import {
   DashboardPage,
   DashboardPageHeader,
   DashboardPrimaryButton,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";
 import type { MinisiteSaveInput } from "@/lib/validations/minisite-editor";

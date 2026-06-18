@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,10 @@ type OnboardingWizardProps = {
 
 export function OnboardingWizard({ checkSlugAction, createShopAction }: OnboardingWizardProps) {
   const [step, setStep] = useState(0);
-  const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "available" | "taken" | "invalid">(
-    "idle",
-  );
+  const [slugCheck, setSlugCheck] = useState<{
+    slug: string;
+    status: "available" | "taken" | "invalid";
+  } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -79,10 +80,10 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
     mode: "onChange",
   });
 
-  const name = form.watch("name");
-  const slug = form.watch("slug");
-  const timezone = form.watch("timezone");
-  const openingHours = form.watch("openingHours");
+  const name = useWatch({ control: form.control, name: "name" }) ?? "";
+  const slug = useWatch({ control: form.control, name: "slug" }) ?? "";
+  const timezone = useWatch({ control: form.control, name: "timezone" }) ?? "";
+  const openingHours = useWatch({ control: form.control, name: "openingHours" }) ?? DEFAULT_ONBOARDING_OPENING_HOURS;
 
   useEffect(() => {
     if (!name || step !== 0) return;
@@ -94,29 +95,34 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
 
   useEffect(() => {
     if (step !== 0 || !slug) {
-      setSlugStatus("idle");
       return;
     }
 
     const parsed = shopSlugSchema.safeParse(slug);
     if (!parsed.success) {
-      setSlugStatus("invalid");
       return;
     }
 
-    setSlugStatus("checking");
     const handle = window.setTimeout(() => {
       void checkSlugAction(slug).then((result) => {
         if (!result.ok) {
-          setSlugStatus("invalid");
+          setSlugCheck({ slug, status: "invalid" });
           return;
         }
-        setSlugStatus(result.available ? "available" : "taken");
+        setSlugCheck({ slug, status: result.available ? "available" : "taken" });
       });
     }, 400);
 
     return () => window.clearTimeout(handle);
-  }, [slug, step]);
+  }, [slug, step, checkSlugAction]);
+
+  const slugStatus = useMemo((): "idle" | "checking" | "available" | "taken" | "invalid" => {
+    if (step !== 0 || !slug) return "idle";
+    const parsed = shopSlugSchema.safeParse(slug);
+    if (!parsed.success) return "invalid";
+    if (!slugCheck || slugCheck.slug !== slug) return "checking";
+    return slugCheck.status;
+  }, [slug, step, slugCheck]);
 
   const previewHost = useMemo(() => {
     const root = clientEnv.NEXT_PUBLIC_ROOT_DOMAIN.replace(/^[^.]+\./, "");

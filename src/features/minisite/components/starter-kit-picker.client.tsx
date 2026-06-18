@@ -2,7 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 
-import { DashboardPrimaryButton } from "@/features/dashboard";
+import { DashboardPrimaryButton } from "@/components/dashboard";
 import { applyStarterKit } from "@/lib/minisite/starter-kits/apply-starter-kit";
 import { STARTER_KITS } from "@/lib/minisite/starter-kits/registry";
 import type { MinisiteSaveInput } from "@/lib/validations/minisite-editor";

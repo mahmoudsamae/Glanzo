@@ -15,7 +15,7 @@ import {
   DashboardPrimaryButton,
   DashboardRowCard,
   DashboardRowList,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import { clientEnv } from "@/lib/env";
 import { STAFF_WEEKDAY_LABELS, staffWeekdayIndexToKey } from "@/lib/staff/weekday";
 

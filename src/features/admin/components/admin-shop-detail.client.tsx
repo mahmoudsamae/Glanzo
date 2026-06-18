@@ -14,7 +14,7 @@ import {
   setPlatformShopStatusAction,
 } from "../api";
 import { normalizeAllowedMinisiteTemplates } from "@/lib/minisite/allowed-templates";
-import { MINISITE_TEMPLATES } from "@/features/minisite/templates/registry";
+import { MINISITE_TEMPLATES } from "@/lib/minisite/template-registry";
 import type { MinisiteTemplate } from "@/lib/validations/public-shop";
 import { buildInviteAbsoluteUrl } from "@/lib/admin/invite-url";
 import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";

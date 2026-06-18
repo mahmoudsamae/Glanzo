@@ -11,7 +11,7 @@ import {
   DashboardPageHeader,
   DashboardPanel,
   DashboardPrimaryButton,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import type { CustomerListItem } from "@/server/modules/customers/customers.types";
 import type { NavRole } from "@/components/layout/nav";
 

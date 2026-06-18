@@ -1,5 +1,5 @@
 import { SettingsNav } from "@/features/settings";
-import { DashboardPage, DashboardPageHeader } from "@/features/dashboard";
+import { DashboardPage, DashboardPageHeader } from "@/components/dashboard";
 import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
 
 export default async function SettingsLayout({

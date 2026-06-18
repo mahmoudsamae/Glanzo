@@ -4,11 +4,11 @@ export {
   DashboardPageHeader,
   DashboardPanel,
   DashboardStatChip,
-} from "./components/dashboard-ui";
+} from "./dashboard-ui";
 export {
   DashboardBadge,
   DashboardPrimaryButton,
   DashboardRowCard,
   DashboardRowList,
   DashboardSearch,
-} from "./components/dashboard-ui.client";
+} from "./dashboard-ui.client";

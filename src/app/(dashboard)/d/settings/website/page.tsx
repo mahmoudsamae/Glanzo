@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-import { DashboardPanel } from "@/features/dashboard";
-import { MinisitePageSettings } from "@/features/minisite/components/minisite-page-settings.client";
+import { DashboardPanel } from "@/components/dashboard";
+import { MinisitePageSettings } from "@/features/minisite";
 import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
 import { loadMinisiteEditorData } from "@/server/modules/minisite/minisite.service";
 

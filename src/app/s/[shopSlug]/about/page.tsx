@@ -2,15 +2,17 @@ import { notFound } from "next/navigation";
 
 import { shopSlugSchema } from "@/lib/validations/shop";
 import { loadPublicShopBySlug } from "@/server/modules/shops/shops.loader";
-import { BoutiqueNav } from "@/features/minisite/templates/boutique/boutique-nav.client";
-import { BoutiqueAboutPage } from "@/features/minisite/templates/boutique/sections/boutique-about-page";
-import { BoutiqueVisitPanel } from "@/features/minisite/templates/boutique/sections/boutique-visit-panel";
-import { BoutiqueAmbient } from "@/features/minisite/templates/boutique/boutique-ambient.client";
-import { NicolesAboutPage } from "@/features/minisite/templates/nicoles/about/nicoles-about-page";
-import { NicolesAmbient } from "@/features/minisite/templates/nicoles/nicoles-ambient.client";
-import { NicolesFooter } from "@/features/minisite/templates/nicoles/nicoles-footer";
-import { NicolesNav } from "@/features/minisite/templates/nicoles/nicoles-nav.client";
-import { BookBarSection } from "@/features/minisite/sections/book-bar";
+import {
+  BookBarSection,
+  BoutiqueAboutPage,
+  BoutiqueAmbient,
+  BoutiqueNav,
+  BoutiqueVisitPanel,
+  NicolesAboutPage,
+  NicolesAmbient,
+  NicolesFooter,
+  NicolesNav,
+} from "@/features/minisite";
 
 export const revalidate = 300;
 

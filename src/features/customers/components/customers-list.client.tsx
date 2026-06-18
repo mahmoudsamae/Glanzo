@@ -8,7 +8,7 @@ import {
   DashboardRowCard,
   DashboardRowList,
   DashboardSearch,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import type { CustomerListItem } from "@/server/modules/customers/customers.types";
 
 type CustomersListProps = {

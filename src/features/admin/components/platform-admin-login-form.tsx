@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +10,6 @@ import { z } from "zod";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AuthLink } from "@/features/auth";
 import type { AuthActionResult } from "@/lib/auth/types";
 
 const loginSchema = z.object({
@@ -101,7 +101,10 @@ export function PlatformAdminLoginForm({ loginAction }: PlatformAdminLoginFormPr
           </form>
 
           <footer className="mt-[var(--space-8)] text-center text-sm text-[var(--text-2)]">
-            Salon-Dashboard? <AuthLink href="/login">Zum Shop-Login</AuthLink>
+            Salon-Dashboard?{" "}
+            <Link href="/login" className="salon-auth-link font-medium underline-offset-4 hover:underline">
+              Zum Shop-Login
+            </Link>
           </footer>
         </div>
       </main>

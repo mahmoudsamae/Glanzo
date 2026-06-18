@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { AdminShell } from "@/components/layout/admin-shell";
-import { PlatformAdminLoginForm } from "@/features/admin/components/platform-admin-login-form";
-import { AdminOverview } from "@/features/admin";
+import { AdminOverview, PlatformAdminLoginForm } from "@/features/admin";
 import { signOutFromPlatformAdmin, loginPlatformAdmin } from "@/server/modules/auth/actions";
 import { getActor } from "@/server/modules/auth/get-actor";
 import { resolvePostAuthRedirect } from "@/server/modules/auth/get-actor-state";

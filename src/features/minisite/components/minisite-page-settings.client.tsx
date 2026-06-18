@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import {
   DashboardPanel,
   DashboardPrimaryButton,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import { Label } from "@/components/ui/label";
 import type { MinisiteEditorData } from "@/lib/minisite/editor-types";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
@@ -91,16 +91,16 @@ export function MinisitePageSettings({
   part = "all",
 }: MinisitePageSettingsProps) {
   const [internalContent, setInternalContent] = useState<MinisiteContent>(initial.content);
+  const [prevInitialContent, setPrevInitialContent] = useState(initial.content);
   const content = controlledContent ?? internalContent;
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (!controlledContent) {
-      setInternalContent(initial.content);
-    }
-  }, [controlledContent, initial.content]);
+  if (!controlledContent && initial.content !== prevInitialContent) {
+    setPrevInitialContent(initial.content);
+    setInternalContent(initial.content);
+  }
 
   function updateContent(next: MinisiteContent) {
     if (onContentChange) {

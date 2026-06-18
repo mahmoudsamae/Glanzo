@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { OpeningHoursEditor } from "@/components/shared/opening-hours-editor";
-import { DashboardPanel, DashboardPrimaryButton } from "@/features/dashboard";
+import { DashboardPanel, DashboardPrimaryButton } from "@/components/dashboard";
 import { Label } from "@/components/ui/label";
 import { parseOpeningHours, type OpeningHours } from "@/lib/validations/shop";
 

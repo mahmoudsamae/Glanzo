@@ -9,7 +9,7 @@ import {
 
 import type { MinisiteLinks } from "@/lib/validations/minisite-links";
 import { normalizeWhatsAppUrl } from "@/lib/validations/minisite-links";
-import { instagramProfileUrl } from "../lib/instagram-url";
+import { instagramProfileUrl } from "@/lib/minisite/instagram-url";
 
 type SocialLinksRowProps = {
   links: MinisiteLinks | undefined;

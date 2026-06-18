@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { ConfirmSheet } from "@/components/shared/confirm-sheet";
-import { DashboardPage, DashboardPageHeader, DashboardPanel, DashboardPrimaryButton } from "@/features/dashboard";
+import { DashboardPage, DashboardPageHeader, DashboardPanel, DashboardPrimaryButton } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

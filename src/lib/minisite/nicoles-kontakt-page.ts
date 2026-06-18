@@ -1,7 +1,7 @@
 import { resolveNicolesKontaktHeroImage } from "@/lib/minisite/nicoles-stock-images";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
 
-import { formatOpeningHoursLines } from "@/server/modules/shops/opening-hours.format";
+import { formatOpeningHoursLines } from "@/lib/shops/opening-hours.format";
 
 export const DEFAULT_KONTAKT_ADDRESS = "Prüfeninger Straße 109b, 93049 Regensburg";
 export const DEFAULT_KONTAKT_PHONE = "+49 941 38 22 88 85";

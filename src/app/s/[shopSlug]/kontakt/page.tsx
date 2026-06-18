@@ -2,11 +2,13 @@ import { notFound } from "next/navigation";
 
 import { shopSlugSchema } from "@/lib/validations/shop";
 import { loadPublicShopBySlug } from "@/server/modules/shops/shops.loader";
-import { NicolesAmbient } from "@/features/minisite/templates/nicoles/nicoles-ambient.client";
-import { NicolesFooter } from "@/features/minisite/templates/nicoles/nicoles-footer";
-import { NicolesKontaktPage } from "@/features/minisite/templates/nicoles/kontakt/nicoles-kontakt-page";
-import { NicolesNav } from "@/features/minisite/templates/nicoles/nicoles-nav.client";
-import { BookBarSection } from "@/features/minisite/sections/book-bar";
+import {
+  BookBarSection,
+  NicolesAmbient,
+  NicolesFooter,
+  NicolesKontaktPage,
+  NicolesNav,
+} from "@/features/minisite";
 
 export const revalidate = 300;
 

@@ -2,7 +2,7 @@ import { resolveNicolesTerminHeroImage } from "@/lib/minisite/nicoles-stock-imag
 import { normalizeWhatsAppUrl, resolveMinisiteLinks } from "@/lib/validations/minisite-links";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
 
-import { instagramProfileUrl } from "@/features/minisite/lib/instagram-url";
+import { instagramProfileUrl } from "@/lib/minisite/instagram-url";
 
 export type NicolesBookingOptionKind = "phone" | "whatsapp" | "instagram" | "mail";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { CutLine } from "@/components/shared/cut-line";
@@ -13,7 +13,7 @@ import {
   DashboardPanel,
   DashboardRowCard,
   DashboardRowList,
-} from "@/features/dashboard";
+} from "@/components/dashboard";
 import { useNow } from "@/hooks/use-now";
 import { filterNewLandingIds, mergeSeenIds } from "@/lib/appointments/lands-animation";
 import { appointmentStatusLabel } from "@/lib/appointments/status-label";
@@ -71,7 +71,6 @@ export function TodayShell({
   const now = useNow();
   const router = useRouter();
   const seenIdsRef = useRef<Set<string>>(new Set());
-  const [landingIds, setLandingIds] = useState<Set<string>>(() => new Set());
 
   const appointmentIds = useMemo(
     () => (data?.appointments ?? []).map((appointment) => appointment.id),
@@ -84,23 +83,6 @@ export function TodayShell({
       return;
     }
     seenIdsRef.current = mergeSeenIds(seenIdsRef.current, fresh);
-    setLandingIds((current) => {
-      const next = new Set(current);
-      for (const id of fresh) {
-        next.add(id);
-      }
-      return next;
-    });
-    const timer = window.setTimeout(() => {
-      setLandingIds((current) => {
-        const next = new Set(current);
-        for (const id of fresh) {
-          next.delete(id);
-        }
-        return next;
-      });
-    }, 600);
-    return () => window.clearTimeout(timer);
   }, [appointmentIds]);
 
   const { weekday, day, month } = formatShopTodayParts(timezone, now);
