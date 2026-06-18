@@ -47,10 +47,10 @@ export function ForgotPasswordForm({ resetAction }: ForgotPasswordFormProps) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[var(--space-4)]">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+        <Input id="email" type="email" autoComplete="email" className="salon-auth-input" {...form.register("email")} />
         {form.formState.errors.email ? (
           <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
         ) : null}
@@ -59,7 +59,9 @@ export function ForgotPasswordForm({ resetAction }: ForgotPasswordFormProps) {
       {message ? <p className="text-sm text-[var(--signal-ok)]">{message}</p> : null}
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
-      <SubmitButton pending={isPending}>Send reset link</SubmitButton>
+      <SubmitButton pending={isPending} className="salon-auth-submit">
+        Send reset link
+      </SubmitButton>
     </form>
   );
 }

@@ -1,0 +1,483 @@
+/* Flux — urban neon: cool depth, sharp geometry, slide motion */
+.theme-flux {
+  --ms-bg: oklch(0.13 0.035 265);
+  --ms-bg-elevated: oklch(0.17 0.04 265);
+  --ms-text: oklch(0.96 0.02 250);
+  --ms-text-muted: oklch(0.68 0.04 260);
+  --ms-border: oklch(0.38 0.08 280);
+  --ms-border-subtle: oklch(0.24 0.05 270);
+  --ms-overlay: oklch(0.1 0.03 265 / 0.82);
+  --ms-font-wonk: 1;
+  --ms-display-scale: 1.02;
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+}
+
+.theme-flux .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}
+
+.theme-flux.minisite-display h1,
+.theme-flux.minisite-display h2 {
+  letter-spacing: -0.03em;
+}
+
+@keyframes ms-flux-aurora-shift {
+  0%,
+  100% {
+    transform: translate3d(-4%, 0, 0) skewY(-2deg);
+  }
+  50% {
+    transform: translate3d(4%, -2%, 0) skewY(2deg);
+  }
+}
+
+@keyframes ms-flux-grid-scroll {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 48px;
+  }
+}
+
+@keyframes ms-flux-word-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-1.25rem, 0.5rem, 0) skewX(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0deg);
+  }
+}
+
+@keyframes ms-flux-frame-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ms-flux-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ms-flux-cta-flicker {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklch, var(--ms-accent) 70%, transparent),
+      0 0 24px color-mix(in oklch, var(--ms-accent) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklch, var(--ms-accent) 95%, white),
+      0 0 36px color-mix(in oklch, var(--ms-accent) 45%, transparent);
+  }
+}
+
+@keyframes ms-flux-section-slide {
+  from {
+    opacity: 0;
+    transform: translate3d(-2rem, 1rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-flux-scan {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.ms-flux-root {
+  isolation: isolate;
+}
+
+.ms-flux-hero {
+  position: relative;
+  min-height: min(88vh, 48rem);
+  overflow: hidden;
+}
+
+.ms-flux-aurora {
+  position: absolute;
+  inset: -20% -10%;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 0%,
+      color-mix(in oklch, var(--ms-accent) 22%, transparent) 35%,
+      transparent 55%
+    ),
+    linear-gradient(
+      -125deg,
+      transparent 10%,
+      color-mix(in oklch, var(--ms-accent) 12%, #ff2d95) 45%,
+      transparent 70%
+    );
+  opacity: 0.55;
+  filter: blur(40px);
+  animation: ms-flux-aurora-shift 14s ease-in-out infinite;
+}
+
+.ms-flux-scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    color-mix(in oklch, var(--ms-text) 40%, transparent) 2px,
+    color-mix(in oklch, var(--ms-text) 40%, transparent) 3px
+  );
+  pointer-events: none;
+}
+
+.ms-flux-scan-beam {
+  position: absolute;
+  inset-inline: 0;
+  top: -40%;
+  height: 35%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in oklch, var(--ms-accent) 18%, transparent),
+    transparent
+  );
+  animation: ms-flux-scan 6s linear infinite;
+  pointer-events: none;
+}
+
+.ms-flux-grid-floor {
+  position: absolute;
+  inset-inline: -20%;
+  bottom: -2rem;
+  height: 42%;
+  transform: perspective(480px) rotateX(62deg);
+  transform-origin: center bottom;
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--ms-accent) 35%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--ms-accent) 35%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, transparent, black 35%, black 85%, transparent);
+  animation: ms-flux-grid-scroll 3s linear infinite;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.ms-flux-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: inherit;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-5);
+  padding: var(--space-16) var(--space-4) var(--space-10);
+  text-align: left;
+}
+
+.ms-flux-hero-panel {
+  width: 100%;
+  max-width: 36rem;
+  border-inline-start: 3px solid var(--ms-accent);
+  padding-inline-start: var(--space-4);
+}
+
+.ms-flux-cover-strip {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 38%;
+  overflow: hidden;
+  mask-image: linear-gradient(180deg, black 40%, transparent);
+}
+
+.ms-flux-cover-strip img {
+  filter: saturate(1.15) contrast(1.05);
+}
+
+.ms-flux-cover-glitch {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--ms-accent) 25%, transparent),
+    transparent 40%,
+    color-mix(in oklch, #ff2d95 20%, transparent)
+  );
+  mix-blend-mode: color-dodge;
+  opacity: 0.35;
+}
+
+.ms-flux-logo-frame {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  flex-shrink: 0;
+}
+
+.ms-flux-logo-frame::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 0.75rem;
+  background: conic-gradient(
+    from 0deg,
+    var(--ms-accent),
+    color-mix(in oklch, #ff2d95 80%, var(--ms-accent)),
+    var(--ms-accent)
+  );
+  animation: ms-flux-frame-spin 8s linear infinite;
+}
+
+.ms-flux-logo-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in oklch, var(--ms-border) 80%, transparent);
+  background: var(--ms-bg-elevated);
+}
+
+.ms-flux-kicker {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ms-accent) 85%, var(--ms-text));
+}
+
+.ms-flux-word {
+  display: inline-block;
+  opacity: 0;
+}
+
+.ms-flux-ready .ms-flux-word,
+.minisite-preview.ms-flux-ready .ms-flux-word,
+.minisite-preview .ms-flux-word {
+  animation: ms-flux-word-in 680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--word-i, 0) * 70ms + 120ms);
+}
+
+.ms-flux-marquee-wrap {
+  overflow: hidden;
+  border-block: 1px solid color-mix(in oklch, var(--ms-accent) 35%, var(--ms-border-subtle));
+  background: color-mix(in oklch, var(--ms-bg-elevated) 70%, transparent);
+  padding-block: var(--space-2);
+}
+
+.ms-flux-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: var(--space-8);
+  animation: ms-flux-marquee 22s linear infinite;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ms-text-muted);
+}
+
+.ms-flux-book-cta {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  animation: ms-flux-cta-flicker 2.8s ease-in-out infinite;
+}
+
+.ms-flux-section {
+  opacity: 0;
+  transform: translate3d(-1.5rem, 0.75rem, 0);
+}
+
+@supports (animation-timeline: view()) {
+  .ms-flux-section {
+    animation: ms-flux-section-slide 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 25%;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ms-flux-section--visible {
+  animation: ms-flux-section-slide 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.ms-flux-root .ms-cinema-section {
+  border-radius: 0;
+}
+
+.ms-flux-root .ms-cinema-ornament {
+  width: 6rem;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--ms-accent),
+    color-mix(in oklch, #ff2d95 70%, var(--ms-accent))
+  );
+}
+
+.ms-flux-root .ms-cinema-ornament::before,
+.ms-flux-root .ms-cinema-ornament::after {
+  display: none;
+}
+
+.ms-flux-rail-scroll {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.ms-flux-rail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.ms-flux-price-chip {
+  position: relative;
+  width: min(72vw, 16rem);
+  border: 1px solid color-mix(in oklch, var(--ms-accent) 35%, var(--ms-border-subtle));
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--ms-bg-elevated) 92%, var(--ms-accent) 8%),
+    var(--ms-bg)
+  );
+  padding: var(--space-4);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  transition: transform var(--t-fast) var(--ease-enter);
+}
+
+.ms-flux-price-chip:hover {
+  transform: translateY(-3px);
+}
+
+.ms-flux-price-chip-index {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--ms-accent) 70%, var(--ms-text-muted));
+}
+
+.ms-flux-team-card {
+  width: min(68vw, 14rem);
+  border: 1px solid var(--ms-border-subtle);
+  background: var(--ms-bg-elevated);
+  padding: var(--space-4);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+.ms-flux-team-avatar {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 1px solid color-mix(in oklch, var(--ms-accent) 50%, var(--ms-border));
+  background: color-mix(in oklch, var(--ms-accent) 12%, var(--ms-bg));
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ms-accent);
+}
+
+.ms-flux-team-link {
+  align-self: flex-start;
+}
+
+.ms-flux-gallery-strip {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.ms-flux-gallery-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.ms-flux-gallery-frame {
+  position: relative;
+  width: min(70vw, 15rem);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--ms-accent) 30%, var(--ms-border-subtle));
+}
+
+.ms-flux-gallery-frame--tall {
+  aspect-ratio: 3 / 5;
+  width: min(62vw, 13rem);
+}
+
+.ms-flux-guideline-chip {
+  border: 1px solid color-mix(in oklch, var(--ms-accent) 40%, var(--ms-border-subtle));
+  background: color-mix(in oklch, var(--ms-bg-elevated) 80%, transparent);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ms-text-muted);
+}
+
+.ms-flux-bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.ms-flux-bento-cell {
+  border: 1px solid var(--ms-border-subtle);
+  background: var(--ms-bg-elevated);
+  padding: var(--space-4);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.ms-flux-bento-cell--wide {
+  grid-column: 1 / -1;
+}
+
+.ms-flux-book-dock {
+  opacity: 0;
+  transform: translateY(110%);
+  transition:
+    opacity var(--t-smooth) var(--ease-enter),
+    transform var(--t-smooth) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ms-flux-book-dock--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (min-width: 1024px) {
+  .ms-flux-book-dock--visible {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-flux-aurora,
+  .ms-flux-grid-floor,
+  .ms-flux-marquee-track,
+  .ms-flux-logo-frame::before,
+  .ms-flux-scan-beam,
+  .ms-flux-ready .ms-flux-word,
+  .minisite-preview .ms-flux-word,
+  .ms-flux-book-cta {
+    animation: none !important;
+  }
+
+  .ms-flux-word,
+  .minisite-preview .ms-flux-word {
+    opacity: 1;
+  }
+}

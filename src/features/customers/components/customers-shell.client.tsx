@@ -3,10 +3,15 @@
 import { useState } from "react";
 
 import { EmptyState } from "@/components/shared/empty-state";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  DashboardPage,
+  DashboardPageHeader,
+  DashboardPanel,
+  DashboardPrimaryButton,
+} from "@/features/dashboard";
 import type { CustomerListItem } from "@/server/modules/customers/customers.types";
 import type { NavRole } from "@/components/layout/nav";
 
@@ -49,44 +54,50 @@ export function CustomersShell({
 
   if (isError) {
     return (
-      <EmptyState
-        title="Customers unavailable"
-        actionLabel="Try again"
-        onAction={onRefetch}
-      />
+      <DashboardPage width="md">
+        <EmptyState title="Customers unavailable" actionLabel="Try again" onAction={onRefetch} />
+      </DashboardPage>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-[360px] flex-1 px-[var(--space-4)] py-[var(--space-8)] lg:max-w-2xl lg:px-[var(--space-8)]">
-      <div className="mb-[var(--space-4)] flex items-center justify-between">
-        <h1 className="font-display text-2xl">Customers</h1>
-        {role === "owner" ? (
-          <Button type="button" size="sm" onClick={() => setAddOpen(true)}>
-            Add customer
-          </Button>
-        ) : null}
-      </div>
-      <CustomersList customers={customers} onSearch={onSearch} serverSearch={serverSearch} />
+    <DashboardPage width="lg">
+      <DashboardPageHeader
+        kicker="Client ledger"
+        title="Customers"
+        subtitle="Regulars, walk-ins, and contact details — tap a card for the full profile."
+        action={
+          role === "owner" ? (
+            <DashboardPrimaryButton type="button" size="sm" onClick={() => setAddOpen(true)}>
+              Add customer
+            </DashboardPrimaryButton>
+          ) : null
+        }
+      />
+
+      <DashboardPanel title="Directory" description={`${customers.length} on file`} padding="md">
+        <CustomersList customers={customers} onSearch={onSearch} serverSearch={serverSearch} />
+      </DashboardPanel>
+
       <Sheet open={addOpen} onOpenChange={setAddOpen}>
-        <SheetContent side="bottom">
+        <SheetContent side="bottom" className="salon-dash-panel border-t-0">
           <SheetHeader>
             <SheetTitle>Add customer</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-[var(--space-3)]">
             <div>
               <Label htmlFor="customer-name">Name</Label>
-              <Input id="customer-name" value={name} onChange={(e) => setName(e.target.value)} />
+              <Input id="customer-name" className="salon-dash-search mt-[var(--space-2)]" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="customer-phone">Phone</Label>
-              <Input id="customer-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Input id="customer-phone" className="salon-dash-search mt-[var(--space-2)]" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div>
               <Label htmlFor="customer-email">Email (optional)</Label>
-              <Input id="customer-email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input id="customer-email" className="salon-dash-search mt-[var(--space-2)]" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <Button
+            <DashboardPrimaryButton
               type="button"
               onClick={async () => {
                 const result = await onCreateCustomer({
@@ -103,10 +114,10 @@ export function CustomersShell({
               }}
             >
               Save
-            </Button>
+            </DashboardPrimaryButton>
           </div>
         </SheetContent>
       </Sheet>
-    </div>
+    </DashboardPage>
   );
 }

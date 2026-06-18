@@ -1,0 +1,22 @@
+type NicolesTerminbuchungPageTitleProps = {
+  title?: string;
+};
+
+export function NicolesTerminbuchungPageTitle({ title = "Terminbuchung" }: NicolesTerminbuchungPageTitleProps) {
+  return (
+    <section
+      className="ms-nicoles-termin-page-title ms-nicoles-section ms-cinema-section bg-[color:var(--ms-nicoles-cream)] px-[var(--space-4)] py-[var(--space-12)] text-center"
+      aria-labelledby="nicoles-termin-page-heading"
+    >
+      <span className="ms-nicoles-sparkle mb-[var(--space-3)] inline-block" aria-hidden>
+        ✦
+      </span>
+      <h1
+        id="nicoles-termin-page-heading"
+        className="ms-nicoles-display font-display text-[clamp(2rem,5vw,3rem)] text-[color:var(--ms-nicoles-ink)]"
+      >
+        {title}
+      </h1>
+    </section>
+  );
+}

@@ -28,7 +28,7 @@ export function AppShell({
   const minisiteUrl = shopSlug ? buildShopMinisiteUrl(shopSlug) : "#";
 
   return (
-    <div className="flex min-h-full flex-1 bg-[var(--ink-0)]">
+    <div className="salon-dash-root flex min-h-full flex-1">
       <RailNavChrome
         shopName={shopName}
         displayName={displayName}
@@ -37,13 +37,15 @@ export function AppShell({
         signOutAction={signOutAction}
       />
 
-      <div className="flex min-h-full flex-1 flex-col lg:min-w-0">
-        <main
-          id="main-content"
-          className="flex flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"
-        >
-          {children}
-        </main>
+      <div className="salon-dash-stage flex min-h-full flex-1 flex-col lg:min-w-0">
+        <div className="salon-dash-canvas salon-dash-scroll flex min-h-full flex-1 flex-col">
+          <main
+            id="main-content"
+            className="salon-dash-main flex flex-1 flex-col pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-0"
+          >
+            {children}
+          </main>
+        </div>
       </div>
 
       <BottomTabsChrome

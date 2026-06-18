@@ -13,11 +13,19 @@ type SubmitButtonProps = {
 };
 
 export function SubmitButton({ children, pending, className }: SubmitButtonProps) {
+  const isSalonAuth = className?.includes("salon-auth-submit");
+
   return (
     <MotionDiv {...pressScale} className="w-full">
       <Button
         type="submit"
-        className={cn("w-full bg-primary text-primary-foreground", className)}
+        className={cn(
+          "w-full",
+          isSalonAuth
+            ? "salon-auth-submit h-11 border-0 shadow-none"
+            : "bg-primary text-primary-foreground",
+          className,
+        )}
         disabled={pending}
       >
         {pending ? "One moment…" : children}

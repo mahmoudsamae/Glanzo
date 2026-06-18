@@ -61,10 +61,10 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[var(--space-4)]">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
         <Label htmlFor="displayName">Display name</Label>
-        <Input id="displayName" autoComplete="name" {...form.register("displayName")} />
+        <Input id="displayName" autoComplete="name" className="salon-auth-input" {...form.register("displayName")} />
         {form.formState.errors.displayName ? (
           <p className="text-sm text-destructive">{form.formState.errors.displayName.message}</p>
         ) : null}
@@ -72,7 +72,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
 
       <div className="space-y-[var(--space-2)]">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+        <Input id="email" type="email" autoComplete="email" className="salon-auth-input" {...form.register("email")} />
         {form.formState.errors.email ? (
           <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
         ) : null}
@@ -84,6 +84,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
           id="password"
           type="password"
           autoComplete="new-password"
+          className="salon-auth-input"
           {...form.register("password")}
         />
         {form.formState.errors.password ? (
@@ -93,7 +94,9 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
 
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
-      <SubmitButton pending={isPending}>Create account</SubmitButton>
+      <SubmitButton pending={isPending} className="salon-auth-submit">
+        Create account
+      </SubmitButton>
     </form>
   );
 }

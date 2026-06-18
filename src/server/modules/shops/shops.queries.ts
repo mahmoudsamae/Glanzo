@@ -41,7 +41,7 @@ export async function getShopBySlug(
   const { data, error } = await supabase
     .from("shops")
     .select(
-      "id, slug, name, status, timezone, currency, opening_hours, booking_lead_time_min, cancellation_window_min, slot_granularity_min, reminders_enabled, created_at, updated_at",
+      "id, slug, name, status, timezone, currency, opening_hours, booking_lead_time_min, cancellation_window_min, slot_granularity_min, reminders_enabled, allowed_minisite_templates, created_at, updated_at",
     )
     .eq("slug", slug)
     .maybeSingle();

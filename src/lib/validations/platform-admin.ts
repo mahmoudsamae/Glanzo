@@ -1,9 +1,23 @@
 import { z } from "zod";
 
+import { minisiteTemplateSchema } from "@/lib/validations/public-shop";
+
 export const platformStatusReasonSchema = z
   .string()
   .trim()
   .min(10, "Mindestens 10 Zeichen Begründung.");
+
+export const platformOwnerEmailChangeSchema = z.object({
+  email: z.string().trim().email("Gültige E-Mail eingeben"),
+  reason: platformStatusReasonSchema,
+});
+
+export const platformOwnerPasswordSetSchema = z
+  .object({
+    password: z.string().min(8, "Mindestens 8 Zeichen"),
+    reason: platformStatusReasonSchema,
+  })
+  .strict();
 
 export const platformShopStatusSchema = z.enum(["active", "suspended"]);
 
@@ -74,11 +88,13 @@ export const platformShopDetailSchema = z
     reminders_enabled: z.boolean(),
     owner_display_name: z.string().nullable().optional(),
     owner_email: z.string().nullable().optional(),
+    owner_user_id: z.string().uuid().nullable().optional(),
     staff_count: z.number().int(),
     bookings_last_30d: z.number().int(),
     dead_outbox_count: z.number().int(),
     minisite_template: z.string(),
     minisite_accent_hex: z.string(),
+    allowed_minisite_templates: z.array(minisiteTemplateSchema).default([]),
     outbox_by_template: z.record(z.record(z.number())).optional(),
     audit_trail: z.array(z.record(z.unknown())).default([]),
   })

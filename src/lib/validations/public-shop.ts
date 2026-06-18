@@ -5,23 +5,187 @@ import { minisiteLinksSchema } from "@/lib/validations/minisite-links";
 
 const hexColorSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 
-export const minisiteTemplateSchema = z.enum(["classic", "midnight", "bold"]);
+export const boutiqueSectionKeySchema = z.enum([
+  "hero",
+  "services",
+  "about",
+  "promo",
+  "prices",
+  "gallery",
+  "team",
+  "guidelines",
+  "visit",
+]);
+
+/** Boutique keys + Nicoles homepage-only blocks (ignored by boutique shell). */
+export const minisiteSectionKeySchema = z.enum([
+  "hero",
+  "services",
+  "about",
+  "promo",
+  "prices",
+  "gallery",
+  "team",
+  "guidelines",
+  "visit",
+  "salon_banner",
+  "aktionstage",
+  "news",
+  "pre_footer",
+]);
+
+export const minisiteSectionBlockSchema = z
+  .object({
+    eyebrow: z.string().trim().max(80).optional(),
+    title: z.string().trim().max(200).optional(),
+    subtitle: z.string().trim().max(4000).optional(),
+    text: z.string().trim().max(4000).optional(),
+    layout: z.enum(["filmstrip", "grid"]).optional(),
+    cta_label: z.string().trim().max(80).optional(),
+    image_path: z.string().trim().min(1).optional(),
+    image_paths: z.array(z.string().trim().min(1)).max(8).optional(),
+    badge_tiny: z.string().trim().max(80).optional(),
+    badge_medium: z.string().trim().max(80).optional(),
+    badge_large: z.string().trim().max(80).optional(),
+  })
+  .strict();
+
+export const nicolesNewsItemSchema = z
+  .object({
+    id: z.string().trim().min(1).max(64),
+    title: z.string().trim().min(1).max(160),
+    image_path: z.string().trim().min(1).optional(),
+  })
+  .strict();
+
+export const nicolesServiceCardSchema = z
+  .object({
+    id: z.string().trim().min(1).max(64),
+    title: z.string().trim().min(1).max(120),
+    image_path: z.string().trim().min(1).optional(),
+  })
+  .strict();
+
+export const nicolesPriceRowSchema = z
+  .object({
+    id: z.string().trim().min(1).max(64).optional(),
+    label: z.string().trim().min(1).max(160),
+    price: z.string().trim().min(1).max(40),
+  })
+  .strict();
+
+export const nicolesPriceSectionSchema = z
+  .object({
+    id: z.string().trim().min(1).max(64),
+    title: z.string().trim().min(1).max(80),
+    rows: z.array(nicolesPriceRowSchema).max(24).optional(),
+  })
+  .strict();
+
+export const minisiteSectionsConfigSchema = z
+  .object({
+    hero: minisiteSectionBlockSchema.optional(),
+    services: minisiteSectionBlockSchema.optional(),
+    about: minisiteSectionBlockSchema.optional(),
+    promo: minisiteSectionBlockSchema.optional(),
+    prices: minisiteSectionBlockSchema.optional(),
+    gallery: minisiteSectionBlockSchema.optional(),
+    team: minisiteSectionBlockSchema.optional(),
+    guidelines: minisiteSectionBlockSchema.optional(),
+    visit: minisiteSectionBlockSchema.optional(),
+    nav: minisiteSectionBlockSchema.optional(),
+    salon_banner: minisiteSectionBlockSchema.optional(),
+    aktionstage: minisiteSectionBlockSchema.optional(),
+    news: minisiteSectionBlockSchema.optional(),
+    pre_footer: minisiteSectionBlockSchema.optional(),
+    booking: minisiteSectionBlockSchema.optional(),
+    contact: minisiteSectionBlockSchema.optional(),
+  })
+  .strict();
+
+export const navLinkSchema = z
+  .object({
+    id: z.string().trim().min(1).max(40),
+    label: z.string().trim().min(1).max(40),
+    href: z.string().trim().max(80).optional(),
+    visible: z.boolean().optional(),
+  })
+  .strict();
+
+export const aboutBlockTypeSchema = z.enum([
+  "page_hero",
+  "intro",
+  "team_heading",
+  "team_profile",
+  "salon_intro",
+  "image_stack",
+  "language_band",
+  "collage",
+  "cta",
+  "split_footer",
+]);
+
+export const aboutBlockSchema = z
+  .object({
+    id: z.string().trim().min(1).max(64),
+    type: aboutBlockTypeSchema,
+    eyebrow: z.string().trim().max(120).optional(),
+    title: z.string().trim().max(200).optional(),
+    subtitle: z.string().trim().max(200).optional(),
+    text: z.string().trim().max(4000).optional(),
+    image_path: z.string().trim().min(1).optional(),
+    image_paths: z.array(z.string().trim().min(1)).max(8).optional(),
+    layout: z.enum(["normal", "reversed"]).optional(),
+  })
+  .strict();
+
+export const minisiteTemplateSchema = z.enum([
+  "classic",
+  "midnight",
+  "bold",
+  "signature",
+  "flux",
+  "boutique",
+  "nicoles",
+]);
 
 export const minisiteContentSchema = z
   .object({
     hero_headline: z.string().trim().max(120).optional(),
     about: z.string().trim().max(2000).optional(),
     address: z.string().trim().max(300).optional(),
+    phone: z.string().trim().max(40).optional(),
+    email: z.string().trim().max(120).optional(),
+    /** Visitor-facing instructions: house rules, parking, late policy, etc. */
+    visitor_guidelines: z.string().trim().max(2000).optional(),
+    /** Short notice near the booking CTA on the public mini-site. */
+    booking_notice: z.string().trim().max(500).optional(),
     instagram: z.string().trim().max(80).optional(),
     links: minisiteLinksSchema,
     gallery: z.array(z.string().trim().min(1)).max(8).optional(),
     team_order: z.array(z.string().uuid()).optional(),
+    section_order: z.array(minisiteSectionKeySchema).optional(),
+    sections: minisiteSectionsConfigSchema.optional(),
+    nicoles_news: z.array(nicolesNewsItemSchema).max(6).optional(),
+    nicoles_service_cards: z.array(nicolesServiceCardSchema).max(8).optional(),
+    nicoles_price_sections: z.array(nicolesPriceSectionSchema).max(12).optional(),
+    nav_links: z.array(navLinkSchema).max(8).optional(),
+    about_blocks: z.array(aboutBlockSchema).max(24).optional(),
     show: z
       .object({
         about: z.boolean().optional(),
+        cover: z.boolean().optional(),
         gallery: z.boolean().optional(),
         team: z.boolean().optional(),
         location: z.boolean().optional(),
+        prices: z.boolean().optional(),
+        hours: z.boolean().optional(),
+        social: z.boolean().optional(),
+        guidelines: z.boolean().optional(),
+        salon_banner: z.boolean().optional(),
+        aktionstage: z.boolean().optional(),
+        news: z.boolean().optional(),
+        pre_footer: z.boolean().optional(),
       })
       .optional(),
     logo_path: z.string().trim().min(1).optional(),

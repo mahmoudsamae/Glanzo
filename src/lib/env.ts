@@ -1,8 +1,22 @@
 import { z } from "zod";
 
+/** Empty or whitespace env values → undefined (optional secrets in dev). */
+function optionalNonEmptyString(minLength = 1) {
+  return z.preprocess(
+    (val) => {
+      if (typeof val !== "string") {
+        return undefined;
+      }
+      const trimmed = val.trim();
+      return trimmed.length >= minLength ? trimmed : undefined;
+    },
+    z.string().min(minLength).optional(),
+  );
+}
+
 const serverEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+  SUPABASE_SERVICE_ROLE_KEY: optionalNonEmptyString(),
   /** Short/empty values are ignored at build time; runtime cron route requires ≥16 chars (see cron-auth.ts). */
   CRON_SECRET: z.preprocess(
     (val) => {
@@ -14,7 +28,8 @@ const serverEnvSchema = z.object({
     },
     z.string().min(16).optional(),
   ),
-  RESEND_API_KEY: z.string().min(1).optional(),
+  /** Omit or leave blank locally — emails go to `.dev-emails/` via log adapter. */
+  RESEND_API_KEY: optionalNonEmptyString(),
   EMAIL_FROM: z.string().min(3).default("Glanzo <termine@glanzo.app>"),
 });
 

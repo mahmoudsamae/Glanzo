@@ -23,7 +23,8 @@ export function HeroSection({ data, bookHref, preview = false }: HeroProps) {
   const { shop, minisite } = data;
   const content = minisite.content;
   const isSuspended = shop.status === "suspended";
-  const coverUrl = content.cover_path ? shopMediaPublicUrl(content.cover_path) : null;
+  const coverUrl =
+    content.show?.cover !== false && content.cover_path ? shopMediaPublicUrl(content.cover_path) : null;
   const logoUrl = content.logo_path ? shopMediaPublicUrl(content.logo_path) : null;
   const headline = content.hero_headline?.trim() || shop.name;
   const hoursToday = formatHoursTodayLine(shop.opening_hours, shop.timezone);
@@ -61,8 +62,8 @@ export function HeroSection({ data, bookHref, preview = false }: HeroProps) {
           </div>
         ) : null}
 
-        <div className="flex max-w-lg flex-col gap-[var(--space-2)]">
-          <h1 className="font-display text-2xl leading-tight text-[color:var(--ms-text)] sm:text-3xl">
+        <div className="flex w-full max-w-lg flex-col gap-[var(--space-2)]">
+          <h1 className="font-display text-2xl leading-tight break-words text-balance text-[color:var(--ms-text)] sm:text-3xl">
             {words.map((word, index) => (
               <span
                 key={`${word}-${index}`}
@@ -79,6 +80,9 @@ export function HeroSection({ data, bookHref, preview = false }: HeroProps) {
           ) : null}
           <p className="text-sm text-[color:var(--ms-text-muted)]">{hoursToday}</p>
           <SocialLinksRow links={links} variant="compact" />
+          {content.booking_notice?.trim() ? (
+            <p className="max-w-md text-sm text-[color:var(--ms-text-muted)]">{content.booking_notice.trim()}</p>
+          ) : null}
           {isSuspended ? (
             <p className="text-md text-[color:var(--ms-text-muted)]">
               Derzeit keine Online-Buchungen.

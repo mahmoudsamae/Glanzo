@@ -1,4 +1,5 @@
 import { SettingsNav } from "@/features/settings";
+import { DashboardPage, DashboardPageHeader } from "@/features/dashboard";
 import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
 
 export default async function SettingsLayout({
@@ -7,12 +8,14 @@ export default async function SettingsLayout({
   await requireOwnerDashboardAccess();
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-[var(--space-4)] py-[var(--space-8)]">
-      <header className="mb-[var(--space-6)]">
-        <h1 className="font-display text-2xl text-[var(--text-0)]">Einstellungen</h1>
-      </header>
+    <DashboardPage width="lg">
+      <DashboardPageHeader
+        kicker="Shop setup"
+        title="Einstellungen"
+        subtitle="Öffnungszeiten, Website-Bereiche, Buchungsregeln und Benachrichtigungen."
+      />
       <SettingsNav />
       {children}
-    </div>
+    </DashboardPage>
   );
 }

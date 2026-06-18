@@ -53,13 +53,14 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[var(--space-4)]">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
         <Label htmlFor="password">New password</Label>
         <Input
           id="password"
           type="password"
           autoComplete="new-password"
+          className="salon-auth-input"
           {...form.register("password")}
         />
         {form.formState.errors.password ? (
@@ -69,7 +70,9 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
 
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
-      <SubmitButton pending={isPending}>Update password</SubmitButton>
+      <SubmitButton pending={isPending} className="salon-auth-submit">
+        Update password
+      </SubmitButton>
     </form>
   );
 }

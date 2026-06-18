@@ -8,7 +8,13 @@ import {
   loadPlatformShopList,
   loadPlatformShopToday,
   setPlatformShopStatus,
+  setPlatformShopMinisiteTemplates,
+  setPlatformShopTemplate,
 } from "@/server/modules/platform/platform.service";
+import {
+  setPlatformOwnerEmail,
+  setPlatformOwnerPassword,
+} from "@/server/modules/platform/platform-owner-credentials.service";
 import { requirePlatformAdmin } from "@/server/modules/shops/create-shop.service";
 import { checkShopSlugAvailability } from "@/server/modules/shops/create-shop.service";
 
@@ -67,4 +73,28 @@ export async function createPlatformOwnerInviteAction(shopId: string, ownerEmail
 export async function checkPlatformShopSlugAction(slug: string) {
   await adminGate();
   return checkShopSlugAvailability(slug);
+}
+
+export async function setPlatformOwnerEmailAction(shopId: string, email: string, reason: string) {
+  await adminGate();
+  return setPlatformOwnerEmail(shopId, email, reason);
+}
+
+export async function setPlatformOwnerPasswordAction(shopId: string, password: string, reason: string) {
+  await adminGate();
+  return setPlatformOwnerPassword(shopId, password, reason);
+}
+
+export async function setPlatformShopTemplateAction(shopId: string, template: string) {
+  await adminGate();
+  return setPlatformShopTemplate(shopId, template);
+}
+
+export async function setPlatformShopMinisiteTemplatesAction(
+  shopId: string,
+  allowedTemplates: string[],
+  activeTemplate: string,
+) {
+  await adminGate();
+  return setPlatformShopMinisiteTemplates(shopId, allowedTemplates, activeTemplate);
 }

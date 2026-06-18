@@ -11,6 +11,7 @@ import {
   platformShopTodaySchema,
   platformStatusReasonSchema,
 } from "@/lib/validations/platform-admin";
+import { minisiteTemplateSchema, type MinisiteTemplate } from "@/lib/validations/public-shop";
 
 export type PlatformResult<T> =
   | { ok: true; data: T }
@@ -129,6 +130,92 @@ export async function createPlatformShop(
       slug: payload.slug,
       invitePath: payload.invite_path,
       inviteToken: payload.invite_token,
+    },
+  };
+}
+
+export async function setPlatformShopTemplate(
+  shopId: string,
+  template: string,
+): Promise<PlatformResult<{ template: string }>> {
+  const parsed = minisiteTemplateSchema.safeParse(template);
+  if (!parsed.success) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data: shop, error: shopError } = await supabase
+    .from("shops")
+    .select("allowed_minisite_templates")
+    .eq("id", shopId)
+    .maybeSingle();
+
+  if (shopError || !shop) {
+    return { ok: false, code: "NOT_FOUND" };
+  }
+
+  const allowed = (shop.allowed_minisite_templates ?? []) as MinisiteTemplate[];
+  if (!allowed.includes(parsed.data)) {
+    return { ok: false, code: "NOT_ALLOWED" };
+  }
+
+  const { error } = await supabase.rpc("platform_set_shop_minisite_templates", {
+    p_shop_id: shopId,
+    p_allowed: allowed,
+    p_active: parsed.data,
+  });
+
+  if (error) {
+    return { ok: false, code: "UNKNOWN" };
+  }
+
+  revalidateShopPublic(shopId);
+  return { ok: true, data: { template: parsed.data } };
+}
+
+export async function setPlatformShopMinisiteTemplates(
+  shopId: string,
+  allowedTemplates: string[],
+  activeTemplate: string,
+): Promise<PlatformResult<{ template: string; allowedTemplates: string[] }>> {
+  const parsedAllowed = allowedTemplates
+    .map((value) => minisiteTemplateSchema.safeParse(value))
+    .filter((result) => result.success)
+    .map((result) => result.data);
+
+  if (parsedAllowed.length === 0) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
+  const parsedActive = minisiteTemplateSchema.safeParse(activeTemplate);
+  if (!parsedActive.success || !parsedAllowed.includes(parsedActive.data)) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("platform_set_shop_minisite_templates", {
+    p_shop_id: shopId,
+    p_allowed: parsedAllowed,
+    p_active: parsedActive.data,
+  });
+
+  if (error) {
+    if (/ALLOWED_REQUIRED|ACTIVE_NOT_ALLOWED|NOT_FOUND/i.test(error.message)) {
+      return { ok: false, code: "VALIDATION" };
+    }
+    return { ok: false, code: "UNKNOWN" };
+  }
+
+  revalidateShopPublic(shopId);
+  const payload = data as unknown as {
+    minisite_template: string;
+    allowed_minisite_templates: string[];
+  };
+  return {
+    ok: true,
+    data: {
+      template: payload.minisite_template,
+      allowedTemplates: payload.allowed_minisite_templates,
     },
   };
 }

@@ -65,10 +65,16 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[var(--space-4)]">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+        <Input
+          id="email"
+          type="email"
+          autoComplete="email"
+          className="salon-auth-input"
+          {...form.register("email")}
+        />
         {form.formState.errors.email ? (
           <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
         ) : null}
@@ -83,6 +89,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
           id="password"
           type="password"
           autoComplete="current-password"
+          className="salon-auth-input"
           {...form.register("password")}
         />
         {form.formState.errors.password ? (
@@ -92,13 +99,15 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
 
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
-      <SubmitButton pending={isPending}>Sign in</SubmitButton>
+      <SubmitButton pending={isPending} className="salon-auth-submit">
+        Sign in
+      </SubmitButton>
 
       {googleEnabled && googleSignInAction ? (
         <Button
           type="button"
           variant="outline"
-          className="w-full"
+          className="salon-auth-secondary w-full"
           disabled={isPending}
           onClick={() => startTransition(async () => googleSignInAction())}
         >

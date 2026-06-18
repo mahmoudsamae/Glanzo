@@ -1,11 +1,12 @@
 "use client";
 
-import { li as MotionLi } from "framer-motion/m";
+import { useReducedMotion } from "framer-motion";
+import { li as MotionLi, ul as MotionUl } from "framer-motion/m";
 import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { centsToEurDisplay } from "@/lib/money/price";
-import { duration, easing } from "@/lib/motion";
+import { duration, easing, fadeSlideIn, staggerContainer } from "@/lib/motion";
 import type { BarberOption, ServiceCatalogItem } from "@/lib/services/catalog";
 
 const layoutTransition = {
@@ -34,52 +35,61 @@ export function ServicesLedgerList({
   onEdit,
   onArchive,
 }: ServicesLedgerListProps) {
+  const reducedMotion = useReducedMotion() ?? false;
+
   return (
-    <ul className="mt-[var(--space-2)] divide-y divide-border border-y border-border">
+    <MotionUl
+      className="flex flex-col gap-[var(--space-3)]"
+      variants={staggerContainer(reducedMotion)}
+      initial="hidden"
+      animate="visible"
+    >
       {services.map((service, index) => (
         <MotionLi
           key={service.id}
           layout
+          variants={fadeSlideIn(reducedMotion)}
           transition={layoutTransition}
-          className="group flex h-9 items-center gap-[var(--space-2)] bg-[var(--ink-0)] px-[var(--space-2)] text-sm"
-          style={{ height: "36px" }}
+          className="salon-dash-service-row group list-none"
         >
-          <div className="flex shrink-0 flex-col">
+          <div className="flex shrink-0 flex-col gap-0.5">
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="size-4 rounded-sm"
+              className="size-6 rounded-md"
               disabled={index === 0}
               aria-label={`Move ${service.name} up`}
               onClick={() => onMove(index, -1)}
             >
-              <ChevronUp className="size-3" strokeWidth={1.5} />
+              <ChevronUp className="size-3.5" strokeWidth={1.5} />
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="size-4 rounded-sm"
+              className="size-6 rounded-md"
               disabled={index === services.length - 1}
               aria-label={`Move ${service.name} down`}
               onClick={() => onMove(index, 1)}
             >
-              <ChevronDown className="size-3" strokeWidth={1.5} />
+              <ChevronDown className="size-3.5" strokeWidth={1.5} />
             </Button>
           </div>
-          <span className="min-w-0 flex-1 truncate text-[var(--text-0)]">{service.name}</span>
-          <span className="text-data text-[var(--text-2)]">{service.durationMin}m</span>
-          <span className="text-data min-w-[4.5rem] text-right text-[var(--text-0)]">
-            {centsToEurDisplay(service.priceCents)}
-          </span>
-          <span className="hidden w-10 text-center text-xs text-[var(--text-2)] sm:inline">
-            {initialsFor(service, barbers)}
-          </span>
-          <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
+
+          <div className="min-w-0">
+            <p className="truncate font-medium text-[var(--text-0)]">{service.name}</p>
+            <p className="mt-[var(--space-1)] text-sm text-[var(--text-2)]">
+              {service.durationMin} min · {initialsFor(service, barbers)}
+            </p>
+          </div>
+
+          <span className="salon-dash-service-price text-data">{centsToEurDisplay(service.priceCents)}</span>
+
+          <div className="flex items-center gap-[var(--space-1)] opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
             <button
               type="button"
-              className="rounded p-1 text-[var(--text-2)] hover:text-[var(--text-0)]"
+              className="inline-flex size-8 items-center justify-center rounded-md border border-border/70 text-[var(--text-2)] hover:border-[color-mix(in_oklch,var(--brass)_30%,var(--ink-3))] hover:text-[var(--text-0)]"
               aria-label={`Edit ${service.name}`}
               onClick={() => onEdit(service)}
             >
@@ -87,7 +97,7 @@ export function ServicesLedgerList({
             </button>
             <button
               type="button"
-              className="rounded px-1 text-xs text-[var(--text-2)] hover:text-destructive"
+              className="rounded-md px-[var(--space-2)] py-[var(--space-1)] text-xs text-[var(--text-2)] hover:text-[var(--signal-bad)]"
               onClick={() => onArchive(service)}
             >
               Archive
@@ -95,6 +105,6 @@ export function ServicesLedgerList({
           </div>
         </MotionLi>
       ))}
-    </ul>
+    </MotionUl>
   );
 }

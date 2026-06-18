@@ -2,13 +2,14 @@ import { cn } from "@/lib/utils";
 
 type StatusDotProps = {
   label: string;
-  tone?: "owner" | "barber" | "neutral";
+  tone?: "owner" | "barber" | "neutral" | "success";
 };
 
 const toneClass: Record<NonNullable<StatusDotProps["tone"]>, string> = {
   owner: "bg-[var(--brass)]",
   barber: "bg-[var(--text-2)]",
   neutral: "bg-[var(--text-2)]",
+  success: "bg-[var(--signal-ok)]",
 };
 
 export function StatusDot({ label, tone = "neutral" }: StatusDotProps) {

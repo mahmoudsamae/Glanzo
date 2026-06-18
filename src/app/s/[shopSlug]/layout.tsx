@@ -9,6 +9,10 @@ import { loadPublicShopBySlug } from "@/server/modules/shops/shops.loader";
 import "@/styles/themes/classic.css";
 import "@/styles/themes/midnight.css";
 import "@/styles/themes/bold.css";
+import "@/styles/themes/signature.css";
+import "@/styles/themes/boutique.css";
+import "@/styles/themes/nicoles.css";
+import "@/styles/themes/flux.css";
 
 export const revalidate = 300;
 

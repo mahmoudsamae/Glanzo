@@ -5,6 +5,7 @@ export type MinisiteEditorData = {
   shopId: string;
   shopSlug: string;
   template: MinisiteTemplate;
+  allowedTemplates: MinisiteTemplate[];
   accentHex: string;
   content: MinisiteContent;
   publicData: ShopPublicData;

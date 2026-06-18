@@ -156,7 +156,7 @@ export async function requirePlatformAdmin(): Promise<void> {
   const state = await getActorState();
 
   if (state.kind === "unauthenticated") {
-    redirect("/login");
+    redirect("/admin");
   }
 
   if (!state.actor.isPlatformAdmin) {

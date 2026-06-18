@@ -7,6 +7,15 @@ import { StatusDot } from "@/components/shared/status-dot";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  DashboardBadge,
+  DashboardPage,
+  DashboardPageHeader,
+  DashboardPanel,
+  DashboardPrimaryButton,
+  DashboardRowCard,
+  DashboardRowList,
+} from "@/features/dashboard";
 import { clientEnv } from "@/lib/env";
 import { STAFF_WEEKDAY_LABELS, staffWeekdayIndexToKey } from "@/lib/staff/weekday";
 
@@ -103,27 +112,29 @@ function OwnerStaff({
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-[var(--space-8)] px-[var(--space-4)] py-[var(--space-8)]">
-      <header>
-        <h1 className="font-display text-2xl text-[var(--text-0)]">Staff</h1>
-      </header>
+    <DashboardPage width="lg">
+      <DashboardPageHeader
+        kicker="Your team"
+        title="Staff"
+        subtitle="Invite barbers, copy join links, and see who has access."
+      />
 
-      <section className="space-y-[var(--space-4)] rounded-md border border-border p-[var(--space-4)]">
-        <h2 className="text-sm font-medium">Invite a barber</h2>
-        <div className="flex flex-col gap-[var(--space-2)] sm:flex-row">
+      <DashboardPanel title="Invite a barber" description="Send a join link — they create their own login.">
+        <div className="flex flex-col gap-[var(--space-3)] sm:flex-row">
           <Input
             type="email"
             placeholder="email@example.com"
+            className="salon-dash-search"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button type="button" disabled={isPending || !email} onClick={createInvite}>
+          <DashboardPrimaryButton type="button" disabled={isPending || !email} onClick={createInvite}>
             Create link
-          </Button>
+          </DashboardPrimaryButton>
         </div>
         {lastLink ? (
-          <div className="flex flex-col gap-[var(--space-2)] sm:flex-row sm:items-center">
-            <code className="flex-1 truncate rounded bg-[var(--ink-2)] px-[var(--space-2)] py-[var(--space-1)] text-xs">
+          <div className="mt-[var(--space-4)] flex flex-col gap-[var(--space-2)] sm:flex-row sm:items-center">
+            <code className="flex-1 truncate rounded-md border border-border/70 bg-[var(--ink-0)]/50 px-[var(--space-3)] py-[var(--space-2)] text-xs">
               {lastLink}
             </code>
             <Button type="button" variant="outline" size="sm" onClick={() => copyLink(lastLink)}>
@@ -131,61 +142,60 @@ function OwnerStaff({
             </Button>
           </div>
         ) : null}
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      </section>
+        {error ? <p className="mt-[var(--space-3)] text-sm text-destructive">{error}</p> : null}
+      </DashboardPanel>
 
       {invites.length > 0 ? (
-        <section className="space-y-[var(--space-3)]">
-          <h2 className="text-sm font-medium text-[var(--text-2)]">Pending invites</h2>
-          <ul className="divide-y divide-border border-y border-border">
+        <DashboardPanel title="Pending invites" description="Links waiting to be accepted." className="mt-[var(--space-4)]">
+          <DashboardRowList>
             {invites.map((invite) => (
-              <li
+              <DashboardRowCard
                 key={invite.id}
-                className="flex flex-wrap items-center justify-between gap-[var(--space-2)] py-[var(--space-3)] text-sm"
-              >
-                <span>{invite.email}</span>
-                <div className="flex gap-[var(--space-2)]">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyLink(buildJoinUrl(invite.token))}
-                  >
-                    Copy link
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" onClick={() => revoke(invite.id)}>
-                    Revoke
-                  </Button>
-                </div>
-              </li>
+                avatar="@"
+                title={invite.email}
+                subtitle="Awaiting acceptance"
+                trailing={
+                  <div className="flex gap-[var(--space-2)]">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyLink(buildJoinUrl(invite.token))}
+                    >
+                      Copy link
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => revoke(invite.id)}>
+                      Revoke
+                    </Button>
+                  </div>
+                }
+              />
             ))}
-          </ul>
-        </section>
+          </DashboardRowList>
+        </DashboardPanel>
       ) : null}
 
-      <section className="space-y-[var(--space-3)]">
-        <h2 className="text-sm font-medium text-[var(--text-2)]">Team</h2>
-        <ul className="divide-y divide-border border-y border-border">
+      <DashboardPanel title="Team" description={`${members.length} members`} className="mt-[var(--space-4)]">
+        <DashboardRowList>
           {members.map((member) => {
             const name = member.profile?.display_name?.trim() || "Staff";
             return (
-              <li
+              <DashboardRowCard
                 key={member.id}
-                className="flex h-9 items-center justify-between gap-[var(--space-3)] text-sm"
-              >
-                <span className="flex items-center gap-[var(--space-3)]">
-                  <span className="flex size-7 items-center justify-center rounded-full bg-[var(--ink-2)] text-xs">
-                    {name.slice(0, 1).toUpperCase()}
-                  </span>
-                  {name}
-                </span>
-                <StatusDot label={member.role} tone={member.role === "owner" ? "owner" : "barber"} />
-              </li>
+                avatar={name.slice(0, 1).toUpperCase()}
+                title={name}
+                badges={
+                  <DashboardBadge tone={member.role === "owner" ? "brass" : "neutral"}>
+                    {member.role}
+                  </DashboardBadge>
+                }
+                trailing={<StatusDot label={member.role} tone={member.role === "owner" ? "owner" : "barber"} />}
+              />
             );
           })}
-        </ul>
-      </section>
-    </div>
+        </DashboardRowList>
+      </DashboardPanel>
+    </DashboardPage>
   );
 }
 

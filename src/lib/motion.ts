@@ -52,6 +52,16 @@ export function withReducedMotion<T extends Record<string, unknown>>(
   return reducedMotion ? ({ ...full, ...reduced } as T) : full;
 }
 
+export function fadeIn(reducedMotion: ReducedMotion = false): Variants {
+  return {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: transition(reducedMotion, duration.fast, easing.enter),
+    },
+  };
+}
+
 export function fadeSlideIn(reducedMotion: ReducedMotion = false): Variants {
   return {
     hidden: withReducedMotion({ opacity: 0, y: 6 }, { opacity: 0, y: 0 }, reducedMotion),

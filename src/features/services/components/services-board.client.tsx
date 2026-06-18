@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { ConfirmSheet } from "@/components/shared/confirm-sheet";
-import { CutLine } from "@/components/shared/cut-line";
+import { DashboardPage, DashboardPageHeader, DashboardPanel, DashboardPrimaryButton } from "@/features/dashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -154,14 +154,17 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
 
   if (services.length === 0) {
     return (
-      <div className="mx-auto flex max-w-xl flex-col items-start gap-[var(--space-6)] py-[var(--space-12)]">
-        <h1 className="font-display text-3xl text-[var(--text-0)]">What do you charge?</h1>
-        <p className="text-base text-[var(--text-2)]">
-          Add your cuts and prices — clients see these on your mini-site later.
-        </p>
-        <Button type="button" onClick={openCreate}>
-          Add your first service
-        </Button>
+      <DashboardPage width="md">
+        <DashboardPageHeader
+          kicker="Price board"
+          title="What do you charge?"
+          subtitle="Add your cuts and prices — clients see these on your mini-site later."
+          action={
+            <DashboardPrimaryButton type="button" onClick={openCreate}>
+              Add your first service
+            </DashboardPrimaryButton>
+          }
+        />
         <ServiceFormSheet
           open={formOpen}
           onOpenChange={setFormOpen}
@@ -173,37 +176,36 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
           onSubmit={submitForm}
           title="New service"
         />
-      </div>
+      </DashboardPage>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-[var(--space-4)] py-[var(--space-8)] lg:px-[var(--space-8)]">
-      <header className="flex items-end justify-between gap-[var(--space-4)]">
-        <div>
-          <h1 className="font-display text-2xl text-[var(--text-0)]">Services</h1>
-          <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">Price board</p>
-        </div>
-        <Button type="button" size="sm" onClick={openCreate}>
-          Add service
-        </Button>
-      </header>
+    <DashboardPage width="lg">
+      <DashboardPageHeader
+        kicker="Price board"
+        title="Services"
+        subtitle="Drag order, edit prices, and assign barbers — synced to booking."
+        action={
+          <DashboardPrimaryButton type="button" size="sm" onClick={openCreate}>
+            Add service
+          </DashboardPrimaryButton>
+        }
+      />
 
-      <div className="mt-[var(--space-6)]">
-        <CutLine />
-      </div>
-
-      <ServicesLedgerList
+      <DashboardPanel title="Menu" description={`${visible.length} active on your mini-site`}>
+        <ServicesLedgerList
         services={visible}
         barbers={barbers}
         onMove={handleMove}
         onEdit={openEdit}
         onArchive={setArchiveTarget}
-      />
+        />
+      </DashboardPanel>
 
       <button
         type="button"
-        className="mt-[var(--space-4)] text-sm text-[var(--text-2)] underline-offset-4 hover:underline"
+        className="mt-[var(--space-4)] text-sm text-[var(--brass)] underline-offset-4 hover:underline"
         onClick={() => setShowArchived((v) => !v)}
       >
         {showArchived ? "Hide archived" : "Show archived"}
@@ -236,8 +238,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
         pending={isPending}
         onConfirm={confirmArchive}
       />
-
-    </div>
+    </DashboardPage>
   );
 }
 

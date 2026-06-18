@@ -1,1 +1,1 @@
-export { shopMediaPublicUrl } from "@/lib/minisite/media-url";
+export { shopMediaPublicUrl, minisiteImageUrl } from "@/lib/minisite/media-url";

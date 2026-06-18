@@ -437,6 +437,7 @@ export type Database = {
       };
       shops: {
         Row: {
+          allowed_minisite_templates: Database["public"]["Enums"]["minisite_template"][];
           booking_lead_time_min: number;
           cancellation_window_min: number;
           created_at: string;
@@ -452,6 +453,7 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          allowed_minisite_templates?: Database["public"]["Enums"]["minisite_template"][];
           booking_lead_time_min?: number;
           cancellation_window_min?: number;
           created_at?: string;
@@ -467,6 +469,7 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          allowed_minisite_templates?: Database["public"]["Enums"]["minisite_template"][];
           booking_lead_time_min?: number;
           cancellation_window_min?: number;
           created_at?: string;
@@ -785,6 +788,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      platform_set_shop_minisite_templates: {
+        Args: {
+          p_shop_id: string;
+          p_allowed: Database["public"]["Enums"]["minisite_template"][];
+          p_active: Database["public"]["Enums"]["minisite_template"];
+        };
+        Returns: Json;
+      };
       is_valid_iana_timezone: { Args: { tz: string }; Returns: boolean };
       user_membership_id: { Args: { p_shop_id: string }; Returns: string };
       user_shop_ids: { Args: Record<string, never>; Returns: string[] };
@@ -795,7 +806,7 @@ export type Database = {
       appointment_source: "online" | "walk_in";
       appointment_status: "booked" | "completed" | "no_show" | "cancelled";
       membership_role: "owner" | "barber";
-      minisite_template: "classic" | "midnight" | "bold";
+      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles";
       notification_channel: "email";
       notification_template:
         | "booking_confirmed"

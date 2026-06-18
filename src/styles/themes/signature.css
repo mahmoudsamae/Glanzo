@@ -1,0 +1,124 @@
+/* Signature — warm dark atelier, gold accent, cinematic motion */
+.theme-signature {
+  --ms-bg: oklch(0.11 0.018 68);
+  --ms-bg-elevated: oklch(0.15 0.022 68);
+  --ms-text: oklch(0.97 0.012 85);
+  --ms-text-muted: oklch(0.68 0.02 75);
+  --ms-border: oklch(0.32 0.03 72);
+  --ms-border-subtle: oklch(0.22 0.022 70);
+  --ms-overlay: oklch(0.08 0.015 68 / 0.78);
+  --ms-font-wonk: 0;
+  --ms-display-scale: 1.06;
+  background-color: var(--ms-bg);
+  color: var(--ms-text);
+}
+
+.theme-signature .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}
+
+@keyframes ms-signature-mesh-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.5%, -1%, 0) scale(1.03);
+  }
+}
+
+@keyframes ms-signature-orb-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0);
+  }
+}
+
+.ms-signature-root {
+  isolation: isolate;
+}
+
+.ms-signature-mesh {
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 20%, color-mix(in oklch, var(--ms-accent) 14%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 85% 10%, color-mix(in oklch, var(--ms-accent) 8%, transparent), transparent 50%),
+    var(--ms-bg);
+  animation: ms-signature-mesh-drift 18s ease-in-out infinite;
+}
+
+.ms-signature-orbs {
+  pointer-events: none;
+}
+
+.ms-signature-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  animation: ms-signature-orb-float 8s ease-in-out infinite;
+}
+
+.ms-signature-orb--a {
+  top: 12%;
+  left: 8%;
+  width: 8rem;
+  height: 8rem;
+  background: color-mix(in oklch, var(--ms-accent) 28%, transparent);
+}
+
+.ms-signature-orb--b {
+  top: 28%;
+  right: 6%;
+  width: 6rem;
+  height: 6rem;
+  background: color-mix(in oklch, var(--ms-accent) 18%, transparent);
+  animation-delay: -2.5s;
+}
+
+.ms-signature-hero-plane {
+  transform-style: preserve-3d;
+  transition: transform var(--t-fast) var(--ease-enter);
+}
+
+.ms-signature-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ms-accent-on-bg);
+}
+
+.ms-signature-section {
+  opacity: 0;
+  transform: translateY(var(--anim-rise));
+}
+
+.ms-signature-section--visible {
+  animation: ms-rise-fade var(--t-smooth) var(--ease-enter) forwards;
+}
+
+.ms-signature-card {
+  border: 1px solid color-mix(in oklch, var(--ms-accent) 20%, var(--ms-border-subtle));
+  border-radius: calc(var(--radius) + 4px);
+  background: color-mix(in oklch, var(--ms-bg-elevated) 90%, var(--ms-accent) 4%);
+  padding: var(--space-5);
+}
+
+.ms-signature-team-avatar {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  border: 2px solid color-mix(in oklch, var(--ms-accent) 55%, var(--ms-border));
+  color: var(--ms-accent-on-bg);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-signature-mesh,
+  .ms-signature-orb {
+    animation: none !important;
+  }
+}

@@ -9,8 +9,9 @@ import { fetchPlatformShopListAction } from "../api";
 import type { z } from "zod";
 
 import type { platformShopListItemSchema } from "@/lib/validations/platform-admin";
-import { cn } from "@/lib/utils";
 
+import { AdminPageHero } from "./admin-ui";
+import { AdminFadeIn, AdminFilterPills, AdminTableShell } from "./admin-ui.client";
 import { ShopStatusBadge } from "./shop-status-badge";
 
 type ShopRow = z.infer<typeof platformShopListItemSchema>;
@@ -72,115 +73,101 @@ export function AdminShopsList({
   }, [debouncedSearch, status, reload]);
 
   return (
-    <div className="flex flex-col gap-[var(--space-6)]">
-      <div className="flex flex-wrap items-end justify-between gap-[var(--space-4)]">
-        <div>
-          <h1 className="text-xl text-[var(--text-0)]">Shops</h1>
-          <p className="text-sm text-[var(--text-2)]">Operational contacts and health signals.</p>
-        </div>
-      </div>
+    <AdminFadeIn className="flex flex-col gap-[var(--space-8)]">
+      <AdminPageHero
+        kicker="Shop-Verzeichnis"
+        title="Shops"
+        subtitle="Status, Inhaber und Gesundheitssignale auf einen Blick — tippe eine Zeile für Details."
+      />
 
-      <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-center sm:justify-between">
+      <div className="platform-admin-glass flex flex-col gap-[var(--space-4)] p-[var(--space-4)] sm:flex-row sm:items-center sm:justify-between">
         <Input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Name oder Slug suchen…"
-          className="max-w-md text-sm"
+          className="max-w-md border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/50 text-sm"
           aria-label="Shops suchen"
         />
-        <div className="flex flex-wrap gap-[var(--space-2)]">
-          {STATUS_FILTERS.map((filter) => (
-            <button
-              key={filter.label}
-              type="button"
-              onClick={() => setStatus(filter.value)}
-              className={cn(
-                "rounded-full border px-[var(--space-3)] py-[var(--space-1)] text-xs",
-                status === filter.value
-                  ? "border-[var(--text-1)] text-[var(--text-0)]"
-                  : "border-border text-[var(--text-2)] hover:text-[var(--text-1)]",
-              )}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+        <AdminFilterPills options={STATUS_FILTERS} value={status} onChange={setStatus} />
       </div>
 
-      <DataTable
-        rows={items}
-        rowKey={(row) => row.id}
-        onRowClick={(row) => router.push(`/admin/shops/${row.id}`)}
-        emptyMessage={isPending ? "Laden…" : "Keine Shops gefunden."}
-        columns={[
-          {
-            key: "name",
-            header: "Shop",
-            cell: (row) => (
-              <div>
-                <div className="text-[var(--text-0)]">{row.name}</div>
-                <div className="text-[var(--text-2)]">{row.slug}</div>
-              </div>
-            ),
-          },
-          {
-            key: "status",
-            header: "Status",
-            cell: (row) => <ShopStatusBadge status={row.status} />,
-          },
-          {
-            key: "owner",
-            header: "Inhaber",
-            cell: (row) => (
-              <div>
-                <div>{row.owner_display_name ?? "—"}</div>
-                <div className="text-[var(--text-2)]">{row.owner_email ?? "—"}</div>
-              </div>
-            ),
-          },
-          {
-            key: "staff",
-            header: "Team",
-            className: "tabular-nums",
-            cell: (row) => row.staff_count,
-          },
-          {
-            key: "bookings",
-            header: "Buchungen 30d",
-            className: "tabular-nums",
-            cell: (row) => row.bookings_last_30d,
-          },
-          {
-            key: "outbox",
-            header: "Outbox",
-            cell: (row) =>
-              row.dead_outbox_count > 0 ? (
-                <span className="rounded border border-[var(--brass)]/50 px-[var(--space-2)] py-0.5 text-xs text-[var(--brass)]">
-                  {row.dead_outbox_count} tot
-                </span>
-              ) : (
-                <span className="text-[var(--text-2)]">—</span>
+      <AdminTableShell>
+        <DataTable
+          rows={items}
+          rowKey={(row) => row.id}
+          onRowClick={(row) => router.push(`/admin/shops/${row.id}`)}
+          emptyMessage={isPending ? "Laden…" : "Keine Shops gefunden."}
+          wrapperClassName="border-0"
+          columns={[
+            {
+              key: "name",
+              header: "Shop",
+              cell: (row) => (
+                <div>
+                  <div className="font-medium text-[var(--text-0)]">{row.name}</div>
+                  <div className="text-[var(--text-2)]">{row.slug}</div>
+                </div>
               ),
-          },
-          {
-            key: "created",
-            header: "Erstellt",
-            cell: (row) => formatDate(row.created_at),
-          },
-        ]}
-      />
+            },
+            {
+              key: "status",
+              header: "Status",
+              cell: (row) => <ShopStatusBadge status={row.status} />,
+            },
+            {
+              key: "owner",
+              header: "Inhaber",
+              cell: (row) => (
+                <div>
+                  <div>{row.owner_display_name ?? "—"}</div>
+                  <div className="text-[var(--text-2)]">{row.owner_email ?? "—"}</div>
+                </div>
+              ),
+            },
+            {
+              key: "staff",
+              header: "Team",
+              className: "tabular-nums",
+              cell: (row) => row.staff_count,
+            },
+            {
+              key: "bookings",
+              header: "Buchungen 30d",
+              className: "tabular-nums",
+              cell: (row) => row.bookings_last_30d,
+            },
+            {
+              key: "outbox",
+              header: "Outbox",
+              cell: (row) =>
+                row.dead_outbox_count > 0 ? (
+                  <span className="rounded-full border border-[color-mix(in_oklch,var(--brass)_40%,var(--ink-3))] bg-[color-mix(in_oklch,var(--brass)_10%,var(--ink-1))] px-[var(--space-2)] py-0.5 text-xs text-[var(--brass)]">
+                    {row.dead_outbox_count} tot
+                  </span>
+                ) : (
+                  <span className="text-[var(--text-2)]">—</span>
+                ),
+            },
+            {
+              key: "created",
+              header: "Erstellt",
+              cell: (row) => formatDate(row.created_at),
+            },
+          ]}
+        />
+      </AdminTableShell>
 
       {nextCursor ? (
         <button
           type="button"
           disabled={isPending}
           onClick={() => reload({ search: debouncedSearch, status, cursor: nextCursor, append: true })}
-          className="self-start rounded-md border border-border px-[var(--space-4)] py-[var(--space-2)] text-sm text-[var(--text-1)] hover:bg-[var(--ink-1)] disabled:opacity-50"
+          className="platform-admin-btn-primary self-start disabled:opacity-50"
         >
           Mehr laden
         </button>
       ) : null}
-    </div>
+    </AdminFadeIn>
   );
 }
 

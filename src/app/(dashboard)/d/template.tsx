@@ -3,15 +3,15 @@
 import { useReducedMotion } from "framer-motion";
 import { div as MotionDiv } from "framer-motion/m";
 
-import { fadeSlideIn } from "@/lib/motion";
+import { fadeIn } from "@/lib/motion";
 
 export default function DashboardTemplate({ children }: { children: React.ReactNode }) {
   const reducedMotion = useReducedMotion() ?? false;
 
   return (
     <MotionDiv
-      className="flex flex-1 flex-col"
-      variants={fadeSlideIn(reducedMotion)}
+      className="salon-dash-content flex flex-1 flex-col"
+      variants={fadeIn(reducedMotion)}
       initial="hidden"
       animate="visible"
     >

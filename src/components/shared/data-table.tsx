@@ -15,6 +15,7 @@ type DataTableProps<T> = {
   rowKey: (row: T) => string;
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
+  wrapperClassName?: string;
 };
 
 export function DataTable<T>({
@@ -23,13 +24,14 @@ export function DataTable<T>({
   rowKey,
   onRowClick,
   emptyMessage = "Keine Einträge.",
+  wrapperClassName,
 }: DataTableProps<T>) {
   if (rows.length === 0) {
     return <p className="text-sm text-[var(--text-2)]">{emptyMessage}</p>;
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border border-border">
+    <div className={cn("overflow-x-auto rounded-md border border-border", wrapperClassName)}>
       <table className="w-full min-w-[40rem] text-[13px]">
         <thead className="bg-[var(--ink-1)] text-left text-[var(--text-2)]">
           <tr className="h-8">

@@ -201,3 +201,58 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   redirect("/login");
 }
+
+/** Platform admin shell — returns to /admin login gate. */
+export async function signOutFromPlatformAdmin(): Promise<void> {
+  const supabase = await createServerSupabaseClient();
+  await supabase.auth.signOut();
+  redirect("/admin");
+}
+
+export async function loginPlatformAdmin(formData: FormData): Promise<AuthActionResult> {
+  const email = String(formData.get("email") ?? "").trim();
+  const password = String(formData.get("password") ?? "");
+
+  if (!email || !password) {
+    return {
+      ok: false,
+      code: "INVALID_CREDENTIALS",
+      message: authErrorMessage("INVALID_CREDENTIALS"),
+    };
+  }
+
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      const code = mapSupabaseAuthError(error);
+      return { ok: false, code, message: authErrorMessage(code) };
+    }
+
+    const state = await getActorState();
+    if (state.kind === "unauthenticated") {
+      return {
+        ok: false,
+        code: "EMAIL_NOT_CONFIRMED",
+        message: authErrorMessage("EMAIL_NOT_CONFIRMED"),
+      };
+    }
+
+    if (!state.actor.isPlatformAdmin) {
+      await supabase.auth.signOut();
+      return {
+        ok: false,
+        code: "NOT_PLATFORM_ADMIN",
+        message: authErrorMessage("NOT_PLATFORM_ADMIN"),
+      };
+    }
+
+    return { ok: true, redirectTo: "/admin" };
+  } catch (error) {
+    if (isSupabaseTransportError(error)) {
+      return supabaseTransportErrorResult();
+    }
+    throw error;
+  }
+}

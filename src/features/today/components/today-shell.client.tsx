@@ -7,6 +7,13 @@ import { CutLine } from "@/components/shared/cut-line";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MetricNumber } from "@/components/shared/metric-number.client";
 import { StatusDot } from "@/components/shared/status-dot";
+import {
+  DashboardMetricTile,
+  DashboardPage,
+  DashboardPanel,
+  DashboardRowCard,
+  DashboardRowList,
+} from "@/features/dashboard";
 import { useNow } from "@/hooks/use-now";
 import { filterNewLandingIds, mergeSeenIds } from "@/lib/appointments/lands-animation";
 import { appointmentStatusLabel } from "@/lib/appointments/status-label";
@@ -117,30 +124,38 @@ export function TodayShell({
   const active = data.appointments.filter((apt) => apt.status !== "cancelled");
 
   return (
-    <div className="mx-auto w-full max-w-[360px] flex-1 px-[var(--space-4)] py-[var(--space-8)] lg:max-w-none lg:px-[var(--space-8)] lg:py-[var(--space-12)]">
-        <header className="dash-today-header max-w-xl">
-          <p className="text-base text-[var(--text-2)]">
-            {weekday},{" "}
-            <span className="text-data text-[var(--text-1)]">{day}</span> {month}
-          </p>
+    <DashboardPage width="lg">
+      <header className="dash-today-header max-w-xl">
+        <p className="salon-dash-kicker text-xs">Today</p>
+        <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">
+          {weekday},{" "}
+          <span className="text-data text-[var(--text-1)]">{day}</span> {month}
+        </p>
+        <div className="mt-[var(--space-4)]">
           <CutLine progress={progress} />
-        </header>
+        </div>
+      </header>
 
-      <div className="mt-[var(--space-8)] max-w-xl">
-        <span className="dash-metric-settle inline-block">
-          <MetricNumber
-            value={data.expectedRevenueCents}
-            format={(cents) => `€${(cents / 100).toFixed(2)}`}
-            className="font-display text-[64px] leading-none text-data text-[var(--text-0)]"
-          />
-        </span>
-        {subline ? (
-          <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
-        ) : null}
+      <div className="mt-[var(--space-8)] grid max-w-3xl gap-[var(--space-3)] sm:grid-cols-2">
+        <div className="salon-dash-hero-metric sm:col-span-2">
+          <span className="dash-metric-settle inline-block">
+            <MetricNumber
+              value={data.expectedRevenueCents}
+              format={(cents) => `€${(cents / 100).toFixed(2)}`}
+              className="font-display text-[64px] leading-none text-data text-[var(--text-0)]"
+            />
+          </span>
+          {subline ? (
+            <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
+          ) : null}
+        </div>
+        <DashboardMetricTile label="Bookings" value={data.appointmentCount} hint="On today's calendar" />
+        <DashboardMetricTile label="Open gaps" value={data.gapCount} hint="Slots between appointments" />
+        <DashboardMetricTile label="No-shows" value={data.noShowCount} hint="Marked today" />
       </div>
 
       {active.length === 0 ? (
-        <div className="mt-[var(--space-12)]">
+        <div className="mt-[var(--space-8)] max-w-xl">
           <EmptyState
             title="A quiet morning."
             actionLabel="Add walk-in"
@@ -148,34 +163,33 @@ export function TodayShell({
           />
         </div>
       ) : (
-        <ul className="mt-[var(--space-8)] max-w-xl divide-y divide-border">
-          {data.appointments.map((appointment) => {
-            const past = now.getTime() > new Date(appointment.endsAt).getTime();
-            return (
-              <li key={appointment.id}>
-                <button
-                  type="button"
-                  className={cn(
-                    "dash-ledger-row flex h-9 w-full items-center gap-[var(--space-3)] text-left text-sm transition-transform",
-                    past && "text-[var(--text-2)]",
-                    landingIds.has(appointment.id) && "booking-lands",
-                  )}
+        <DashboardPanel
+          title="Today's chair"
+          description={`${active.length} booking${active.length === 1 ? "" : "s"} on the books`}
+          className="mt-[var(--space-8)] max-w-2xl"
+        >
+          <DashboardRowList>
+            {data.appointments.map((appointment) => {
+              const past = now.getTime() > new Date(appointment.endsAt).getTime();
+              return (
+                <DashboardRowCard
+                  key={appointment.id}
                   onClick={() => onSelectAppointment(appointment)}
-                >
-                  <span className="w-11 shrink-0 tabular-nums">
-                    {formatRowTime(appointment.startsAt, timezone)}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate">
-                    {appointment.customerName ?? "Walk-in"}
-                  </span>
-                  <span className="hidden truncate sm:inline">{appointment.serviceName}</span>
-                  <StatusDot label={appointmentStatusLabel(appointment.status)} />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                  avatar={formatRowTime(appointment.startsAt, timezone)}
+                  title={appointment.customerName ?? "Walk-in"}
+                  subtitle={appointment.serviceName}
+                  badges={<StatusDot label={appointmentStatusLabel(appointment.status)} />}
+                  trailing={
+                    <span className={cn("text-sm tabular-nums", past ? "text-[var(--text-2)]" : "text-[var(--text-0)]")}>
+                      {past ? "Done" : "Up next"}
+                    </span>
+                  }
+                />
+              );
+            })}
+          </DashboardRowList>
+        </DashboardPanel>
       )}
-    </div>
+    </DashboardPage>
   );
 }

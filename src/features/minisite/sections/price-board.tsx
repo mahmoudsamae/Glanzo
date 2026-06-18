@@ -1,13 +1,18 @@
-import type { ShopPublicData } from "@/lib/validations/public-shop";
+import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
 import { formatPriceCents } from "@/lib/minisite/format-price";
 import { PRICE_LEADER_CLASS } from "@/lib/minisite/price-leader";
 
 type PriceBoardProps = {
   services: ShopPublicData["services"];
+  content: MinisiteContent;
 };
 
-export function PriceBoardSection({ services }: PriceBoardProps) {
+export function PriceBoardSection({ services, content }: PriceBoardProps) {
+  if (content.show?.prices === false) {
+    return null;
+  }
+
   if (services.length === 0) {
     return null;
   }

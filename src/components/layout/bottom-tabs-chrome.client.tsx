@@ -45,9 +45,9 @@ function MobileNavSlot({
   const active = item.enabled && !item.isSheetTrigger && isNavItemActive(item.href, pathname);
 
   const slotClass = cn(
-    "flex min-h-11 flex-1 flex-col items-center justify-center gap-[var(--space-1)] rounded-md px-[var(--space-2)] py-[var(--space-1)] text-xs transition-colors duration-[var(--t-fast)] ease-[var(--ease-enter)]",
-    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--brass)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--ink-0)]",
-    active ? "text-[var(--brass)]" : "text-[var(--text-2)]",
+    "salon-dash-mobile-tab flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-[var(--space-1)] py-[var(--space-1)] text-[10px] font-medium transition-all duration-[var(--t-fast)] ease-[var(--ease-enter)]",
+    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--brass)]",
+    active ? "salon-dash-mobile-tab--active text-[var(--text-0)]" : "text-[var(--text-2)]",
     !item.enabled && !item.isSheetTrigger ? "cursor-not-allowed opacity-40" : "",
   );
 
@@ -114,12 +114,13 @@ export function BottomTabsChrome({
     <Sheet open={open} onOpenChange={setOpen}>
       <nav
         aria-label="Dashboard"
-        className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-[var(--ink-1)] px-[var(--space-2)] pt-[var(--space-2)] lg:hidden"
-        style={{ paddingBottom: "calc(var(--space-2) + env(safe-area-inset-bottom, 0px))" }}
+        className="salon-dash-mobile-dock fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-40 flex lg:hidden"
       >
-        {items.map((item) => (
-          <MobileNavSlot key={item.key} item={item} pathname={pathname} />
-        ))}
+        <div className="salon-dash-mobile-dock__inner flex flex-1 gap-[var(--space-1)] p-[var(--space-1)]">
+          {items.map((item) => (
+            <MobileNavSlot key={item.key} item={item} pathname={pathname} />
+          ))}
+        </div>
       </nav>
 
       <SheetContent side="bottom" className="gap-[var(--space-6)]">

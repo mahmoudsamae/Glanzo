@@ -7,6 +7,7 @@ export type AuthErrorCode =
   | "OAUTH_FAILED"
   | "RESET_FAILED"
   | "UPDATE_PASSWORD_FAILED"
+  | "NOT_PLATFORM_ADMIN"
   | "UNKNOWN";
 
 const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
@@ -18,6 +19,8 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   OAUTH_FAILED: "Google sign-in didn't work. Try email instead.",
   RESET_FAILED: "We couldn't send that reset link. Check the email and try again.",
   UPDATE_PASSWORD_FAILED: "That link may have expired. Request a new reset.",
+  NOT_PLATFORM_ADMIN:
+    "Dieses Konto hat keinen Plattform-Zugang. Bitte in Supabase platform_admins eintragen.",
   UNKNOWN: "Something went wrong. Try again.",
 };
 

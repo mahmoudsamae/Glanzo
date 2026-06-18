@@ -26,6 +26,30 @@ export const MINISITE_TEMPLATES: Record<MinisiteTemplate, MinisiteTemplateConfig
     themeClass: "theme-bold",
     fontClass: "minisite-font minisite-display",
   },
+  signature: {
+    key: "signature",
+    label: "Signature",
+    themeClass: "theme-signature",
+    fontClass: "minisite-font",
+  },
+  boutique: {
+    key: "boutique",
+    label: "Boutique",
+    themeClass: "theme-boutique",
+    fontClass: "minisite-font",
+  },
+  nicoles: {
+    key: "nicoles",
+    label: "Nicoles",
+    themeClass: "theme-nicoles",
+    fontClass: "minisite-font minisite-nicoles-fonts",
+  },
+  flux: {
+    key: "flux",
+    label: "Flux",
+    themeClass: "theme-flux",
+    fontClass: "minisite-font minisite-display",
+  },
 };
 
 export function getMinisiteTemplate(key: MinisiteTemplate): MinisiteTemplateConfig {

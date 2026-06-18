@@ -16,6 +16,10 @@ const THEME_BACKGROUNDS: Record<MinisiteTemplate, string> = {
   classic: "oklch(0.95 0.02 85)",
   midnight: "oklch(0.16 0.008 75)",
   bold: "oklch(0.05 0 0)",
+  signature: "oklch(0.11 0.018 68)",
+  boutique: "oklch(0.96 0.018 85)",
+  nicoles: "oklch(0.96 0.018 85)",
+  flux: "oklch(0.13 0.035 265)",
 };
 
 type Rgb = { r: number; g: number; b: number };

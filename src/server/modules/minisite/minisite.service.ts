@@ -1,5 +1,6 @@
 import "server-only";
 
+import { normalizeAllowedMinisiteTemplates, isMinisiteTemplateAllowed } from "@/lib/minisite/allowed-templates";
 import { revalidateShopPublic } from "@/lib/minisite/revalidate-shop-public";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
@@ -8,6 +9,7 @@ import {
 } from "@/lib/validations/minisite-editor";
 import type { MinisiteEditorData } from "@/lib/minisite/editor-types";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
+import type { MinisiteTemplate } from "@/lib/validations/public-shop";
 import { auditDiff, writeAuditLog } from "@/server/modules/audit/write-audit-log";
 import { requireShopOwner } from "@/server/modules/auth/assert-shop-access";
 import type { Actor } from "@/server/modules/auth/types";
@@ -29,7 +31,7 @@ export async function loadMinisiteEditorData(
 
   const { data: shop, error: shopError } = await supabase
     .from("shops")
-    .select("id, slug")
+    .select("id, slug, allowed_minisite_templates")
     .eq("id", shopId)
     .maybeSingle();
 
@@ -56,6 +58,10 @@ export async function loadMinisiteEditorData(
     shopId,
     shopSlug: shop.slug,
     template: minisite.template,
+    allowedTemplates: normalizeAllowedMinisiteTemplates(
+      shop.allowed_minisite_templates as MinisiteTemplate[] | null,
+      minisite.template,
+    ),
     accentHex: minisite.accent_hex,
     content: (minisite.content ?? {}) as MinisiteContent,
     publicData,
@@ -83,6 +89,26 @@ export async function updateMinisite(
   }
 
   const supabase = await createServerSupabaseClient();
+
+  const { data: shop, error: shopLoadError } = await supabase
+    .from("shops")
+    .select("allowed_minisite_templates")
+    .eq("id", shopId)
+    .maybeSingle();
+
+  if (shopLoadError || !shop) {
+    return { ok: false, code: "NOT_FOUND" };
+  }
+
+  const allowedTemplates = normalizeAllowedMinisiteTemplates(
+    shop.allowed_minisite_templates as MinisiteTemplate[] | null,
+    parsed.data.template,
+  );
+
+  if (!isMinisiteTemplateAllowed(parsed.data.template, allowedTemplates)) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
   const { data: existing, error: loadError } = await supabase
     .from("minisite")
     .select("template, accent_hex, content")
