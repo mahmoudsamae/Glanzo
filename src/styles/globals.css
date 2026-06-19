@@ -617,11 +617,62 @@
   .ms-booking-sheet {
     z-index: 60 !important;
     background: var(--ms-bg) !important;
-    color: var(--ms-text);
+    color: var(--ms-text) !important;
     border-color: color-mix(in oklch, var(--ms-accent) 22%, transparent) !important;
     box-shadow:
       0 -28px 80px rgb(0 0 0 / 0.45),
       inset 0 1px 0 color-mix(in oklch, var(--ms-accent) 18%, transparent);
+  }
+
+  /* theme-* minisite classes set cream bg + dark ink — wrong inside the booking portal */
+  .ms-booking-sheet[class*="theme-"] {
+    background-color: var(--ms-bg) !important;
+    color: var(--ms-text) !important;
+  }
+
+  .ms-booking-sheet [data-slot="label"] {
+    color: var(--ms-text);
+  }
+
+  .ms-booking-sheet [data-slot="input"] {
+    border-color: color-mix(in oklch, var(--ms-accent) 22%, var(--ms-border-subtle));
+    background: color-mix(in oklch, var(--ms-bg-elevated) 94%, var(--ms-bg));
+    color: var(--ms-text);
+  }
+
+  .ms-booking-sheet [data-slot="input"]::placeholder {
+    color: var(--ms-text-muted);
+  }
+
+  .ms-booking-sheet [data-slot="button"].bg-primary {
+    background-color: var(--ms-accent) !important;
+    color: var(--ms-on-accent) !important;
+    border-color: transparent;
+  }
+
+  .ms-booking-sheet [data-slot="button"].bg-secondary {
+    background: color-mix(in oklch, var(--ms-accent) 18%, var(--ms-bg-elevated)) !important;
+    color: var(--ms-text) !important;
+    border-color: color-mix(in oklch, var(--ms-accent) 32%, transparent);
+  }
+
+  .ms-booking-sheet [data-slot="button"].border-border {
+    background: var(--ms-bg-elevated);
+    color: var(--ms-text);
+    border-color: color-mix(in oklch, var(--ms-accent) 28%, var(--ms-border-subtle));
+  }
+
+  .ms-booking-sheet [data-slot="button"].border-border:hover {
+    background: color-mix(in oklch, var(--ms-accent) 14%, var(--ms-bg-elevated));
+    color: var(--ms-text);
+  }
+
+  .ms-booking-confirmation dl dd {
+    color: var(--ms-text);
+  }
+
+  .ms-booking-confirmation dl dd.ms-booking-confirmation__accent {
+    color: var(--ms-accent-on-bg);
   }
 
   .ms-booking-sheet .font-display {

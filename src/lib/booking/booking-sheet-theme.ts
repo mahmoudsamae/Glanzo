@@ -79,7 +79,7 @@ export function bookingSheetCssVars(
   const surface = BOOKING_SURFACES[template];
 
   return {
-    ...deriveAccentCssVars(accentHex, template),
+    ...deriveAccentCssVars(accentHex, template, surface.bg),
     "--ms-bg": surface.bg,
     "--ms-bg-elevated": surface.elevated,
     "--ms-text": surface.text,

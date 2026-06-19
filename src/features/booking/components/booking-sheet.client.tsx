@@ -815,7 +815,7 @@ function ConfirmationView({
   onClose,
 }: ConfirmationViewProps) {
   return (
-    <div className="ms-booking-celebrate flex flex-col gap-[var(--space-6)] pt-[var(--space-4)]">
+    <div className="ms-booking-celebrate ms-booking-confirmation flex flex-col gap-[var(--space-6)] pt-[var(--space-4)]">
       <header className="text-center">
         <h2 className="font-display text-2xl text-[color:var(--ms-text)]">Gebucht.</h2>
         <div className="ms-booking-celebrate__shimmer mx-auto mt-[var(--space-3)] h-px w-24 bg-[color:var(--ms-accent-on-bg)]" aria-hidden />
@@ -824,7 +824,7 @@ function ConfirmationView({
       <dl className="flex flex-col gap-[var(--space-3)] rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-4)] text-sm">
         <div className="flex justify-between gap-[var(--space-4)]">
           <dt className="text-[color:var(--ms-text-muted)]">Wann</dt>
-          <dd className="text-right text-data">
+          <dd className="text-right text-data tabular-nums ms-booking-confirmation__accent">
             {formatBookingSummaryDate(confirmation.startsAt, timezone)}
             <br />
             {formatSlotTime(confirmation.startsAt, timezone)} Uhr
@@ -841,7 +841,7 @@ function ConfirmationView({
         {priceCents !== undefined ? (
           <div className="flex justify-between gap-[var(--space-4)]">
             <dt className="text-[color:var(--ms-text-muted)]">Preis</dt>
-            <dd className="text-data tabular-nums">{formatPriceCents(priceCents)}</dd>
+            <dd className="text-data tabular-nums ms-booking-confirmation__accent">{formatPriceCents(priceCents)}</dd>
           </div>
         ) : null}
         <div className="flex justify-between gap-[var(--space-4)]">

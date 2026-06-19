@@ -210,8 +210,9 @@ function ensureAccentFillContrast(accent: string, onAccent: string): string {
 export function deriveAccentPalette(
   accentHex: string,
   template: MinisiteTemplate,
+  backgroundOverride?: string,
 ): AccentPalette {
-  const background = THEME_BACKGROUNDS[template];
+  const background = backgroundOverride ?? THEME_BACKGROUNDS[template];
   const onAccent = pickOnAccent(accentHex);
   const accent = ensureAccentFillContrast(accentHex, onAccent);
   const accentOnBg = ensureContrastOnBackground(accentHex, background);
@@ -235,6 +236,7 @@ export function accentPaletteToCssVars(palette: AccentPalette): Record<string, s
 export function deriveAccentCssVars(
   accentHex: string,
   template: MinisiteTemplate,
+  backgroundOverride?: string,
 ): Record<string, string> {
-  return accentPaletteToCssVars(deriveAccentPalette(accentHex, template));
+  return accentPaletteToCssVars(deriveAccentPalette(accentHex, template, backgroundOverride));
 }
