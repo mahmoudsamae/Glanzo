@@ -31,7 +31,7 @@ export function NicolesAktionstage({ data }: NicolesAktionstageProps) {
       <div className="ms-nicoles-aktionstage-overlay absolute inset-0" aria-hidden />
 
       <div className="relative z-10 flex justify-center px-[var(--space-4)] py-[var(--space-14)]">
-        <div className="ms-nicoles-aktionstage-box w-full max-w-[37.5rem] px-[var(--space-6)] py-[var(--space-8)] text-center">
+        <div className="ms-nicoles-aktionstage-box w-full max-w-[37.5rem] px-[var(--space-5)] py-[var(--space-8)] text-center sm:px-[var(--space-6)]">
           <p className="ms-nicoles-eyebrow text-[color:var(--ms-accent)]">
             {getNicolesSectionField(content, "aktionstage", "eyebrow", meta.defaults.eyebrow ?? "")}
           </p>
@@ -40,7 +40,7 @@ export function NicolesAktionstage({ data }: NicolesAktionstageProps) {
           </h2>
           <ul className="mt-[var(--space-6)] space-y-[var(--space-4)] text-left text-sm leading-relaxed text-white">
             {rows.map((row) => (
-              <li key={`${row.day}-${row.label}`} className="grid grid-cols-[5.5rem_1fr] gap-[var(--space-3)]">
+              <li key={`${row.day}-${row.label}`} className="grid grid-cols-1 gap-[var(--space-1)] sm:grid-cols-[5.5rem_1fr] sm:gap-[var(--space-3)]">
                 <span className="font-bold">{row.day}</span>
                 <span>{row.label}</span>
               </li>

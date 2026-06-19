@@ -74,7 +74,7 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ms-accent);
+  color: var(--ms-accent-on-bg);
 }
 
 .ms-nicoles-sparkle {
@@ -481,6 +481,44 @@
 
   .ms-nicoles-hero-badge.absolute {
     display: none;
+  }
+
+  .ms-nicoles-section {
+    scroll-margin-top: 4.5rem;
+  }
+
+  .ms-nicoles-about-preview,
+  .ms-nicoles-services-preview,
+  .ms-nicoles-news {
+    padding-block: var(--space-10);
+  }
+
+  .ms-nicoles-aktionstage > .relative.z-10 {
+    padding-block: var(--space-10);
+  }
+
+  .ms-nicoles-aktionstage-box {
+    padding-inline: var(--space-5);
+    padding-block: var(--space-6);
+    text-align: left;
+  }
+
+  .ms-nicoles-aktionstage-box ul li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+
+  .ms-nicoles-about-portraits > div:last-child {
+    margin-bottom: 0;
+  }
+
+  .ms-nicoles-news ul {
+    margin-top: var(--space-8);
+    gap: var(--space-8);
+  }
+
+  .ms-nicoles-news article h3 {
+    margin-top: var(--space-4);
   }
 }
 

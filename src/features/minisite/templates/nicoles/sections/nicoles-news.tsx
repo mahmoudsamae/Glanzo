@@ -15,7 +15,7 @@ export function NicolesNewsSection({ data }: NicolesNewsSectionProps) {
 
   return (
     <section
-      className="ms-nicoles-news ms-nicoles-section ms-cinema-section bg-white px-[var(--space-4)] py-[var(--space-14)]"
+      className="ms-nicoles-news ms-nicoles-section ms-cinema-section bg-white px-[var(--space-5)] py-[var(--space-14)] sm:px-[var(--space-6)]"
       aria-label="Aktuelles"
     >
       <div className="mx-auto max-w-6xl">
@@ -28,7 +28,7 @@ export function NicolesNewsSection({ data }: NicolesNewsSectionProps) {
           </h2>
         </div>
 
-        <ul className="mt-[var(--space-10)] grid gap-[var(--space-6)] sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-[var(--space-10)] grid gap-[var(--space-8)] sm:grid-cols-2 sm:gap-[var(--space-6)] lg:grid-cols-3">
           {items.map((item, index) => {
             const imagePath = resolveNicolesNewsImage(content, index, item.image_path);
             return (

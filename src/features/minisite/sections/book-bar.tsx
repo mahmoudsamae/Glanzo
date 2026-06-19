@@ -21,7 +21,7 @@ export function BookBarSection({ bookHref, suspended }: BookBarProps) {
   return (
     <div
       data-cinema-book-bar
-      className="ms-cinema-book-bar pointer-events-none fixed inset-x-0 bottom-0 z-20 border-t border-[color:var(--ms-border-subtle)] px-[var(--space-4)] pb-[max(var(--space-4),env(safe-area-inset-bottom))] pt-[var(--space-3)] lg:hidden"
+      className="ms-cinema-book-bar pointer-events-none fixed inset-x-0 bottom-0 z-20 border-t border-[color:var(--ms-border-subtle)] px-[var(--space-5)] pb-[max(var(--space-5),env(safe-area-inset-bottom))] pt-[var(--space-4)] lg:hidden"
       aria-label="Buchen"
     >
       <div className="pointer-events-auto mx-auto flex w-full max-w-lg justify-center">

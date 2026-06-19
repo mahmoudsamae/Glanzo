@@ -23,14 +23,18 @@
   --signal-warn: oklch(0.75 0.14 60);
   --signal-bad: oklch(0.62 0.18 25);
 
-  /* Spacing scale: 4/8/12/16/24/32/48/64/96 */
+  /* Spacing scale: 4/8/12/16/20/24/28/32/40/48/56/64/96 */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
   --space-4: 1rem;
+  --space-5: 1.25rem;
   --space-6: 1.5rem;
+  --space-7: 1.75rem;
   --space-8: 2rem;
+  --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-14: 3.5rem;
   --space-16: 4rem;
   --space-24: 6rem;
 
@@ -2150,6 +2154,34 @@
   .salon-dash-mobile-tab--active {
     background: linear-gradient(145deg, color-mix(in oklch, var(--brass) 16%, var(--ink-2)), var(--ink-1));
     box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--brass) 24%, transparent);
+  }
+
+  @media (max-width: 1023px) {
+    .salon-dash-page {
+      padding-inline: var(--space-5);
+    }
+
+    .salon-dash-panel {
+      padding: var(--space-5);
+    }
+
+    .salon-dash-panel-title {
+      margin-bottom: var(--space-1);
+    }
+
+    .salon-dash-row-card {
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    .salon-dash-row-card__avatar {
+      margin-top: var(--space-1);
+    }
+
+    .dash-today-header {
+      margin-bottom: var(--space-2);
+    }
   }
 
   .salon-dash-btn-primary {

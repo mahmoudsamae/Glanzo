@@ -47,7 +47,7 @@ export function CustomerBookingAccess({
     <div
       className={cn(
         "pointer-events-none fixed inset-x-0 z-[25] flex justify-center px-[var(--space-4)]",
-        "bottom-[calc(5.5rem+env(safe-area-inset-bottom))] lg:bottom-[var(--space-6)]",
+        "bottom-[calc(6.75rem+env(safe-area-inset-bottom))] lg:bottom-[var(--space-6)]",
         className,
       )}
     >

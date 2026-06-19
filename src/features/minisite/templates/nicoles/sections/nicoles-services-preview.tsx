@@ -18,7 +18,7 @@ export function NicolesServicesPreview({ data, shopSlug, preview = false }: Nico
   return (
     <section
       id={anchors.services}
-      className="ms-nicoles-services-preview ms-nicoles-section ms-cinema-section bg-[color:var(--ms-nicoles-cream)] px-[var(--space-4)] py-[var(--space-14)] text-center"
+      className="ms-nicoles-services-preview ms-nicoles-section ms-cinema-section bg-[color:var(--ms-nicoles-cream)] px-[var(--space-5)] py-[var(--space-14)] text-center sm:px-[var(--space-6)]"
       aria-label="Leistungen"
     >
       <div className="mx-auto max-w-3xl">

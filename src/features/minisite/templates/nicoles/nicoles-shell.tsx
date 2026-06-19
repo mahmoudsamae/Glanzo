@@ -69,7 +69,7 @@ export function NicolesShell({ data, shopSlug, preview = false }: NicolesShellPr
         className={`relative z-[1] flex w-full flex-1 flex-col ${
           preview
             ? "pb-[var(--space-4)]"
-            : "pb-[calc(var(--space-16)+env(safe-area-inset-bottom))] lg:pb-[var(--space-8)]"
+            : "pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-[var(--space-8)]"
         }`}
       >
         {sectionOrder.map((key) => renderSection(key))}

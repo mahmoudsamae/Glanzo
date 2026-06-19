@@ -20,10 +20,10 @@ export function NicolesAboutPreview({ data, shopSlug, preview = false }: Nicoles
   return (
     <section
       id={anchors.about}
-      className="ms-nicoles-about-preview ms-nicoles-section ms-cinema-section bg-[color:var(--ms-nicoles-cream)] px-[var(--space-4)] py-[var(--space-12)]"
+      className="ms-nicoles-about-preview ms-nicoles-section ms-cinema-section bg-[color:var(--ms-nicoles-cream)] px-[var(--space-5)] py-[var(--space-12)] sm:px-[var(--space-6)]"
       aria-label="Über uns Vorschau"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-[var(--space-10)] lg:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl items-center gap-[var(--space-8)] lg:grid-cols-2 lg:gap-[var(--space-10)]">
         <div>
           <p className="ms-nicoles-eyebrow">{getNicolesSectionField(content, "about", "eyebrow", meta.defaults.eyebrow ?? "")}</p>
           <h2 className="ms-nicoles-display mt-[var(--space-4)] font-display text-[clamp(1.75rem,4vw,2.75rem)] leading-[1.12] text-[color:var(--ms-nicoles-ink)]">
@@ -45,7 +45,7 @@ export function NicolesAboutPreview({ data, shopSlug, preview = false }: Nicoles
           <div className="relative aspect-[3/4] w-[42%] overflow-hidden bg-[color:var(--ms-border-subtle)]">
             <NicolesPhoto path={photoA} sizes="200px" />
           </div>
-          <div className="relative -mb-[var(--space-6)] aspect-[3/5] w-[48%] overflow-hidden bg-[color:var(--ms-border-subtle)]">
+          <div className="relative aspect-[3/5] w-[48%] overflow-hidden bg-[color:var(--ms-border-subtle)] sm:-mb-[var(--space-6)]">
             <NicolesPhoto path={photoB} sizes="220px" />
           </div>
         </div>
