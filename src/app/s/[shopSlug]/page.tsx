@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { BookingSheetGate } from "@/features/booking";
-import { CustomerBookingAccess } from "@/features/booking/components/customer-booking-access.client";
+import { BookingSheetGate, CustomerBookingAccess } from "@/features/booking";
 import { MinisiteShell } from "@/features/minisite";
 import { shopMediaPublicUrl } from "@/lib/minisite/media-url";
 import { shopJsonLdScript } from "@/lib/minisite/json-ld";
