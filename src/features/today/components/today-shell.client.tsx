@@ -2,11 +2,13 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { RefreshCw } from "lucide-react";
 
 import { CutLine } from "@/components/shared/cut-line";
 import { EmptyState } from "@/components/shared/empty-state";
 import { MetricNumber } from "@/components/shared/metric-number.client";
 import { StatusDot } from "@/components/shared/status-dot";
+import { Button } from "@/components/ui/button";
 import {
   DashboardMetricTile,
   DashboardPage,
@@ -45,6 +47,7 @@ type TodayShellProps = {
   data: TodayPayload | undefined;
   isLoading: boolean;
   isError: boolean;
+  isRefreshing?: boolean;
   onRefetch: () => void;
   onSelectAppointment: (appointment: AppointmentListItem) => void;
 };
@@ -65,6 +68,7 @@ export function TodayShell({
   data,
   isLoading,
   isError,
+  isRefreshing = false,
   onRefetch,
   onSelectAppointment,
 }: TodayShellProps) {
@@ -108,11 +112,27 @@ export function TodayShell({
   return (
     <DashboardPage width="lg">
       <header className="dash-today-header max-w-xl">
-        <p className="salon-dash-kicker text-xs">Today</p>
-        <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">
-          {weekday},{" "}
-          <span className="text-data text-[var(--text-1)]">{day}</span> {month}
-        </p>
+        <div className="flex items-start justify-between gap-[var(--space-3)]">
+          <div>
+            <p className="salon-dash-kicker text-xs">Today</p>
+            <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">
+              {weekday},{" "}
+              <span className="text-data text-[var(--text-1)]">{day}</span> {month}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="salon-dash-btn-outline shrink-0"
+            disabled={isRefreshing}
+            onClick={onRefetch}
+            aria-label="Refresh today"
+          >
+            <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
+            Refresh
+          </Button>
+        </div>
         <div className="mt-[var(--space-4)]">
           <CutLine progress={progress} />
         </div>

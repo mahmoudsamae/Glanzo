@@ -49,7 +49,7 @@ export function TodayClient({
   const now = useNow();
   const [selected, setSelected] = useState<AppointmentListItem | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const { data, isLoading, isError, refetch } = useTodayQuery(shopId, date);
+  const { data, isLoading, isError, refetch, isFetching } = useTodayQuery(shopId, date);
 
   const moveMutation = useMoveAppointmentMutation(shopId, date, null, (code) => {
     setToast(
@@ -74,6 +74,7 @@ export function TodayClient({
         data={data}
         isLoading={isLoading}
         isError={isError}
+        isRefreshing={isFetching && !isLoading}
         onRefetch={() => void refetch()}
         onSelectAppointment={setSelected}
       />

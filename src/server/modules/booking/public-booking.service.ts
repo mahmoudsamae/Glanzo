@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { PublicApiAlternativeSlot } from "@/lib/api/public-response";
+import { isoToShopDate } from "@/lib/booking/slot-days";
 import { mapBookingRpcError } from "@/lib/booking/errors";
 import { normalizePhoneToE164 } from "@/lib/phone/normalize-e164";
 import { createAnonServerClient } from "@/lib/supabase/server";
@@ -14,11 +15,12 @@ import type {
   RescheduleBookingByTokenRpcResult,
 } from "@/types/database-rpc.types";
 
-import { getAppointmentSchedulingContextByToken } from "./booking.queries";
+import { getAppointmentSchedulingContextByToken, getShopSchedulingContextBySlug } from "./booking.queries";
 import {
   fetchAvailabilityNearSlot,
   slotsToAvailabilityModels,
 } from "./availability-io.service";
+import { dayEndMs, dayStartMs } from "@/server/modules/availability/time-windows";
 
 export type PublicBookingResult<T> =
   | { ok: true; data: T }
@@ -122,6 +124,90 @@ export async function bookPublicAppointment(input: {
       endsAt: row.ends_at,
       manageUrl: manageUrlFromToken(row.manage_token),
       idempotentReplay: row.idempotent_replay,
+    },
+  };
+}
+
+export type DuplicateBookingCheck = {
+  duplicate: boolean;
+  existing?: {
+    startsAt: string;
+    serviceName: string;
+  };
+};
+
+export async function checkDuplicateCustomerBooking(input: {
+  slug: string;
+  phone: string;
+  name: string;
+  startsAt: string;
+}): Promise<PublicBookingResult<DuplicateBookingCheck>> {
+  const phone = normalizePhoneToE164(input.phone);
+  if (!phone) {
+    return { ok: false, code: "INVALID_INPUT" };
+  }
+
+  const supabase = createServiceRoleClient();
+  const shop = await getShopSchedulingContextBySlug(supabase, input.slug);
+  if (!shop) {
+    return { ok: false, code: "INVALID_INPUT" };
+  }
+
+  const bookingDate = isoToShopDate(input.startsAt, shop.timezone);
+  const dayStartIso = new Date(dayStartMs(bookingDate, shop.timezone)).toISOString();
+  const dayEndIso = new Date(dayEndMs(bookingDate, shop.timezone)).toISOString();
+  const nameNormalized = input.name.trim().toLowerCase();
+  const nowIso = new Date().toISOString();
+
+  const { data: customers, error: customerError } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("shop_id", shop.id)
+    .eq("phone", phone);
+
+  if (customerError) {
+    return mapRpcFailure(customerError.message);
+  }
+
+  const customerIds = (customers ?? []).map((row) => row.id);
+  if (customerIds.length === 0) {
+    return { ok: true, data: { duplicate: false } };
+  }
+
+  const { data: appointments, error: appointmentError } = await supabase
+    .from("appointments")
+    .select("starts_at, service_name, customer:customers(name)")
+    .eq("shop_id", shop.id)
+    .eq("status", "booked")
+    .in("customer_id", customerIds)
+    .gte("starts_at", dayStartIso)
+    .lt("starts_at", dayEndIso)
+    .gt("ends_at", nowIso);
+
+  if (appointmentError) {
+    return mapRpcFailure(appointmentError.message);
+  }
+
+  const existing = (appointments ?? []).find((row) => {
+    const customer = row.customer;
+    if (!customer || Array.isArray(customer)) {
+      return false;
+    }
+    return customer.name.trim().toLowerCase() === nameNormalized;
+  });
+
+  if (!existing) {
+    return { ok: true, data: { duplicate: false } };
+  }
+
+  return {
+    ok: true,
+    data: {
+      duplicate: true,
+      existing: {
+        startsAt: existing.starts_at,
+        serviceName: existing.service_name,
+      },
     },
   };
 }

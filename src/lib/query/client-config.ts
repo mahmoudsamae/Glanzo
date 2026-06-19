@@ -11,3 +11,6 @@ export const DASHBOARD_QUERY_DEFAULTS: DefaultOptions = {
 
 /** Calendar + Today polling interval (MVP — no Realtime). */
 export const CALENDAR_POLL_INTERVAL_MS = 30_000;
+
+/** Today view — faster refresh for live chair updates. */
+export const TODAY_POLL_INTERVAL_MS = 15_000;

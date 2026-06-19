@@ -19,6 +19,10 @@ import {
 } from "@/lib/booking/booking-steps";
 import { readCustomerPrefill, writeCustomerPrefill } from "@/lib/booking/customer-prefill";
 import {
+  notifyCustomerBookingSaved,
+  upsertSavedCustomerBooking,
+} from "@/lib/booking/customer-saved-bookings";
+import {
   clearBookingIdempotencyKey,
   getOrCreateBookingIdempotencyKey,
 } from "@/lib/booking/idempotency";
@@ -96,6 +100,10 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
   const [networkError, setNetworkError] = useState(false);
   const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null);
   const [copyDone, setCopyDone] = useState(false);
+  const [duplicatePrompt, setDuplicatePrompt] = useState<{
+    startsAt: string;
+    serviceName: string;
+  } | null>(null);
 
   const [name, setName] = useState("");
   const [phoneDigits, setPhoneDigits] = useState("");
@@ -151,6 +159,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     setConfirmation(null);
     setAlternatives([]);
     setError(null);
+    setDuplicatePrompt(null);
     pushParams(buildParams(new URLSearchParams(searchParams.toString()), { open: false }));
   }, [buildParams, pushParams, searchParams]);
 
@@ -322,7 +331,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     pushParams(next);
   }
 
-  function confirmBooking() {
+  async function submitBooking(forceDuplicate = false) {
     const startsAt = normalizeBookingSlotParam(urlState.slotStartsAt);
     if (!urlState.serviceId || !startsAt || isPending) {
       return;
@@ -346,6 +355,33 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
       setError("Bitte wähle einen Termin erneut.");
       return;
     }
+
+    if (!forceDuplicate) {
+      try {
+        const checkParams = new URLSearchParams({
+          phone,
+          name: name.trim(),
+          startsAt,
+        });
+        const checkResponse = await fetch(
+          `/api/public/shops/${shopSlug}/bookings/duplicate-check?${checkParams.toString()}`,
+        );
+        const checkBody = (await checkResponse.json()) as PublicApiEnvelope<{
+          duplicate: boolean;
+          existing?: { startsAt: string; serviceName: string };
+        }>;
+
+        if ("data" in checkBody && checkBody.data.duplicate && checkBody.data.existing) {
+          setDuplicatePrompt(checkBody.data.existing);
+          setError(null);
+          return;
+        }
+      } catch {
+        // Non-blocking — proceed with booking if duplicate check fails.
+      }
+    }
+
+    setDuplicatePrompt(null);
 
     startTransition(async () => {
       setError(null);
@@ -388,6 +424,16 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
         clearBookingIdempotencyKey(shopSlug, sessionStorage);
         writeCustomerPrefill(localStorage, { name: name.trim(), phone });
+        upsertSavedCustomerBooking(localStorage, {
+          shopSlug,
+          shopName: data.shop.name,
+          manageUrl: body.data.manageUrl,
+          startsAt: body.data.startsAt,
+          endsAt: body.data.endsAt,
+          serviceName: selectedService?.name ?? "",
+          customerName: name.trim(),
+        });
+        notifyCustomerBookingSaved();
         setConfirmation({
           manageUrl: body.data.manageUrl,
           startsAt: body.data.startsAt,
@@ -398,6 +444,10 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
         setNetworkError(true);
       }
     });
+  }
+
+  function confirmBooking() {
+    void submitBooking(false);
   }
 
   const progress = bookingStepProgress(urlState.step, autoAssignBarber);
@@ -730,6 +780,37 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   </div>
                 ) : null}
 
+                {duplicatePrompt ? (
+                  <div className="ms-booking-summary flex flex-col gap-[var(--space-3)] border-[color:var(--ms-accent)]">
+                    <p className="text-sm text-[color:var(--ms-text)]">
+                      Du hast heute schon einen Termin um{" "}
+                      <span className="text-[color:var(--ms-accent-on-bg)]">
+                        {formatSlotTime(duplicatePrompt.startsAt, timezone)} Uhr
+                      </span>{" "}
+                      ({duplicatePrompt.serviceName}). Noch einen buchen?
+                    </p>
+                    <div className="flex flex-col gap-[var(--space-2)] sm:flex-row">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        disabled={isPending}
+                        onClick={() => setDuplicatePrompt(null)}
+                      >
+                        Abbrechen
+                      </Button>
+                      <Button
+                        type="button"
+                        className="flex-1"
+                        disabled={isPending}
+                        onClick={() => void submitBooking(true)}
+                      >
+                        Trotzdem buchen
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
+
                 {networkError ? (
                   <div className="flex flex-col gap-[var(--space-2)]">
                     <p className="text-sm text-[color:var(--ms-text-muted)]">
@@ -755,7 +836,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   <Button
                     type="button"
                     className="w-full active:scale-[0.98] transition-transform duration-[var(--t-instant)]"
-                    disabled={isPending}
+                    disabled={isPending || Boolean(duplicatePrompt)}
                     onClick={confirmBooking}
                   >
                     {isPending ? "Wird gebucht…" : "Termin bestätigen"}
@@ -866,6 +947,9 @@ function ConfirmationView({
         <Button type="button" variant="secondary" onClick={onCopy}>
           {copyDone ? "Link kopiert" : "Link kopieren"}
         </Button>
+        <p className="text-center text-xs text-[color:var(--ms-text-muted)]">
+          Nach «Fertig» findest du deinen Termin jederzeit über «Dein Termin» auf der Seite.
+        </p>
         <Button type="button" onClick={onClose}>
           Fertig
         </Button>

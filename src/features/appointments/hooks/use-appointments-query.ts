@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { CALENDAR_POLL_INTERVAL_MS } from "@/lib/query/client-config";
+import { CALENDAR_POLL_INTERVAL_MS, TODAY_POLL_INTERVAL_MS } from "@/lib/query/client-config";
 import type { DayAppointmentsPayload, TodaySummary } from "@/server/modules/appointments/appointments.types";
 
 import {
@@ -58,7 +58,7 @@ export function useTodayQuery(shopId: string, date: string) {
       }
       return result.data;
     },
-    refetchInterval: CALENDAR_POLL_INTERVAL_MS,
+    refetchInterval: TODAY_POLL_INTERVAL_MS,
   });
 }
 

@@ -9,6 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { PublicApiAlternativeSlot, PublicApiEnvelope } from "@/lib/api/public-response";
 import {
+  notifyCustomerBookingSaved,
+  removeSavedCustomerBookingByManageUrl,
+  upsertSavedCustomerBooking,
+} from "@/lib/booking/customer-saved-bookings";
+import {
   appointmentDateInTimezone,
   formatAppointmentDateTime,
 } from "@/lib/booking/format-appointment";
@@ -105,6 +110,8 @@ export function ManageBookingClient({
       }
       setCancelOpen(false);
       setBooking((current) => ({ ...current, status: "cancelled" }));
+      removeSavedCustomerBookingByManageUrl(localStorage, `/bookings/${token}`);
+      notifyCustomerBookingSaved();
       router.refresh();
     });
   }
@@ -136,6 +143,17 @@ export function ManageBookingClient({
         return;
       }
       setRescheduleOpen(false);
+      removeSavedCustomerBookingByManageUrl(localStorage, `/bookings/${token}`);
+      upsertSavedCustomerBooking(localStorage, {
+        shopSlug,
+        shopName: booking.shop_name,
+        manageUrl: body.data.manageUrl,
+        startsAt: body.data.starts_at,
+        endsAt: body.data.ends_at,
+        serviceName: booking.service_name,
+        customerName: "Termin",
+      });
+      notifyCustomerBookingSaved();
       router.replace(body.data.manageUrl);
     });
   }

@@ -40,6 +40,14 @@ export const createBookingBodySchema = z.object({
 
 export type CreateBookingBody = z.infer<typeof createBookingBodySchema>;
 
+export const duplicateBookingQuerySchema = z.object({
+  phone: z.string().trim().min(1).max(20),
+  name: z.string().trim().min(2).max(80),
+  startsAt: isoDateTimeSchema,
+});
+
+export type DuplicateBookingQuery = z.infer<typeof duplicateBookingQuerySchema>;
+
 export const rescheduleBookingBodySchema = z.object({
   startsAt: isoDateTimeSchema,
 });

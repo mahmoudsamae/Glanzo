@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { BookingSheetGate } from "@/features/booking";
+import { CustomerBookingAccess } from "@/features/booking/components/customer-booking-access.client";
 import { MinisiteShell } from "@/features/minisite";
 import { shopMediaPublicUrl } from "@/lib/minisite/media-url";
 import { shopJsonLdScript } from "@/lib/minisite/json-ld";
@@ -37,6 +38,7 @@ export default async function ShopPage({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
       <MinisiteShell data={data} shopSlug={parsed.data} />
+      <CustomerBookingAccess shopSlug={parsed.data} timezone={data.shop.timezone} />
       {book === "1" ? (
         <Suspense fallback={null}>
           <BookingSheetGate shopSlug={parsed.data} data={data} />

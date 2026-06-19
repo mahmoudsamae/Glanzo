@@ -29,6 +29,15 @@ export function nextDaysInTimezone(
   });
 }
 
+/** Wall-clock date YYYY-MM-DD for an ISO instant in shop timezone. */
+export function isoToShopDate(iso: string, timezone: string): string {
+  const zoned = new TZDate(new Date(iso).getTime(), timezone);
+  const year = zoned.getFullYear();
+  const month = String(zoned.getMonth() + 1).padStart(2, "0");
+  const day = String(zoned.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function formatDayChipLabel(
   date: string,
   timezone: string,
