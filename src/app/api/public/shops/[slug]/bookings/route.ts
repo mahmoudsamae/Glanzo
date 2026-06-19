@@ -9,6 +9,7 @@ import {
   idempotencyKeyHeaderSchema,
   publicShopSlugParamSchema,
 } from "@/lib/validations/booking";
+import { normalizeBookingSlotParam } from "@/lib/booking/booking-steps";
 import { bookPublicAppointment } from "@/server/modules/booking/public-booking.service";
 
 type RouteContext = { params: Promise<{ slug: string }> };
@@ -31,6 +32,13 @@ export async function POST(request: Request, context: RouteContext) {
     json = await request.json();
   } catch {
     return publicError("INVALID_INPUT");
+  }
+
+  if (json && typeof json === "object" && "startsAt" in json && typeof json.startsAt === "string") {
+    json = {
+      ...json,
+      startsAt: normalizeBookingSlotParam(json.startsAt) ?? json.startsAt,
+    };
   }
 
   const bodyParsed = createBookingBodySchema.safeParse(json);

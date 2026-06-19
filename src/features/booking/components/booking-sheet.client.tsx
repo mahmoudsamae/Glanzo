@@ -13,6 +13,7 @@ import {
   BARBER_FIRST,
   bookingStepProgress,
   buildBookingSearchParams,
+  normalizeBookingSlotParam,
   parseBookingUrlState,
   previousBookingSearchParams,
 } from "@/lib/booking/booking-steps";
@@ -322,7 +323,8 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
   }
 
   function confirmBooking() {
-    if (!urlState.serviceId || !urlState.slotStartsAt || isPending) {
+    const startsAt = normalizeBookingSlotParam(urlState.slotStartsAt);
+    if (!urlState.serviceId || !startsAt || isPending) {
       return;
     }
 
@@ -336,7 +338,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     const membershipId =
       effectiveBarberId === BARBER_FIRST
         ? (resolvedSlot?.membershipId ||
-            slots.find((s) => s.startsAt === urlState.slotStartsAt)?.membershipId ||
+            slots.find((s) => s.startsAt === startsAt)?.membershipId ||
             null)
         : effectiveBarberId;
 
@@ -362,7 +364,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
           body: JSON.stringify({
             serviceId: urlState.serviceId,
             membershipId,
-            startsAt: urlState.slotStartsAt,
+            startsAt,
             name: name.trim(),
             phone,
             email: email.trim() || null,

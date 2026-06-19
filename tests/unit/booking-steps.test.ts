@@ -5,6 +5,7 @@ import {
   BOOKING_OPEN_PARAM,
   bookingStepProgress,
   buildBookingSearchParams,
+  normalizeBookingSlotParam,
   parseBookingUrlState,
   previousBookingSearchParams,
 } from "@/lib/booking/booking-steps";
@@ -95,5 +96,16 @@ describe("buildBookingSearchParams", () => {
     );
     expect(next.get("service")).toBe("svc-1");
     expect(next.get("barber")).toBe(BARBER_FIRST);
+  });
+});
+
+describe("normalizeBookingSlotParam", () => {
+  it("restores plus sign in timezone offset mangled by query strings", () => {
+    expect(normalizeBookingSlotParam("2026-06-20T08:00:00+02:00")).toBe(
+      "2026-06-20T08:00:00+02:00",
+    );
+    expect(normalizeBookingSlotParam("2026-06-20T08:00:00 02:00")).toBe(
+      "2026-06-20T08:00:00+02:00",
+    );
   });
 });

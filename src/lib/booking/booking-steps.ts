@@ -16,6 +16,19 @@ export type BookingFlowOptions = {
   autoAssignBarber?: boolean;
 };
 
+/** Fix ISO datetimes where URL query parsing turned '+' into space in the offset. */
+export function normalizeBookingSlotParam(value: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.replace(
+    /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?) (\d{2}:\d{2})$/,
+    "$1+$2",
+  );
+}
+
 export function parseBookingUrlState(
   params: URLSearchParams,
   options: BookingFlowOptions = {},
@@ -23,7 +36,7 @@ export function parseBookingUrlState(
   const open = params.get(BOOKING_OPEN_PARAM) === "1";
   const serviceId = params.get("service");
   const barberId = params.get("barber");
-  const slotStartsAt = params.get("slot");
+  const slotStartsAt = normalizeBookingSlotParam(params.get("slot"));
   const autoAssign = options.autoAssignBarber ?? false;
 
   let step: BookingSheetStep = "service";
