@@ -24,6 +24,10 @@ import {
 import { downloadBookingIcs, generateBookingIcs } from "@/lib/booking/ics";
 import { bookingErrorMessageDe } from "@/lib/booking/messages-de";
 import {
+  bookingSheetCssVars,
+  bookingSheetThemeClass,
+} from "@/lib/booking/booking-sheet-theme";
+import {
   digitsFromPhoneInput,
   formatGermanPhoneVisual,
   germanPhoneRawFromDigits,
@@ -288,6 +292,15 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     queueMicrotask(() => applyCustomerPrefill());
   }, [applyCustomerPrefill, urlState.slotStartsAt, urlState.step]);
 
+  useEffect(() => {
+    if (urlState.open) {
+      document.body.classList.add("ms-booking-open");
+    } else {
+      document.body.classList.remove("ms-booking-open");
+    }
+    return () => document.body.classList.remove("ms-booking-open");
+  }, [urlState.open]);
+
   function selectSlot(slot: AvailabilitySlot) {
     pushParams(
       buildParams(new URLSearchParams(searchParams.toString()), {
@@ -391,6 +404,8 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     data.minisite.content.instagram,
   );
   const contactFallback = bookingContactFallback(contactLinks);
+  const bookingThemeClass = bookingSheetThemeClass(data.minisite.template);
+  const bookingStyle = bookingSheetCssVars(data.minisite.template, data.minisite.accent_hex);
 
   return (
     <Sheet
@@ -402,27 +417,37 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
       }}
     >
       <SheetContent
+        overlayClassName="ms-booking-overlay"
+        style={bookingStyle}
         className={cn(
-          "max-h-[92dvh] overflow-y-auto border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] text-[color:var(--ms-text)] lg:max-h-none",
+          "ms-booking-sheet minisite-font",
+          bookingThemeClass,
+          "max-h-[92dvh] overflow-y-auto text-[color:var(--ms-text)] lg:max-h-none",
           "lg:inset-y-0 lg:right-0 lg:left-auto lg:top-0 lg:bottom-0 lg:w-full lg:max-w-md",
           "lg:rounded-none lg:border-t-0 lg:border-l",
           "data-[state=open]:duration-[var(--t-smooth)] data-[state=closed]:duration-[var(--t-fast)]",
         )}
         aria-describedby={undefined}
       >
-        <div className="flex items-center gap-[var(--space-3)] pr-8">
+        <div className="ms-booking-sheet__header flex items-center gap-[var(--space-3)] pr-8">
           {!confirmation && urlState.step !== "service" ? (
-            <Button type="button" variant="ghost" size="sm" className="-ml-2" onClick={goBack}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="-ml-2 text-[color:var(--ms-text-muted)] hover:bg-[color-mix(in_oklch,var(--ms-accent)_12%,transparent)] hover:text-[color:var(--ms-text)]"
+              onClick={goBack}
+            >
               Zurück
             </Button>
           ) : (
             <span className="w-14" />
           )}
           <div className="flex-1">
-          <div className={confirmation ? "ms-booking-celebrate" : undefined}>
-            <CutLine progress={confirmation ? 1 : progress} />
+            <div className={confirmation ? "ms-booking-celebrate" : undefined}>
+              <CutLine progress={confirmation ? 1 : progress} />
+            </div>
           </div>
-        </div>
         </div>
 
         {confirmation ? (
@@ -475,12 +500,17 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
         ) : (
           <div key={urlState.step} className="ms-booking-step">
             <SheetHeader className="pt-[var(--space-2)]">
-              <SheetTitle>
+              <SheetTitle className="ms-booking-sheet__title">
                 {urlState.step === "service" && "Service wählen"}
                 {urlState.step === "barber" && "Barber wählen"}
-                {urlState.step === "slot" && (autoAssignBarber ? "Termin wählen" : "Termin wählen")}
+                {urlState.step === "slot" && "Termin wählen"}
                 {urlState.step === "details" && "Deine Daten"}
               </SheetTitle>
+              {urlState.step === "service" ? (
+                <p className="ms-booking-sheet__subtitle">
+                  Wähle eine Leistung — danach siehst du sofort freie Termine.
+                </p>
+              ) : null}
             </SheetHeader>
 
             {urlState.step === "service" ? (
@@ -489,7 +519,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   <li key={service.id}>
                     <button
                       type="button"
-                      className="group flex w-full items-center gap-[var(--space-4)] rounded-lg border border-[color:var(--ms-border-subtle)] bg-[color-mix(in_oklch,var(--ms-bg-elevated)_92%,transparent)] px-[var(--space-4)] py-[var(--space-4)] text-left transition-[border-color,background-color,transform] hover:border-[color:var(--ms-accent-on-bg)] active:scale-[0.99]"
+                      className="ms-booking-service-card group"
                       onClick={() => selectService(service.id)}
                     >
                       <span className="flex min-w-0 flex-1 flex-col gap-[var(--space-1)]">
@@ -498,7 +528,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                           {service.duration_min} Min.
                         </span>
                       </span>
-                      <span className="shrink-0 rounded-full border border-[color:var(--ms-border-subtle)] px-[var(--space-3)] py-[var(--space-1)] text-data text-sm tabular-nums text-[color:var(--ms-accent-on-bg)] group-hover:border-[color:var(--ms-accent-on-bg)]">
+                      <span className="ms-booking-service-card__price">
                         {formatPriceCents(service.price_cents)}
                       </span>
                     </button>
@@ -512,7 +542,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 <li>
                   <button
                     type="button"
-                    className="w-full rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-3)] text-left font-display text-md hover:border-[color:var(--ms-accent-on-bg)]"
+                    className="ms-booking-service-card font-display text-md"
                     onClick={() => selectBarber(BARBER_FIRST)}
                   >
                     Erstverfügbar
@@ -522,7 +552,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   <li key={member.membership_id}>
                     <button
                       type="button"
-                      className="w-full rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-3)] text-left font-display text-md hover:border-[color:var(--ms-accent-on-bg)]"
+                      className="ms-booking-service-card font-display text-md"
                       onClick={() => selectBarber(member.membership_id)}
                     >
                       {member.display_name}
@@ -535,7 +565,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
             {urlState.step === "slot" ? (
               <div className="flex flex-col gap-[var(--space-5)]">
                 {selectedService ? (
-                  <div className="rounded-lg border border-[color:var(--ms-border-subtle)] bg-[color-mix(in_oklch,var(--ms-bg-elevated)_88%,transparent)] px-[var(--space-4)] py-[var(--space-3)]">
+                  <div className="ms-booking-summary">
                     <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
                       Gewählt
                     </p>
@@ -557,12 +587,11 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                         key={date}
                         type="button"
                         className={cn(
-                          "shrink-0 rounded-full border px-[var(--space-3)] py-[var(--space-2)] text-sm transition-colors",
-                          date === selectedDate
-                            ? "border-[color:var(--ms-accent)] bg-[color:var(--ms-accent)] text-[color:var(--ms-on-accent)]"
-                            : date === suggestedDate
-                              ? "border-[color:var(--ms-accent-on-bg)] ring-1 ring-[color:var(--ms-accent-on-bg)]"
-                              : "border-[color:var(--ms-border-subtle)] hover:border-[color:var(--ms-accent-on-bg)]",
+                          "ms-booking-day-chip",
+                          date === selectedDate && "ms-booking-day-chip--active",
+                          date === suggestedDate &&
+                            date !== selectedDate &&
+                            "ms-booking-day-chip--suggested",
                         )}
                         onClick={() => setSelectedDate(date)}
                       >
@@ -587,10 +616,8 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                               key={`${slot.membershipId}-${slot.startsAt}`}
                               type="button"
                               className={cn(
-                                "ms-slot-chip rounded-lg border py-[var(--space-3)] text-data text-sm tabular-nums transition-[border-color,background-color,transform]",
-                                urlState.slotStartsAt === slot.startsAt
-                                  ? "border-[color:var(--ms-accent)] bg-[color:var(--ms-accent)] text-[color:var(--ms-on-accent)]"
-                                  : "border-[color:var(--ms-border-subtle)] hover:border-[color:var(--ms-accent-on-bg)] active:scale-[0.98]",
+                                "ms-booking-slot-chip ms-slot-chip",
+                                urlState.slotStartsAt === slot.startsAt && "ms-booking-slot-chip--active",
                               )}
                               style={{ ["--slot-i" as string]: slotIndex }}
                               onClick={() => selectSlot(slot)}
@@ -603,7 +630,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-lg border border-dashed border-[color:var(--ms-border-subtle)] px-[var(--space-4)] py-[var(--space-6)] text-center">
+                  <div className="ms-booking-empty">
                     <p className="font-display text-base">Keine freien Termine</p>
                     <p className="mt-[var(--space-2)] text-sm text-[color:var(--ms-text-muted)]">
                       An diesem Tag ist nichts frei. Wähle einen anderen Tag oder kontaktiere uns direkt.
@@ -625,7 +652,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
             {urlState.step === "details" && selectedService ? (
               <div className="flex flex-col gap-[var(--space-4)]">
-                <div className="rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-3)] text-sm">
+                <div className="ms-booking-summary">
                   <p className="font-display text-md">{selectedService.name}</p>
                   <p className="text-[color:var(--ms-text-muted)]">
                     {urlState.slotStartsAt

@@ -608,6 +608,168 @@
     animation: ms-booking-step-in var(--t-fast) var(--ease-enter) both;
   }
 
+  .ms-booking-overlay {
+    z-index: 55 !important;
+    background: var(--ms-booking-overlay, rgb(0 0 0 / 0.88)) !important;
+    backdrop-filter: blur(10px);
+  }
+
+  .ms-booking-sheet {
+    z-index: 60 !important;
+    background: var(--ms-bg) !important;
+    color: var(--ms-text);
+    border-color: color-mix(in oklch, var(--ms-accent) 22%, transparent) !important;
+    box-shadow:
+      0 -28px 80px rgb(0 0 0 / 0.45),
+      inset 0 1px 0 color-mix(in oklch, var(--ms-accent) 18%, transparent);
+  }
+
+  .ms-booking-sheet .font-display {
+    color: var(--ms-text);
+  }
+
+  .ms-booking-sheet__header {
+    border-bottom: 1px solid color-mix(in oklch, var(--ms-accent) 15%, transparent);
+    padding-bottom: var(--space-4);
+    margin-inline: calc(var(--space-6) * -1);
+    padding-inline: var(--space-6);
+    margin-top: calc(var(--space-2) * -1);
+  }
+
+  .ms-booking-sheet__title {
+    font-size: 1.35rem;
+    letter-spacing: 0.01em;
+  }
+
+  .ms-booking-sheet__subtitle {
+    color: var(--ms-text-muted);
+    font-size: 0.875rem;
+    margin-top: var(--space-1);
+  }
+
+  .ms-booking-service-card {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: var(--space-4);
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklch, var(--ms-accent) 16%, transparent);
+    background: var(--ms-bg-elevated);
+    padding: var(--space-4);
+    text-align: left;
+    color: var(--ms-text);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.12);
+    transition:
+      border-color var(--t-fast) var(--ease-enter),
+      transform var(--t-instant) var(--ease-enter),
+      box-shadow var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-booking-service-card:hover {
+    border-color: color-mix(in oklch, var(--ms-accent) 55%, transparent);
+    box-shadow:
+      0 10px 28px rgb(0 0 0 / 0.22),
+      inset 0 0 0 1px color-mix(in oklch, var(--ms-accent) 12%, transparent);
+  }
+
+  .ms-booking-service-card:active {
+    transform: scale(0.99);
+  }
+
+  .ms-booking-service-card__price {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--ms-accent) 35%, transparent);
+    background: color-mix(in oklch, var(--ms-accent) 12%, var(--ms-bg-elevated));
+    padding: var(--space-1) var(--space-3);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.875rem;
+    color: var(--ms-accent-on-bg);
+  }
+
+  .ms-booking-summary {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklch, var(--ms-accent) 20%, transparent);
+    background: var(--ms-bg-elevated);
+    padding: var(--space-4);
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--ms-accent) 10%, transparent);
+  }
+
+  .ms-booking-day-chip {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklch, var(--ms-accent) 14%, transparent);
+    background: var(--ms-bg-elevated);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.875rem;
+    color: var(--ms-text);
+    transition:
+      border-color var(--t-fast) var(--ease-enter),
+      background-color var(--t-fast) var(--ease-enter),
+      color var(--t-fast) var(--ease-enter);
+  }
+
+  .ms-booking-day-chip:hover {
+    border-color: color-mix(in oklch, var(--ms-accent) 45%, transparent);
+  }
+
+  .ms-booking-day-chip--active {
+    border-color: var(--ms-accent);
+    background: var(--ms-accent);
+    color: var(--ms-on-accent);
+  }
+
+  .ms-booking-day-chip--suggested {
+    border-color: var(--ms-accent-on-bg);
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--ms-accent-on-bg) 40%, transparent);
+  }
+
+  .ms-booking-slot-chip {
+    border-radius: 0.625rem;
+    border: 1px solid color-mix(in oklch, var(--ms-accent) 14%, transparent);
+    background: var(--ms-bg-elevated);
+    padding-block: var(--space-3);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ms-text);
+    transition:
+      border-color var(--t-fast) var(--ease-enter),
+      background-color var(--t-fast) var(--ease-enter),
+      transform var(--t-instant) var(--ease-enter);
+  }
+
+  .ms-booking-slot-chip:hover {
+    border-color: color-mix(in oklch, var(--ms-accent) 50%, transparent);
+  }
+
+  .ms-booking-slot-chip--active {
+    border-color: var(--ms-accent);
+    background: var(--ms-accent);
+    color: var(--ms-on-accent);
+  }
+
+  .ms-booking-empty {
+    border-radius: 0.75rem;
+    border: 1px dashed color-mix(in oklch, var(--ms-accent) 22%, transparent);
+    background: color-mix(in oklch, var(--ms-bg-elevated) 88%, var(--ms-bg));
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  body.ms-booking-open .ms-cinema-book-bar {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .ms-booking-sheet > button.absolute {
+    color: var(--ms-text-muted);
+  }
+
+  .ms-booking-sheet > button.absolute:hover {
+    color: var(--ms-text);
+    background: color-mix(in oklch, var(--ms-accent) 10%, transparent);
+  }
+
   .ms-slot-chip {
     animation: ms-slot-pop var(--t-fast) var(--ease-enter) both;
     animation-delay: calc(var(--slot-i, 0) * 30ms);

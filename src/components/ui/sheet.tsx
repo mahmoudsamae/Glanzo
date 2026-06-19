@@ -45,13 +45,16 @@ function SheetOverlay({
 function SheetContent({
   className,
   children,
+  overlayClassName,
+  style,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   side?: "bottom";
+  overlayClassName?: string;
 }) {
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="sheet-content"
         className={cn(
@@ -63,6 +66,7 @@ function SheetContent({
         )}
         style={{
           paddingBottom: "calc(var(--space-6) + env(safe-area-inset-bottom, 0px))",
+          ...style,
         }}
         {...props}
       >
