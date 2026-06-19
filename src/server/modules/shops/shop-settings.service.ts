@@ -13,6 +13,7 @@ const shopSettingsSchema = z.object({
   bookingLeadTimeMin: z.number().int().min(0),
   cancellationWindowMin: z.number().int().min(0),
   slotGranularityMin: z.union([z.literal(5), z.literal(10), z.literal(15), z.literal(20), z.literal(30), z.literal(60)]),
+  bookingAutoAssignBarber: z.boolean(),
 });
 
 export type ShopSettingsInput = z.infer<typeof shopSettingsSchema>;
@@ -23,7 +24,7 @@ export async function loadShopSettings(actor: Actor, shopId: string) {
   const { data, error } = await supabase
     .from("shops")
     .select(
-      "id, name, slug, opening_hours, booking_lead_time_min, cancellation_window_min, slot_granularity_min",
+      "id, name, slug, opening_hours, booking_lead_time_min, cancellation_window_min, slot_granularity_min, booking_auto_assign_barber",
     )
     .eq("id", shopId)
     .single();
@@ -56,6 +57,7 @@ export async function updateShopSettings(
       booking_lead_time_min: parsed.data.bookingLeadTimeMin,
       cancellation_window_min: parsed.data.cancellationWindowMin,
       slot_granularity_min: parsed.data.slotGranularityMin,
+      booking_auto_assign_barber: parsed.data.bookingAutoAssignBarber,
     })
     .eq("id", shopId);
 

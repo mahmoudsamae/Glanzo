@@ -11,16 +11,27 @@ export type BookingUrlState = {
   slotStartsAt: string | null;
 };
 
-export function parseBookingUrlState(params: URLSearchParams): BookingUrlState {
+export type BookingFlowOptions = {
+  /** Skip barber picker — auto-assign first available barber at confirm time. */
+  autoAssignBarber?: boolean;
+};
+
+export function parseBookingUrlState(
+  params: URLSearchParams,
+  options: BookingFlowOptions = {},
+): BookingUrlState {
   const open = params.get(BOOKING_OPEN_PARAM) === "1";
   const serviceId = params.get("service");
   const barberId = params.get("barber");
   const slotStartsAt = params.get("slot");
+  const autoAssign = options.autoAssignBarber ?? false;
 
   let step: BookingSheetStep = "service";
   if (serviceId && barberId && slotStartsAt) {
     step = "details";
   } else if (serviceId && barberId) {
+    step = "slot";
+  } else if (serviceId && autoAssign) {
     step = "slot";
   } else if (serviceId) {
     step = "barber";
@@ -35,7 +46,16 @@ export function parseBookingUrlState(params: URLSearchParams): BookingUrlState {
   };
 }
 
-export function bookingStepProgress(step: BookingSheetStep): number {
+export function bookingStepProgress(step: BookingSheetStep, autoAssignBarber = false): number {
+  if (autoAssignBarber) {
+    switch (step) {
+      case "service":
+        return 0.5;
+      default:
+        return 1;
+    }
+  }
+
   switch (step) {
     case "service":
       return 1 / 3;
@@ -54,8 +74,10 @@ export function buildBookingSearchParams(
     barberId?: string | null;
     slotStartsAt?: string | null;
   },
+  options: BookingFlowOptions = {},
 ): URLSearchParams {
   const next = new URLSearchParams(base.toString());
+  const autoAssign = options.autoAssignBarber ?? false;
 
   if (patch.open === false) {
     next.delete(BOOKING_OPEN_PARAM);
@@ -77,6 +99,9 @@ export function buildBookingSearchParams(
     next.set("service", patch.serviceId);
     next.delete("barber");
     next.delete("slot");
+    if (autoAssign) {
+      next.set("barber", BARBER_FIRST);
+    }
   }
 
   if (patch.barberId === null) {
@@ -97,19 +122,27 @@ export function buildBookingSearchParams(
 }
 
 /** One step back for in-app-browser back / header back. */
-export function previousBookingSearchParams(params: URLSearchParams): URLSearchParams {
-  const state = parseBookingUrlState(params);
+export function previousBookingSearchParams(
+  params: URLSearchParams,
+  options: BookingFlowOptions = {},
+): URLSearchParams {
+  const state = parseBookingUrlState(params, options);
+  const autoAssign = options.autoAssignBarber ?? false;
+
   if (!state.open) {
     return params;
   }
   if (state.slotStartsAt) {
-    return buildBookingSearchParams(params, { slotStartsAt: null });
+    return buildBookingSearchParams(params, { slotStartsAt: null }, options);
   }
   if (state.barberId) {
-    return buildBookingSearchParams(params, { barberId: null });
+    if (autoAssign && state.barberId === BARBER_FIRST) {
+      return buildBookingSearchParams(params, { serviceId: null }, options);
+    }
+    return buildBookingSearchParams(params, { barberId: null }, options);
   }
   if (state.serviceId) {
-    return buildBookingSearchParams(params, { serviceId: null });
+    return buildBookingSearchParams(params, { serviceId: null }, options);
   }
-  return buildBookingSearchParams(params, { open: false });
+  return buildBookingSearchParams(params, { open: false }, options);
 }

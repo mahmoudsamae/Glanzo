@@ -18,6 +18,7 @@ type ShopSettingsFormProps = {
     booking_lead_time_min: number;
     cancellation_window_min: number;
     slot_granularity_min: number;
+    booking_auto_assign_barber: boolean;
   };
 };
 
@@ -39,6 +40,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
   const [leadTime, setLeadTime] = useState(shop.booking_lead_time_min);
   const [cancelWindow, setCancelWindow] = useState(shop.cancellation_window_min);
   const [granularity, setGranularity] = useState(shop.slot_granularity_min);
+  const [autoAssignBarber, setAutoAssignBarber] = useState(shop.booking_auto_assign_barber);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -50,6 +52,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
         bookingLeadTimeMin: leadTime,
         cancellationWindowMin: cancelWindow,
         slotGranularityMin: granularity as (typeof GRANULARITY_OPTIONS)[number],
+        bookingAutoAssignBarber: autoAssignBarber,
       });
       if (!result.ok) {
         setError("Could not save settings.");
@@ -113,6 +116,22 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
             </select>
           </div>
         </div>
+        <label className="mt-[var(--space-4)] flex cursor-pointer items-start gap-[var(--space-3)] rounded-md border border-[color-mix(in_oklch,var(--brass)_8%,var(--ink-3))] px-[var(--space-4)] py-[var(--space-3)]">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={autoAssignBarber}
+            onChange={(e) => setAutoAssignBarber(e.target.checked)}
+          />
+          <span>
+            <span className="block text-sm font-medium text-[var(--text-0)]">
+              Direkt buchen (ohne Barber-Auswahl)
+            </span>
+            <span className="mt-[var(--space-1)] block text-xs text-[var(--text-2)]">
+              Gäste wählen nur Service und Uhrzeit — der nächste freie Barber wird automatisch zugewiesen.
+            </span>
+          </span>
+        </label>
       </DashboardPanel>
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

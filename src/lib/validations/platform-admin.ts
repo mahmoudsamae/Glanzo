@@ -85,6 +85,7 @@ export const platformShopDetailSchema = z
     booking_lead_time_min: z.number().int(),
     cancellation_window_min: z.number().int(),
     slot_granularity_min: z.number().int(),
+    booking_auto_assign_barber: z.boolean(),
     reminders_enabled: z.boolean(),
     owner_display_name: z.string().nullable().optional(),
     owner_email: z.string().nullable().optional(),

@@ -28,6 +28,10 @@ function staffWindowsForDay(
   }
 
   const shifts = staffHours.filter((row) => row.weekday === weekday);
+  if (shifts.length === 0 && shopOpen) {
+    return [shopOpen];
+  }
+
   const windows: MsInterval[] = [];
 
   for (const shift of shifts) {

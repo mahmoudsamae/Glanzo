@@ -12,6 +12,7 @@ import {
   setPlatformOwnerPasswordAction,
   setPlatformShopMinisiteTemplatesAction,
   setPlatformShopStatusAction,
+  setPlatformShopBookingAutoAssignAction,
 } from "../api";
 import { normalizeAllowedMinisiteTemplates } from "@/lib/minisite/allowed-templates";
 import { MINISITE_TEMPLATES } from "@/lib/minisite/template-registry";
@@ -76,6 +77,9 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
   );
   const [templateSuccess, setTemplateSuccess] = useState<string | null>(null);
   const [templateError, setTemplateError] = useState<string | null>(null);
+  const [autoAssignBarber, setAutoAssignBarber] = useState(shop.booking_auto_assign_barber);
+  const [bookingModeSuccess, setBookingModeSuccess] = useState<string | null>(null);
+  const [bookingModeError, setBookingModeError] = useState<string | null>(null);
 
   const minisiteUrl = buildShopMinisiteUrl(shop.slug);
   const isSuspended = shop.status === "suspended";
@@ -234,6 +238,20 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
     });
   }
 
+  function saveBookingMode() {
+    setBookingModeError(null);
+    setBookingModeSuccess(null);
+    startTransition(async () => {
+      const result = await setPlatformShopBookingAutoAssignAction(shop.id, autoAssignBarber);
+      if (!result.ok) {
+        setBookingModeError("Buchungsmodus konnte nicht gespeichert werden.");
+        return;
+      }
+      setBookingModeSuccess("Buchungsmodus wurde gespeichert.");
+      router.refresh();
+    });
+  }
+
   const templateSettingsChanged =
     selectedTemplate !== shop.minisite_template ||
     allowedTemplates.slice().sort().join(",") !==
@@ -302,6 +320,10 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
             <AdminFact label="Lead-Zeit" value={`${shop.booking_lead_time_min} min`} />
             <AdminFact label="Storno-Fenster" value={`${shop.cancellation_window_min} min`} />
             <AdminFact label="Slot-Raster" value={`${shop.slot_granularity_min} min`} />
+            <AdminFact
+              label="Direkt buchen"
+              value={shop.booking_auto_assign_barber ? "An (ohne Barber)" : "Aus (Barber wählen)"}
+            />
             <AdminFact
               label="Mini-Site"
               value={
@@ -410,6 +432,44 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
                 onClick={saveTemplateSettings}
               >
                 Template-Einstellungen speichern
+              </Button>
+            </div>
+          </AdminPanel>
+
+          <AdminPanel
+            title="Online-Buchung"
+            description="Steuert den öffentlichen Buchungsflow auf der Mini-Site."
+          >
+            {bookingModeSuccess ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-ok)]">{bookingModeSuccess}</p>
+            ) : null}
+            {bookingModeError ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-bad)]">{bookingModeError}</p>
+            ) : null}
+            <label className="flex cursor-pointer items-start gap-[var(--space-3)] rounded-md border border-[var(--ink-3)] px-[var(--space-4)] py-[var(--space-3)]">
+              <input
+                type="checkbox"
+                className="mt-1"
+                checked={autoAssignBarber}
+                onChange={(e) => setAutoAssignBarber(e.target.checked)}
+              />
+              <span>
+                <span className="block text-sm font-medium text-[var(--text-0)]">
+                  Direkt buchen (Barber automatisch zuweisen)
+                </span>
+                <span className="mt-[var(--space-1)] block text-xs text-[var(--text-2)]">
+                  Gäste überspringen die Barber-Auswahl — der nächste freie Termin wird zugewiesen.
+                </span>
+              </span>
+            </label>
+            <div className="mt-[var(--space-4)]">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending || autoAssignBarber === shop.booking_auto_assign_barber}
+                onClick={saveBookingMode}
+              >
+                Buchungsmodus speichern
               </Button>
             </div>
           </AdminPanel>

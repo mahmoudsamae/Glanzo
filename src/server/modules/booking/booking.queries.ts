@@ -96,7 +96,23 @@ export async function listServiceMembershipIds(
   }
 
   const linkedIds = (links ?? []).map((row) => row.membership_id);
-  if (linkedIds.length === 0) {
+  let membershipFilterIds = linkedIds;
+
+  if (membershipFilterIds.length === 0) {
+    const { data: allMembers, error: allMembersError } = await supabase
+      .from("memberships")
+      .select("id")
+      .eq("shop_id", shopId)
+      .is("archived_at", null);
+
+    if (allMembersError) {
+      throw allMembersError;
+    }
+
+    membershipFilterIds = (allMembers ?? []).map((row) => row.id);
+  }
+
+  if (membershipFilterIds.length === 0) {
     return [];
   }
 
@@ -104,7 +120,7 @@ export async function listServiceMembershipIds(
     .from("memberships")
     .select("id")
     .eq("shop_id", shopId)
-    .in("id", linkedIds)
+    .in("id", membershipFilterIds)
     .is("archived_at", null);
 
   if (membersError) {

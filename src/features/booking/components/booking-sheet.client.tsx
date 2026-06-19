@@ -35,6 +35,7 @@ import {
   nextDaysInTimezone,
   todayInTimezone,
 } from "@/lib/booking/slot-days";
+import { groupSlotsByPeriod } from "@/lib/booking/slot-groups";
 import { formatPriceCents } from "@/lib/minisite/format-price";
 import { normalizePhoneToE164 } from "@/lib/phone/normalize-e164";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
@@ -62,10 +63,19 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const urlState = useMemo(
-    () => parseBookingUrlState(new URLSearchParams(searchParams.toString())),
-    [searchParams],
+  const autoAssignBarber = data.shop.booking_auto_assign_barber !== false;
+  const flowOptions = useMemo(
+    () => ({ autoAssignBarber }),
+    [autoAssignBarber],
   );
+
+  const urlState = useMemo(
+    () => parseBookingUrlState(new URLSearchParams(searchParams.toString()), flowOptions),
+    [searchParams, flowOptions],
+  );
+
+  const effectiveBarberId =
+    urlState.barberId ?? (autoAssignBarber && urlState.serviceId ? BARBER_FIRST : null);
 
   const timezone = data.shop.timezone;
   const isSuspended = data.shop.status === "suspended";
@@ -126,34 +136,43 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     [pathname, router],
   );
 
+  const buildParams = useCallback(
+    (base: URLSearchParams, patch: Parameters<typeof buildBookingSearchParams>[1]) =>
+      buildBookingSearchParams(base, patch, flowOptions),
+    [flowOptions],
+  );
+
   const closeSheet = useCallback(() => {
     setConfirmation(null);
     setAlternatives([]);
     setError(null);
-    pushParams(buildBookingSearchParams(new URLSearchParams(searchParams.toString()), { open: false }));
-  }, [pushParams, searchParams]);
+    pushParams(buildParams(new URLSearchParams(searchParams.toString()), { open: false }));
+  }, [buildParams, pushParams, searchParams]);
 
   const goBack = useCallback(() => {
     if (confirmation) {
       return;
     }
-    const prev = previousBookingSearchParams(new URLSearchParams(searchParams.toString()));
+    const prev = previousBookingSearchParams(
+      new URLSearchParams(searchParams.toString()),
+      flowOptions,
+    );
     if (!parseBookingUrlState(prev).open) {
       closeSheet();
       return;
     }
     pushParams(prev);
-  }, [closeSheet, confirmation, pushParams, searchParams]);
+  }, [closeSheet, confirmation, flowOptions, pushParams, searchParams]);
 
   const loadSlotsForDate = useCallback(
     async (date: string): Promise<AvailabilitySlot[]> => {
-      if (!urlState.serviceId || !urlState.barberId) {
+      if (!urlState.serviceId || !effectiveBarberId) {
         return [];
       }
       const membershipQuery =
-        urlState.barberId === BARBER_FIRST
+        effectiveBarberId === BARBER_FIRST
           ? ""
-          : `&membershipId=${encodeURIComponent(urlState.barberId)}`;
+          : `&membershipId=${encodeURIComponent(effectiveBarberId)}`;
       const response = await fetch(
         `/api/public/shops/${shopSlug}/availability?serviceId=${urlState.serviceId}&date=${date}${membershipQuery}`,
       );
@@ -168,11 +187,11 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
       }
       return body.data.slots;
     },
-    [shopSlug, urlState.barberId, urlState.serviceId],
+    [effectiveBarberId, shopSlug, urlState.serviceId],
   );
 
   useEffect(() => {
-    if (urlState.step !== "slot" || !urlState.serviceId || !urlState.barberId) {
+    if (urlState.step !== "slot" || !urlState.serviceId || !effectiveBarberId) {
       return;
     }
 
@@ -226,14 +245,18 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     dayOptions,
     loadSlotsForDate,
     selectedDate,
-    urlState.barberId,
-    urlState.serviceId,
     urlState.step,
+    effectiveBarberId,
   ]);
+
+  const groupedSlots = useMemo(
+    () => groupSlotsByPeriod(slots, timezone),
+    [slots, timezone],
+  );
 
   function selectService(serviceId: string) {
     pushParams(
-      buildBookingSearchParams(new URLSearchParams(searchParams.toString()), {
+      buildParams(new URLSearchParams(searchParams.toString()), {
         open: true,
         serviceId,
       }),
@@ -242,7 +265,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
   function selectBarber(barberId: string) {
     pushParams(
-      buildBookingSearchParams(new URLSearchParams(searchParams.toString()), {
+      buildParams(new URLSearchParams(searchParams.toString()), {
         barberId,
       }),
     );
@@ -267,8 +290,9 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
   function selectSlot(slot: AvailabilitySlot) {
     pushParams(
-      buildBookingSearchParams(new URLSearchParams(searchParams.toString()), {
+      buildParams(new URLSearchParams(searchParams.toString()), {
         slotStartsAt: slot.startsAt,
+        ...(autoAssignBarber && !urlState.barberId ? { barberId: BARBER_FIRST } : {}),
       }),
     );
   }
@@ -276,8 +300,9 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
   function pickAlternative(slot: AvailabilitySlot) {
     setAlternatives([]);
     setError(null);
-    const next = buildBookingSearchParams(new URLSearchParams(searchParams.toString()), {
-      barberId: urlState.barberId === BARBER_FIRST ? BARBER_FIRST : slot.membershipId,
+    const next = buildParams(new URLSearchParams(searchParams.toString()), {
+      barberId:
+        effectiveBarberId === BARBER_FIRST || autoAssignBarber ? BARBER_FIRST : slot.membershipId,
       slotStartsAt: slot.startsAt,
     });
     pushParams(next);
@@ -296,11 +321,11 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     }
 
     const membershipId =
-      urlState.barberId === BARBER_FIRST
+      effectiveBarberId === BARBER_FIRST
         ? (resolvedSlot?.membershipId ||
             slots.find((s) => s.startsAt === urlState.slotStartsAt)?.membershipId ||
             null)
-        : urlState.barberId;
+        : effectiveBarberId;
 
     if (!membershipId) {
       setError("Bitte wähle einen Termin erneut.");
@@ -360,7 +385,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     });
   }
 
-  const progress = bookingStepProgress(urlState.step);
+  const progress = bookingStepProgress(urlState.step, autoAssignBarber);
   const contactLinks = resolveMinisiteLinks(
     data.minisite.content.links,
     data.minisite.content.instagram,
@@ -453,27 +478,27 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
               <SheetTitle>
                 {urlState.step === "service" && "Service wählen"}
                 {urlState.step === "barber" && "Barber wählen"}
-                {urlState.step === "slot" && "Termin wählen"}
+                {urlState.step === "slot" && (autoAssignBarber ? "Termin wählen" : "Termin wählen")}
                 {urlState.step === "details" && "Deine Daten"}
               </SheetTitle>
             </SheetHeader>
 
             {urlState.step === "service" ? (
-              <ul className="flex flex-col gap-[var(--space-2)]">
+              <ul className="flex flex-col gap-[var(--space-3)]">
                 {data.services.map((service) => (
                   <li key={service.id}>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-3)] text-left transition-colors hover:border-[color:var(--ms-accent-on-bg)]"
+                      className="group flex w-full items-center gap-[var(--space-4)] rounded-lg border border-[color:var(--ms-border-subtle)] bg-[color-mix(in_oklch,var(--ms-bg-elevated)_92%,transparent)] px-[var(--space-4)] py-[var(--space-4)] text-left transition-[border-color,background-color,transform] hover:border-[color:var(--ms-accent-on-bg)] active:scale-[0.99]"
                       onClick={() => selectService(service.id)}
                     >
-                      <span>
-                        <span className="block font-display text-md">{service.name}</span>
+                      <span className="flex min-w-0 flex-1 flex-col gap-[var(--space-1)]">
+                        <span className="font-display text-base leading-snug">{service.name}</span>
                         <span className="text-sm text-[color:var(--ms-text-muted)]">
                           {service.duration_min} Min.
                         </span>
                       </span>
-                      <span className="text-data tabular-nums text-[color:var(--ms-accent-on-bg)]">
+                      <span className="shrink-0 rounded-full border border-[color:var(--ms-border-subtle)] px-[var(--space-3)] py-[var(--space-1)] text-data text-sm tabular-nums text-[color:var(--ms-accent-on-bg)] group-hover:border-[color:var(--ms-accent-on-bg)]">
                         {formatPriceCents(service.price_cents)}
                       </span>
                     </button>
@@ -482,7 +507,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
               </ul>
             ) : null}
 
-            {urlState.step === "barber" ? (
+            {urlState.step === "barber" && !autoAssignBarber ? (
               <ul className="flex flex-col gap-[var(--space-2)]">
                 <li>
                   <button
@@ -508,45 +533,82 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
             ) : null}
 
             {urlState.step === "slot" ? (
-              <div className="flex flex-col gap-[var(--space-4)]">
-                <div className="flex gap-[var(--space-2)] overflow-x-auto pb-1">
-                  {dayOptions.map((date) => (
-                    <button
-                      key={date}
-                      type="button"
-                      className={cn(
-                        "shrink-0 rounded-full border px-[var(--space-3)] py-[var(--space-2)] text-sm",
-                        date === selectedDate
-                          ? "border-[color:var(--ms-accent)] bg-[color:var(--ms-accent)] text-[color:var(--ms-on-accent)]"
-                          : date === suggestedDate
-                            ? "border-[color:var(--ms-accent-on-bg)] ring-1 ring-[color:var(--ms-accent-on-bg)]"
-                            : "border-[color:var(--ms-border-subtle)]",
-                      )}
-                      onClick={() => setSelectedDate(date)}
-                    >
-                      {formatDayChipLabel(date, timezone, today)}
-                    </button>
-                  ))}
+              <div className="flex flex-col gap-[var(--space-5)]">
+                {selectedService ? (
+                  <div className="rounded-lg border border-[color:var(--ms-border-subtle)] bg-[color-mix(in_oklch,var(--ms-bg-elevated)_88%,transparent)] px-[var(--space-4)] py-[var(--space-3)]">
+                    <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
+                      Gewählt
+                    </p>
+                    <p className="mt-[var(--space-1)] font-display text-base">{selectedService.name}</p>
+                    <p className="text-sm text-[color:var(--ms-text-muted)]">
+                      {selectedService.duration_min} Min. · {formatPriceCents(selectedService.price_cents)}
+                      {autoAssignBarber ? " · Nächster freier Termin" : null}
+                    </p>
+                  </div>
+                ) : null}
+
+                <div>
+                  <p className="mb-[var(--space-2)] text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
+                    Tag
+                  </p>
+                  <div className="flex gap-[var(--space-2)] overflow-x-auto pb-1">
+                    {dayOptions.map((date) => (
+                      <button
+                        key={date}
+                        type="button"
+                        className={cn(
+                          "shrink-0 rounded-full border px-[var(--space-3)] py-[var(--space-2)] text-sm transition-colors",
+                          date === selectedDate
+                            ? "border-[color:var(--ms-accent)] bg-[color:var(--ms-accent)] text-[color:var(--ms-on-accent)]"
+                            : date === suggestedDate
+                              ? "border-[color:var(--ms-accent-on-bg)] ring-1 ring-[color:var(--ms-accent-on-bg)]"
+                              : "border-[color:var(--ms-border-subtle)] hover:border-[color:var(--ms-accent-on-bg)]",
+                        )}
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        {formatDayChipLabel(date, timezone, today)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {slotsLoading ? (
                   <SlotGridSkeleton />
                 ) : slots.length > 0 ? (
-                  <div className="grid grid-cols-3 gap-[var(--space-2)] sm:grid-cols-4">
-                    {slots.map((slot, slotIndex) => (
-                      <button
-                        key={`${slot.membershipId}-${slot.startsAt}`}
-                        type="button"
-                        className="ms-slot-chip rounded-md border border-[color:var(--ms-border-subtle)] py-[var(--space-2)] text-data text-sm tabular-nums hover:border-[color:var(--ms-accent-on-bg)]"
-                        style={{ ["--slot-i" as string]: slotIndex }}
-                        onClick={() => selectSlot(slot)}
-                      >
-                        {formatSlotTime(slot.startsAt, timezone)}
-                      </button>
+                  <div className="flex flex-col gap-[var(--space-5)]">
+                    {groupedSlots.map((group) => (
+                      <div key={group.period}>
+                        <p className="mb-[var(--space-3)] text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
+                          {group.label}
+                        </p>
+                        <div className="grid grid-cols-3 gap-[var(--space-2)] sm:grid-cols-4">
+                          {group.slots.map((slot, slotIndex) => (
+                            <button
+                              key={`${slot.membershipId}-${slot.startsAt}`}
+                              type="button"
+                              className={cn(
+                                "ms-slot-chip rounded-lg border py-[var(--space-3)] text-data text-sm tabular-nums transition-[border-color,background-color,transform]",
+                                urlState.slotStartsAt === slot.startsAt
+                                  ? "border-[color:var(--ms-accent)] bg-[color:var(--ms-accent)] text-[color:var(--ms-on-accent)]"
+                                  : "border-[color:var(--ms-border-subtle)] hover:border-[color:var(--ms-accent-on-bg)] active:scale-[0.98]",
+                              )}
+                              style={{ ["--slot-i" as string]: slotIndex }}
+                              onClick={() => selectSlot(slot)}
+                            >
+                              {formatSlotTime(slot.startsAt, timezone)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-md text-[color:var(--ms-text-muted)]">Keine freien Termine</p>
+                  <div className="rounded-lg border border-dashed border-[color:var(--ms-border-subtle)] px-[var(--space-4)] py-[var(--space-6)] text-center">
+                    <p className="font-display text-base">Keine freien Termine</p>
+                    <p className="mt-[var(--space-2)] text-sm text-[color:var(--ms-text-muted)]">
+                      An diesem Tag ist nichts frei. Wähle einen anderen Tag oder kontaktiere uns direkt.
+                    </p>
+                  </div>
                 )}
 
                 {suggestedDate && suggestedDate !== selectedDate ? (

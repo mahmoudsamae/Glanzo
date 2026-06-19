@@ -110,11 +110,12 @@ describe("computeAvailabilitySlots", () => {
     expect(slots).toHaveLength(0);
   });
 
-  it("returns empty when barber has no staff hours", () => {
+  it("falls back to shop opening hours when barber has no staff hours", () => {
     const slots = computeAvailabilitySlots(
       baseInput({ barbers: [barber("barber-a", { staffHours: [] })] }),
     );
-    expect(slots).toHaveLength(0);
+    expect(slots.length).toBeGreaterThan(0);
+    expect(slotStarts(slots)[0]).toBe("09:00");
   });
 
   it("clamps staff shift to narrower shop opening hours", () => {
@@ -528,9 +529,11 @@ describe("edge cases", () => {
     expect(pickFairBarber(["barber-a", "barber-b"], load, "2026-06-15", TZ)).toBe("barber-a");
   });
 
-  it("union returns empty when every barber is unavailable", () => {
+  it("union returns empty when shop is closed", () => {
     const slots = computeAnyBarberSlots(
       baseInput({
+        date: "2026-06-14",
+        openingHours: { ...WEEKDAY_HOURS, sun: null },
         barbers: [
           barber("barber-a", { staffHours: [] }),
           barber("barber-b", { staffHours: [] }),

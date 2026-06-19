@@ -216,6 +216,7 @@ export const publicShopInfoSchema = z
     status: z.enum(["active", "suspended"]),
     timezone: z.string(),
     opening_hours: openingHoursSchema,
+    booking_auto_assign_barber: z.boolean().default(true),
   })
   .strict();
 
@@ -235,6 +236,7 @@ export const SHOP_PUBLIC_SHOP_KEYS = [
   "status",
   "timezone",
   "opening_hours",
+  "booking_auto_assign_barber",
 ] as const;
 export const SHOP_PUBLIC_SERVICE_KEYS = [
   "id",

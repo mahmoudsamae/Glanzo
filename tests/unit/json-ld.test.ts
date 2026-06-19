@@ -9,6 +9,7 @@ const BASE: ShopPublicData = {
     slug: "test-salon",
     status: "active",
     timezone: "Europe/Berlin",
+    booking_auto_assign_barber: true,
     opening_hours: {
       mon: { open: "09:00", close: "18:00" },
       tue: null,

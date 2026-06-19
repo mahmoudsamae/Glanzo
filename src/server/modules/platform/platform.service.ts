@@ -220,6 +220,28 @@ export async function setPlatformShopMinisiteTemplates(
   };
 }
 
+export async function setPlatformShopBookingAutoAssign(
+  shopId: string,
+  enabled: boolean,
+): Promise<PlatformResult<{ bookingAutoAssignBarber: boolean }>> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("platform_set_shop_booking_auto_assign", {
+    p_shop_id: shopId,
+    p_enabled: enabled,
+  });
+
+  if (error) {
+    if (/NOT_FOUND/i.test(error.message)) {
+      return { ok: false, code: "NOT_FOUND" };
+    }
+    return { ok: false, code: "UNKNOWN" };
+  }
+
+  revalidateShopPublic(shopId);
+  const payload = data as unknown as { booking_auto_assign_barber: boolean };
+  return { ok: true, data: { bookingAutoAssignBarber: payload.booking_auto_assign_barber } };
+}
+
 export async function createPlatformOwnerInvite(
   shopId: string,
   ownerEmail: string,

@@ -27,6 +27,12 @@ describe("parseBookingUrlState", () => {
     ).toBe("barber");
     expect(
       parseBookingUrlState(
+        new URLSearchParams(`${BOOKING_OPEN_PARAM}=1&service=a`),
+        { autoAssignBarber: true },
+      ).step,
+    ).toBe("slot");
+    expect(
+      parseBookingUrlState(
         new URLSearchParams(`${BOOKING_OPEN_PARAM}=1&service=a&barber=${BARBER_FIRST}`),
       ).step,
     ).toBe("slot");
@@ -79,5 +85,15 @@ describe("buildBookingSearchParams", () => {
     expect(next.get("service")).toBe("new");
     expect(next.get("barber")).toBeNull();
     expect(next.get("slot")).toBeNull();
+  });
+
+  it("auto-selects barber when building service params", () => {
+    const next = buildBookingSearchParams(
+      new URLSearchParams(`${BOOKING_OPEN_PARAM}=1`),
+      { serviceId: "svc-1" },
+      { autoAssignBarber: true },
+    );
+    expect(next.get("service")).toBe("svc-1");
+    expect(next.get("barber")).toBe(BARBER_FIRST);
   });
 });

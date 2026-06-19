@@ -438,6 +438,7 @@ export type Database = {
       shops: {
         Row: {
           allowed_minisite_templates: Database["public"]["Enums"]["minisite_template"][];
+          booking_auto_assign_barber: boolean;
           booking_lead_time_min: number;
           cancellation_window_min: number;
           created_at: string;
@@ -454,6 +455,7 @@ export type Database = {
         };
         Insert: {
           allowed_minisite_templates?: Database["public"]["Enums"]["minisite_template"][];
+          booking_auto_assign_barber?: boolean;
           booking_lead_time_min?: number;
           cancellation_window_min?: number;
           created_at?: string;
@@ -470,6 +472,7 @@ export type Database = {
         };
         Update: {
           allowed_minisite_templates?: Database["public"]["Enums"]["minisite_template"][];
+          booking_auto_assign_barber?: boolean;
           booking_lead_time_min?: number;
           cancellation_window_min?: number;
           created_at?: string;
@@ -794,6 +797,10 @@ export type Database = {
           p_allowed: Database["public"]["Enums"]["minisite_template"][];
           p_active: Database["public"]["Enums"]["minisite_template"];
         };
+        Returns: Json;
+      };
+      platform_set_shop_booking_auto_assign: {
+        Args: { p_shop_id: string; p_enabled: boolean };
         Returns: Json;
       };
       is_valid_iana_timezone: { Args: { tz: string }; Returns: boolean };

@@ -10,6 +10,7 @@ import {
   setPlatformShopStatus,
   setPlatformShopMinisiteTemplates,
   setPlatformShopTemplate,
+  setPlatformShopBookingAutoAssign,
 } from "@/server/modules/platform/platform.service";
 import {
   setPlatformOwnerEmail,
@@ -97,4 +98,9 @@ export async function setPlatformShopMinisiteTemplatesAction(
 ) {
   await adminGate();
   return setPlatformShopMinisiteTemplates(shopId, allowedTemplates, activeTemplate);
+}
+
+export async function setPlatformShopBookingAutoAssignAction(shopId: string, enabled: boolean) {
+  await adminGate();
+  return setPlatformShopBookingAutoAssign(shopId, enabled);
 }
