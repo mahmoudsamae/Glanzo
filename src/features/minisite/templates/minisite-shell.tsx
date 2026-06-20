@@ -5,6 +5,7 @@ import { BoutiqueShell } from "./boutique/boutique-shell";
 import { NicolesShell } from "./nicoles/nicoles-shell";
 import { SignatureShell } from "./signature/signature-shell";
 import { FluxShell } from "./flux/flux-shell";
+import { MeccaShell } from "./mecca/mecca-shell";
 import { GuidelinesSection } from "../sections/guidelines";
 import { BookBarSection } from "../sections/book-bar";
 import { GallerySection } from "../sections/gallery";
@@ -35,6 +36,10 @@ export function MinisiteShell({ data, shopSlug, preview = false }: MinisiteShell
 
   if (data.minisite.template === "flux") {
     return <FluxShell data={data} shopSlug={shopSlug} preview={preview} />;
+  }
+
+  if (data.minisite.template === "mecca") {
+    return <MeccaShell data={data} shopSlug={shopSlug} preview={preview} />;
   }
 
   const bookHref = `/s/${shopSlug}?book=1`;

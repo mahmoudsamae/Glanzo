@@ -50,6 +50,12 @@ export const MINISITE_TEMPLATES: Record<MinisiteTemplate, MinisiteTemplateConfig
     themeClass: "theme-flux",
     fontClass: "minisite-font minisite-display",
   },
+  mecca: {
+    key: "mecca",
+    label: "Mecca Noir",
+    themeClass: "theme-mecca",
+    fontClass: "minisite-font minisite-mecca-fonts",
+  },
 };
 
 export function getMinisiteTemplate(key: MinisiteTemplate): MinisiteTemplateConfig {

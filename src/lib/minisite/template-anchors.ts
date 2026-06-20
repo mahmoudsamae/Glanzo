@@ -66,6 +66,14 @@ const ANCHORS: Record<MinisiteTemplate, MinisiteAnchors> = {
     gallery: "ms-nicoles-gallery",
     contact: "ms-nicoles-contact",
   },
+  mecca: {
+    top: "ms-mecca-top",
+    about: "ms-mecca-about",
+    services: "ms-mecca-services",
+    prices: "ms-mecca-prices",
+    gallery: "ms-mecca-gallery",
+    contact: "ms-mecca-contact",
+  },
 };
 
 export function getMinisiteAnchors(template: MinisiteTemplate): MinisiteAnchors {

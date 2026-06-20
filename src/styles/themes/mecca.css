@@ -1,0 +1,1357 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap");
+
+/* Mecca — dark luxury salon: near-black, champagne gold, serif editorial */
+.theme-mecca {
+  --ms-mecca-black: #0c0b09;
+  --ms-mecca-surface: #151310;
+  --ms-mecca-gold: #c9a84c;
+  --ms-mecca-gold-hover: #b8963e;
+  --ms-mecca-cream: #f5f0e8;
+  --ms-mecca-muted: #8a7f70;
+  --ms-mecca-border: #2a2520;
+  --ms-mecca-border-subtle: #1e1a16;
+  --ms-mecca-on-accent: #0c0b09;
+  --ms-bg: var(--ms-mecca-black);
+  --ms-bg-elevated: var(--ms-mecca-surface);
+  --ms-text: var(--ms-mecca-cream);
+  --ms-text-muted: var(--ms-mecca-muted);
+  --ms-border: var(--ms-mecca-border);
+  --ms-border-subtle: var(--ms-mecca-border-subtle);
+  --ms-overlay: rgb(8 6 4 / 0.72);
+  --ms-font-wonk: 0;
+  --ms-display-scale: 1;
+  background-color: var(--ms-mecca-black);
+  color: var(--ms-mecca-cream);
+}
+
+.theme-mecca.minisite-mecca-fonts {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+}
+
+.theme-mecca.minisite-mecca-fonts .font-display,
+.theme-mecca.minisite-mecca-fonts .ms-mecca-display {
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+}
+
+.theme-mecca .minisite-font {
+  font-variation-settings: "SOFT" 0, "WONK" var(--ms-font-wonk);
+}
+
+/* ——— Keyframes ——— */
+@keyframes ms-mecca-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ms-mecca-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0% 0 0);
+  }
+}
+
+@keyframes ms-mecca-image-scale {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ms-mecca-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes ms-mecca-section-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ms-mecca-hero-bg-in {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ms-mecca-hero-scroll-line {
+  0%,
+  100% {
+    height: 3rem;
+    opacity: 0.45;
+  }
+  50% {
+    height: 6rem;
+    opacity: 1;
+  }
+}
+
+.ms-mecca-root {
+  isolation: isolate;
+  max-width: 100%;
+  overflow-x: clip;
+  background-color: var(--ms-mecca-black);
+  color: var(--ms-mecca-cream);
+}
+
+/* ——— Scrollbar (theme scope) ——— */
+.theme-mecca,
+.theme-mecca * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ms-mecca-gold) var(--ms-mecca-black);
+}
+
+.theme-mecca *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.theme-mecca *::-webkit-scrollbar-track {
+  background: var(--ms-mecca-black);
+}
+
+.theme-mecca *::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--ms-mecca-gold) 85%, var(--ms-mecca-black));
+}
+
+.theme-mecca *::-webkit-scrollbar-thumb:hover {
+  background: var(--ms-mecca-gold-hover);
+}
+
+/* ——— Accent shimmer utility ——— */
+.ms-mecca-shimmer-target {
+  position: relative;
+  overflow: hidden;
+}
+
+.ms-mecca-shimmer-target::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in oklch, var(--ms-mecca-gold) 55%, white) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  animation: ms-mecca-shimmer 2.8s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* ——— Section reveals ——— */
+.ms-mecca-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+.ms-mecca-ready .ms-mecca-section,
+.ms-mecca-section--visible {
+  opacity: 1;
+  transform: none;
+}
+
+@supports (animation-timeline: view()) {
+  .ms-mecca-ready .ms-mecca-section {
+    opacity: 1;
+    transform: none;
+    animation: ms-mecca-section-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+}
+
+.ms-mecca-fade-up {
+  animation: ms-mecca-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ms-mecca-reveal {
+  animation: ms-mecca-reveal 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ms-mecca-image-scale {
+  animation: ms-mecca-image-scale 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ——— Nav ——— */
+.ms-mecca-nav {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    backdrop-filter 0.35s ease;
+}
+
+.ms-mecca-nav--scrolled {
+  background: rgb(12 11 9 / 0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid #2a2520;
+}
+
+.ms-mecca-nav-inner {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding: 0.875rem 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-nav-inner {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    padding-inline: 3rem;
+  }
+}
+
+.ms-mecca-nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+}
+
+.ms-mecca-nav-crown {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-nav-logo {
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: 1.125rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ms-mecca-cream);
+  text-decoration: none;
+}
+
+.ms-mecca-nav-desktop {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-nav-desktop {
+    display: flex;
+  }
+}
+
+.ms-mecca-nav-actions {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-nav-actions {
+    display: flex;
+  }
+}
+
+.ms-mecca-nav-menu-btn {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  place-content: center;
+  gap: 5px;
+  justify-self: end;
+  border: 0;
+  background: transparent;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-nav-menu-btn {
+    display: none;
+  }
+}
+
+.ms-mecca-nav-menu-btn span {
+  display: block;
+  width: 1.35rem;
+  height: 1px;
+  background: var(--ms-mecca-cream);
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.ms-mecca-nav-menu-btn--open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.ms-mecca-nav-menu-btn--open span:nth-child(2) {
+  opacity: 0;
+}
+
+.ms-mecca-nav-menu-btn--open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.ms-mecca-nav-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 5rem 1.5rem 2rem;
+  background: rgb(12 11 9 / 0.98);
+  backdrop-filter: blur(16px);
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-nav-drawer {
+    display: none;
+  }
+}
+
+.ms-mecca-nav-drawer-link {
+  border: 0;
+  background: transparent;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-cream);
+  text-decoration: none;
+  cursor: pointer;
+  padding-block: 0.5rem;
+  transition: color 0.25s ease;
+}
+
+.ms-mecca-nav-drawer-link:hover,
+.ms-mecca-nav-drawer-link--active {
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-nav-cta--drawer {
+  min-height: 3.25rem;
+  min-width: min(100%, 18rem);
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.14em;
+}
+
+.ms-mecca-nav-link {
+  border: 0;
+  background: transparent;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-muted);
+  text-decoration: none;
+  cursor: pointer;
+  padding-block: 0.35rem;
+  transition: color 0.25s ease;
+}
+
+.ms-mecca-nav-link:hover,
+.ms-mecca-nav-link--active {
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-nav-cta {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 0;
+  background: var(--ms-accent, var(--ms-mecca-gold));
+  color: var(--ms-on-accent, var(--ms-mecca-on-accent));
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.15rem;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    background-color 0.25s ease;
+}
+
+.ms-mecca-nav-cta:hover {
+  transform: scale(1.02);
+  background: var(--ms-accent-hover, var(--ms-mecca-gold-hover));
+}
+
+/* ——— Hero ——— */
+.ms-mecca-hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.ms-mecca-hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center;
+  animation: ms-mecca-hero-bg-in 1.8s ease both;
+}
+
+.ms-mecca-hero-placeholder {
+  background:
+    radial-gradient(circle at 20% 80%, rgb(201 168 76 / 0.08), transparent 42%),
+    radial-gradient(circle at 80% 20%, rgb(245 240 232 / 0.04), transparent 38%),
+    linear-gradient(145deg, #12100d 0%, var(--ms-mecca-black) 55%, #080706 100%);
+}
+
+.ms-mecca-hero-placeholder-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23c9a84c' stroke-width='0.75' opacity='0.55'%3E%3Cpath d='M0 80h160M80 0v160M0 0l160 160M160 0L0 160'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+.ms-mecca-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgb(12 11 9 / 0.92) 0%,
+      rgb(12 11 9 / 0.55) 28%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 18%,
+      rgb(12 11 9 / 0.35) 48%,
+      rgb(12 11 9 / 0.88) 78%,
+      rgb(12 11 9 / 0.98) 100%
+    );
+  pointer-events: none;
+}
+
+.ms-mecca-hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4rem);
+  padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
+  padding-top: calc(5.5rem + env(safe-area-inset-top, 0px));
+}
+
+.ms-mecca-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ms-mecca-gold) 60%, transparent);
+}
+
+.ms-mecca-hero-eyebrow-dot {
+  flex-shrink: 0;
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-hero-divider {
+  width: 3rem;
+  height: 1px;
+  margin-bottom: 1.5rem;
+  background: var(--ms-mecca-gold);
+}
+
+.ms-mecca-hero-title-white {
+  display: block;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 0.92;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-hero-title-gold {
+  display: block;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 0.92;
+  color: var(--ms-accent-on-bg, var(--ms-mecca-gold));
+}
+
+.ms-mecca-hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.875rem;
+  margin-top: 2rem;
+}
+
+.ms-mecca-hero-side-label {
+  position: absolute;
+  top: 50%;
+  right: clamp(1rem, 3vw, 2rem);
+  z-index: 3;
+  transform: translateY(-50%) rotate(90deg);
+  transform-origin: center;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ms-mecca-hero-scroll {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vh, 2.5rem);
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  text-decoration: none;
+}
+
+.ms-mecca-hero-scroll-line {
+  display: block;
+  width: 1px;
+  height: 3rem;
+  background: var(--ms-mecca-gold);
+  animation: ms-mecca-hero-scroll-line 2.4s ease-in-out infinite;
+}
+
+.ms-mecca-hero-cta-primary {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: 9999px;
+  border: 0;
+  background: var(--ms-mecca-cream);
+  color: var(--ms-mecca-on-accent);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.35rem;
+  text-decoration: none;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.ms-mecca-hero-cta-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.ms-mecca-hero-cta-ghost {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(245 240 232 / 0.4);
+  background: transparent;
+  color: var(--ms-mecca-cream);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.35rem;
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.ms-mecca-hero-cta-ghost:hover {
+  border-color: var(--ms-mecca-cream);
+  transform: translateY(-1px);
+}
+
+/* ——— About ——— */
+.ms-mecca-about {
+  background: var(--ms-mecca-black);
+  padding-block: clamp(5rem, 10vw, 9rem);
+}
+
+.ms-mecca-about-grid {
+  display: grid;
+  align-items: center;
+  gap: clamp(2rem, 5vw, 4rem);
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4rem);
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-about-grid {
+    grid-template-columns: 45fr 55fr;
+  }
+}
+
+.ms-mecca-about-media,
+.ms-mecca-about-copy {
+  opacity: 0;
+  transition:
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ms-mecca-about-media {
+  transform: translateX(-28px);
+}
+
+.ms-mecca-about-copy {
+  transform: translateX(28px);
+  transition-delay: 0.15s;
+}
+
+.ms-mecca-ready .ms-mecca-about-media,
+.ms-mecca-about--visible .ms-mecca-about-media,
+.ms-mecca-ready .ms-mecca-about-copy,
+.ms-mecca-about--visible .ms-mecca-about-copy {
+  opacity: 1;
+  transform: none;
+}
+
+.ms-mecca-about-image-wrap {
+  position: relative;
+  isolation: isolate;
+  padding: 1rem;
+}
+
+.ms-mecca-about-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  aspect-ratio: 4 / 5;
+  background: var(--ms-mecca-surface);
+}
+
+.ms-mecca-about-image::after {
+  content: "";
+  position: absolute;
+  inset: -1rem;
+  z-index: -1;
+  border: 2px solid var(--ms-mecca-gold);
+  border-radius: 1rem;
+  pointer-events: none;
+}
+
+.ms-mecca-about-image img,
+.ms-mecca-about-image .ms-mecca-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ms-mecca-about-image:hover img,
+.ms-mecca-about-image:hover .ms-mecca-photo {
+  transform: scale(1.03);
+}
+
+.ms-mecca-about-placeholder {
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 30% 20%, rgb(201 168 76 / 0.08), transparent 42%),
+    linear-gradient(160deg, #151310 0%, var(--ms-mecca-black) 100%);
+}
+
+.ms-mecca-about-label {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 0.875rem;
+  border-left: 2px solid var(--ms-mecca-gold);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-about-headline {
+  margin-top: 1.25rem;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.ms-mecca-about-headline-white {
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-about-headline-gold {
+  font-style: italic;
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-about-body {
+  margin-top: 1.5rem;
+  max-width: 42rem;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-about-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ms-mecca-about-stat {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-about-stat-sep {
+  color: var(--ms-mecca-gold);
+  font-size: 0.625rem;
+  line-height: 1;
+}
+
+.ms-mecca-about-link {
+  position: relative;
+  display: inline-flex;
+  margin-top: 2rem;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ms-mecca-gold);
+  text-decoration: none;
+}
+
+.ms-mecca-about-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.2rem;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.ms-mecca-about-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ——— Services ——— */
+.ms-mecca-services {
+  background: #0f0e0b;
+  padding-block: clamp(4rem, 8vw, 6.5rem);
+}
+
+.ms-mecca-services-inner {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4rem);
+}
+
+.ms-mecca-services-header {
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.ms-mecca-services-eyebrow {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-services-title {
+  margin-top: 1rem;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-services-group + .ms-mecca-services-group {
+  margin-top: 2.5rem;
+}
+
+.ms-mecca-service-name {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-service-desc {
+  max-width: 40ch;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-services-cta {
+  display: inline-flex;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgb(201 168 76 / 0.4);
+  background: transparent;
+  color: var(--ms-mecca-gold);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.75rem 1.35rem;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.ms-mecca-services-cta:hover {
+  border-color: var(--ms-mecca-gold);
+  color: var(--ms-mecca-cream);
+  transform: translateY(-1px);
+}
+
+.ms-mecca-service-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) auto;
+  gap: var(--space-4);
+  align-items: center;
+  border-top: 1px solid var(--ms-mecca-border-subtle);
+  padding-block: 1.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.ms-mecca-service-row:hover {
+  background: #151310;
+}
+
+.ms-mecca-service-category {
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ms-accent-on-bg, var(--ms-mecca-gold));
+  border-bottom: 1px solid var(--ms-accent, var(--ms-mecca-gold));
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.ms-mecca-price-from {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+  text-align: right;
+}
+
+.ms-mecca-price-from small {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-price-from strong {
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--ms-mecca-cream);
+}
+
+@media (max-width: 767px) {
+  .ms-mecca-service-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .ms-mecca-price-from {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ——— Gallery ——— */
+.ms-mecca-gallery {
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.ms-mecca-gallery:active {
+  cursor: grabbing;
+}
+
+.ms-mecca-before-after {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  aspect-ratio: 16 / 10;
+  background: var(--ms-mecca-surface);
+}
+
+.ms-mecca-before-after__after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ms-mecca-before-after__before-wrap {
+  position: absolute;
+  inset: 0;
+  width: var(--ms-mecca-split, 50%);
+  overflow: hidden;
+}
+
+.ms-mecca-before-after__before {
+  width: calc(100vw * 0.92);
+  max-width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ms-mecca-before-after__divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--ms-mecca-split, 50%);
+  z-index: 2;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--ms-mecca-cream);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
+  cursor: ew-resize;
+}
+
+.ms-mecca-before-after__handle {
+  position: absolute;
+  top: 50%;
+  left: var(--ms-mecca-split, 50%);
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  border: 1px solid var(--ms-mecca-border);
+  background: var(--ms-mecca-black);
+  color: var(--ms-mecca-cream);
+  cursor: ew-resize;
+}
+
+.ms-mecca-gallery-label {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  background: linear-gradient(180deg, transparent, rgb(8 6 4 / 0.88));
+  color: var(--ms-mecca-cream);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ——— Reviews ——— */
+.ms-mecca-reviews {
+  background: var(--ms-mecca-black);
+  padding-block: clamp(4rem, 8vw, 6.5rem);
+}
+
+.ms-mecca-reviews-inner {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4rem);
+}
+
+.ms-mecca-reviews-header {
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.ms-mecca-reviews-eyebrow {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-reviews-title {
+  margin-top: 1rem;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-reviews-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(85vw, 20rem);
+  gap: 1rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.25rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ms-mecca-gold) var(--ms-mecca-black);
+}
+
+.ms-mecca-reviews-track::-webkit-scrollbar {
+  height: 4px;
+}
+
+.ms-mecca-reviews-track::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--ms-mecca-gold) 70%, var(--ms-mecca-black));
+}
+
+@media (min-width: 1024px) {
+  .ms-mecca-reviews-track {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row;
+    grid-auto-columns: unset;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+}
+
+.ms-mecca-review-card {
+  scroll-snap-align: start;
+  border: 1px solid #2a2520;
+  border-radius: 1.25rem;
+  background: #151310;
+  padding: 1.5rem;
+}
+
+.ms-mecca-stars {
+  color: var(--ms-accent-on-bg, var(--ms-mecca-gold));
+  letter-spacing: -0.05em;
+  font-size: 0.875rem;
+}
+
+.ms-mecca-review-quote {
+  position: relative;
+  margin-top: 1rem;
+  padding-top: 1.75rem;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-style: italic;
+  line-height: 1.65;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-review-quote::before {
+  content: "\201C";
+  position: absolute;
+  top: -0.35rem;
+  left: 0;
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: 4rem;
+  font-style: normal;
+  line-height: 1;
+  color: var(--ms-mecca-gold);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.ms-mecca-reviewer {
+  margin-top: 1.25rem;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-reviewer-date {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--ms-mecca-muted);
+}
+
+/* ——— Footer ——— */
+.ms-mecca-footer {
+  background: #070605;
+  border-top: 1px solid #1e1a16;
+  padding-block: clamp(3rem, 8vw, 5rem);
+}
+
+.ms-mecca-footer-inner {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.5rem, 5vw, 4rem);
+}
+
+.ms-mecca-footer-grid {
+  display: grid;
+  gap: var(--space-8);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .ms-mecca-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-10);
+  }
+}
+
+.ms-mecca-footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ms-mecca-footer-crown {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex-shrink: 0;
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-footer-brand {
+  font-family: "Playfair Display", var(--font-display), Georgia, serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-footer-tagline {
+  margin-top: var(--space-3);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ms-mecca-muted);
+}
+
+.ms-mecca-footer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ms-mecca-footer-social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.25rem;
+  border: 1px solid #2a2520;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--ms-mecca-cream);
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 0.45rem 0.9rem;
+  text-decoration: none;
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.ms-mecca-footer-social-pill:hover {
+  border-color: var(--ms-mecca-gold);
+  color: var(--ms-mecca-gold);
+}
+
+.ms-mecca-footer-heading {
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ms-accent-on-bg, var(--ms-mecca-gold));
+}
+
+.ms-mecca-footer-link {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--ms-mecca-muted);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.ms-mecca-footer-link:hover {
+  color: var(--ms-mecca-cream);
+}
+
+.ms-mecca-footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: clamp(2rem, 5vw, 3rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid #1e1a16;
+  font-family: "Inter", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--ms-mecca-muted);
+}
+
+@media (min-width: 640px) {
+  .ms-mecca-footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* ——— Shared photo hook ——— */
+.theme-mecca .ms-mecca-photo,
+.theme-mecca img.ms-mecca-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ——— Booking bar on dark theme ——— */
+.theme-mecca .ms-cinema-book-bar {
+  border-top-color: var(--ms-mecca-border-subtle);
+  background: color-mix(in oklch, var(--ms-mecca-black) 88%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-mecca-shimmer-target::after,
+  .ms-mecca-hero-bg,
+  .ms-mecca-hero-scroll-line,
+  .ms-mecca-about-media,
+  .ms-mecca-about-copy,
+  .ms-mecca-fade-up,
+  .ms-mecca-reveal,
+  .ms-mecca-image-scale,
+  .ms-mecca-ready .ms-mecca-section {
+    animation: none !important;
+  }
+
+  .ms-mecca-section,
+  .ms-mecca-ready .ms-mecca-section,
+  .ms-mecca-section--visible,
+  .ms-mecca-ready .ms-mecca-about-media,
+  .ms-mecca-about--visible .ms-mecca-about-media,
+  .ms-mecca-ready .ms-mecca-about-copy,
+  .ms-mecca-about--visible .ms-mecca-about-copy {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .ms-mecca-about-link:hover::after {
+    transform: scaleX(0.35);
+  }
+
+  .ms-mecca-nav-cta:hover,
+  .ms-mecca-hero-cta-primary:hover,
+  .ms-mecca-hero-cta-ghost:hover,
+  .ms-mecca-services-cta:hover {
+    transform: none;
+  }
+}

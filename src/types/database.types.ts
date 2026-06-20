@@ -813,7 +813,7 @@ export type Database = {
       appointment_source: "online" | "walk_in";
       appointment_status: "booked" | "completed" | "no_show" | "cancelled";
       membership_role: "owner" | "barber";
-      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles";
+      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles" | "mecca";
       notification_channel: "email";
       notification_template:
         | "booking_confirmed"

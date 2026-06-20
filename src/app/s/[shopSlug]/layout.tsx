@@ -13,6 +13,7 @@ import "@/styles/themes/signature.css";
 import "@/styles/themes/boutique.css";
 import "@/styles/themes/nicoles.css";
 import "@/styles/themes/flux.css";
+import "@/styles/themes/mecca.css";
 
 export const revalidate = 300;
 

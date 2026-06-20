@@ -147,6 +147,7 @@ export const minisiteTemplateSchema = z.enum([
   "flux",
   "boutique",
   "nicoles",
+  "mecca",
 ]);
 
 export const minisiteContentSchema = z
