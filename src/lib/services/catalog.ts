@@ -3,6 +3,9 @@ export type ServiceCatalogItem = {
   name: string;
   durationMin: number;
   priceCents: number;
+  showPrice: boolean;
+  description: string | null;
+  imagePath: string | null;
   sortOrder: number;
   archivedAt: string | null;
   assignedMembershipIds: string[];

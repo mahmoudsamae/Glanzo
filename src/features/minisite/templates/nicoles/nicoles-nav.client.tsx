@@ -9,8 +9,9 @@ import {
   navHrefTarget,
   type NavLink,
 } from "@/lib/minisite/about-blocks";
-import { getMinisiteAnchors, defaultNavLinksForTemplate } from "@/lib/minisite/template-anchors";
-import type { MinisiteContent } from "@/lib/validations/public-shop";
+import { resolveEffectiveNavLinks } from "@/lib/minisite/nav-links";
+import { getMinisiteAnchors } from "@/lib/minisite/template-anchors";
+import type { MinisiteContent, MinisiteTemplate } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../lib/media-url";
 import { NicolesLogoIcon } from "./nicoles-logo-icon";
@@ -21,6 +22,7 @@ type NicolesNavProps = {
   bookHref: string;
   preview?: boolean;
   basePath?: string;
+  template?: MinisiteTemplate;
 };
 
 function scrollToAnchor(href: string) {
@@ -58,6 +60,7 @@ export function NicolesNav({
   bookHref,
   preview = false,
   basePath,
+  template = "nicoles",
 }: NicolesNavProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -66,13 +69,7 @@ export function NicolesNav({
   const [active, setActive] = useState<string>(anchors.top);
   const logoUrl = content.logo_path ? shopMediaPublicUrl(content.logo_path) : null;
   const tagline = content.sections?.nav?.text?.trim() || "friseur- & barbershop";
-  const links = useMemo(() => {
-    const custom = content.nav_links?.filter((link) => link.visible !== false && link.label.trim()) ?? [];
-    if (custom.length > 0) {
-      return custom;
-    }
-    return defaultNavLinksForTemplate("nicoles");
-  }, [content]);
+  const links = useMemo(() => resolveEffectiveNavLinks(template, content), [template, content]);
 
   const scrollLinks = useMemo(
     () =>
@@ -153,19 +150,18 @@ export function NicolesNav({
     const activeClass = isLinkActive(link) ? "ms-nicoles-nav-link--active" : "";
 
     if (isTerminNavLink(link)) {
-      if (basePath && !preview) {
-        const pageHref = resolvePageHref(link.href, basePath) ?? `${basePath}/terminbuchung`;
-        return (
-          <Link href={pageHref} className={`${className} ms-nicoles-nav-cta`} onClick={() => setOpen(false)}>
-            {link.label}
-          </Link>
-        );
+      if (preview) {
+        return <span className={`${className} ms-nicoles-nav-cta`}>{link.label}</span>;
       }
 
-      return preview ? (
-        <span className={`${className} ms-nicoles-nav-cta`}>{link.label}</span>
-      ) : (
-        <Link href={bookHref} className={`${className} ms-nicoles-nav-cta`}>
+      const href =
+        link.href === "__book__"
+          ? bookHref
+          : basePath
+            ? `${basePath}/terminbuchung`
+            : bookHref;
+      return (
+        <Link href={href} className={`${className} ms-nicoles-nav-cta`} onClick={() => setOpen(false)}>
           {link.label}
         </Link>
       );

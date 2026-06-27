@@ -28,6 +28,8 @@ export const minisiteSectionKeySchema = z.enum([
   "team",
   "guidelines",
   "visit",
+  "reviews",
+  "contact",
   "salon_banner",
   "aktionstage",
   "news",
@@ -100,6 +102,7 @@ export const minisiteSectionsConfigSchema = z
     pre_footer: minisiteSectionBlockSchema.optional(),
     booking: minisiteSectionBlockSchema.optional(),
     contact: minisiteSectionBlockSchema.optional(),
+    reviews: minisiteSectionBlockSchema.optional(),
   })
   .strict();
 
@@ -148,6 +151,7 @@ export const minisiteTemplateSchema = z.enum([
   "boutique",
   "nicoles",
   "mecca",
+  "forge",
 ]);
 
 export const minisiteContentSchema = z
@@ -200,6 +204,9 @@ export const publicShopServiceSchema = z
     name: z.string(),
     duration_min: z.number().int().positive(),
     price_cents: z.number().int().nonnegative(),
+    description: z.string().nullable().optional(),
+    image_path: z.string().nullable().optional(),
+    show_price: z.boolean().default(true),
   })
   .strict();
 
@@ -244,6 +251,9 @@ export const SHOP_PUBLIC_SERVICE_KEYS = [
   "name",
   "duration_min",
   "price_cents",
+  "description",
+  "image_path",
+  "show_price",
 ] as const;
 export const SHOP_PUBLIC_TEAM_KEYS = ["membership_id", "display_name"] as const;
 export const SHOP_PUBLIC_MINISITE_KEYS = ["template", "accent_hex", "content"] as const;

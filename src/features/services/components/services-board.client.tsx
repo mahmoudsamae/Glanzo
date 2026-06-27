@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
+import Image from "next/image";
+
 import { ConfirmSheet } from "@/components/shared/confirm-sheet";
 import { DashboardPage, DashboardPageHeader, DashboardPanel, DashboardPrimaryButton } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { centsToEurInput, eurInputToCents } from "@/lib/money/price";
 import type { BarberOption, ServiceCatalogItem } from "@/lib/services/catalog";
+
+import { shopMediaPublicUrl } from "@/lib/minisite/media-url";
 
 import {
   archiveServiceAction,
@@ -32,11 +36,22 @@ type FormState = {
   name: string;
   durationMin: number;
   priceInput: string;
+  showPrice: boolean;
+  description: string;
+  imagePath: string | null;
   membershipIds: string[];
 };
 
 function emptyForm(): FormState {
-  return { name: "", durationMin: 30, priceInput: "", membershipIds: [] };
+  return {
+    name: "",
+    durationMin: 30,
+    priceInput: "",
+    showPrice: true,
+    description: "",
+    imagePath: null,
+    membershipIds: [],
+  };
 }
 
 function moveService(
@@ -67,6 +82,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
   const [form, setForm] = useState<FormState>(emptyForm);
   const [archiveTarget, setArchiveTarget] = useState<ServiceCatalogItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function syncCatalog() {
@@ -88,17 +104,45 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
       id: service.id,
       name: service.name,
       durationMin: service.durationMin,
-      priceInput: centsToEurInput(service.priceCents),
+      priceInput: service.showPrice ? centsToEurInput(service.priceCents) : "",
+      showPrice: service.showPrice,
+      description: service.description ?? "",
+      imagePath: service.imagePath,
       membershipIds: service.assignedMembershipIds,
     });
     setError(null);
     setFormOpen(true);
   }
 
+  async function handleImageUpload(file: File) {
+    setUploadingImage(true);
+    setError(null);
+    const { uploadShopMediaFile } = await import("@/features/minisite/lib/upload-media.client");
+    const result = await uploadShopMediaFile(shopId, "service", file);
+    setUploadingImage(false);
+    if (!result.ok) {
+      const message = result.message.includes("row-level security")
+        ? "Bild-Upload blockiert — bitte Datenbank-Migration ausführen (supabase db push) oder Admin kontaktieren."
+        : result.message;
+      setError(message);
+      return;
+    }
+    setForm((current) => ({ ...current, imagePath: result.path }));
+  }
+
   function submitForm() {
-    const priceCents = eurInputToCents(form.priceInput);
-    if (!form.name.trim() || priceCents === null) {
-      setError("Enter a name and valid price.");
+    if (!form.name.trim()) {
+      setError("Enter a service name.");
+      return;
+    }
+
+    const priceCents = form.showPrice ? eurInputToCents(form.priceInput) : 0;
+    if (form.showPrice && priceCents === null) {
+      setError("Enter a valid price or hide price and add a description.");
+      return;
+    }
+    if (!form.showPrice && !form.description.trim()) {
+      setError("Add a short description when hiding the price.");
       return;
     }
 
@@ -106,7 +150,10 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
       const payload = {
         name: form.name.trim(),
         durationMin: form.durationMin,
-        priceCents,
+        showPrice: form.showPrice,
+        priceCents: form.showPrice ? (priceCents ?? 0) : 0,
+        description: form.description.trim() || null,
+        imagePath: form.imagePath,
         membershipIds: form.membershipIds,
       };
 
@@ -166,6 +213,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
           }
         />
         <ServiceFormSheet
+          shopId={shopId}
           open={formOpen}
           onOpenChange={setFormOpen}
           form={form}
@@ -173,6 +221,8 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
           barbers={barbers}
           error={error}
           pending={isPending}
+          uploadingImage={uploadingImage}
+          onImageUpload={handleImageUpload}
           onSubmit={submitForm}
           title="New service"
         />
@@ -214,6 +264,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
       {error ? <p className="mt-[var(--space-4)] text-sm text-destructive">{error}</p> : null}
 
       <ServiceFormSheet
+        shopId={shopId}
         open={formOpen}
         onOpenChange={setFormOpen}
         form={form}
@@ -221,6 +272,8 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
         barbers={barbers}
         error={error}
         pending={isPending}
+        uploadingImage={uploadingImage}
+        onImageUpload={handleImageUpload}
         onSubmit={submitForm}
         title={form.id ? "Edit service" : "New service"}
       />
@@ -243,6 +296,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
 }
 
 function ServiceFormSheet({
+  shopId: _shopId,
   open,
   onOpenChange,
   form,
@@ -250,9 +304,12 @@ function ServiceFormSheet({
   barbers,
   error,
   pending,
+  uploadingImage,
+  onImageUpload,
   onSubmit,
   title,
 }: {
+  shopId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   form: FormState;
@@ -260,6 +317,8 @@ function ServiceFormSheet({
   barbers: BarberOption[];
   error: string | null;
   pending: boolean;
+  uploadingImage: boolean;
+  onImageUpload: (file: File) => void;
   onSubmit: () => void;
   title: string;
 }) {
@@ -278,6 +337,58 @@ function ServiceFormSheet({
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
           </div>
+
+          <div className="space-y-[var(--space-2)]">
+            <Label>Service image</Label>
+            <p className="text-xs text-[var(--text-2)]">Shown on your public minisite.</p>
+            {form.imagePath ? (
+              <div className="flex items-center gap-[var(--space-3)]">
+                <span className="relative block size-16 overflow-hidden rounded-md border border-border">
+                  <Image
+                    src={shopMediaPublicUrl(form.imagePath)}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                </span>
+                <button
+                  type="button"
+                  className="text-sm text-[var(--text-2)] underline-offset-4 hover:underline"
+                  onClick={() => setForm({ ...form, imagePath: null })}
+                >
+                  Remove
+                </button>
+              </div>
+            ) : null}
+            <label className="inline-flex cursor-pointer text-sm font-medium text-[var(--brass)] underline-offset-4 hover:underline">
+              {uploadingImage ? "Uploading…" : "+ Upload image"}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                disabled={uploadingImage || pending}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void onImageUpload(file);
+                }}
+              />
+            </label>
+          </div>
+
+          <div className="space-y-[var(--space-2)]">
+            <Label htmlFor="service-description">Short description</Label>
+            <textarea
+              id="service-description"
+              rows={3}
+              maxLength={240}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              placeholder="e.g. Includes wash, cut and styling"
+              className="flex min-h-[5rem] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            />
+          </div>
+
           <div className="space-y-[var(--space-2)]">
             <Label>Duration (minutes)</Label>
             <div className="flex items-center gap-[var(--space-2)]">
@@ -304,15 +415,33 @@ function ServiceFormSheet({
               </Button>
             </div>
           </div>
-          <div className="space-y-[var(--space-2)]">
-            <Label htmlFor="service-price">Price (EUR)</Label>
-            <Input
-              id="service-price"
-              inputMode="decimal"
-              value={form.priceInput}
-              onChange={(e) => setForm({ ...form, priceInput: e.target.value })}
+
+          <label className="flex cursor-pointer items-start gap-[var(--space-3)]">
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={form.showPrice}
+              onChange={(e) => setForm({ ...form, showPrice: e.target.checked })}
             />
-          </div>
+            <span>
+              <span className="block text-sm font-medium">Show price on website</span>
+              <span className="mt-0.5 block text-xs text-[var(--text-2)]">
+                Turn off to show only the description on your minisite.
+              </span>
+            </span>
+          </label>
+
+          {form.showPrice ? (
+            <div className="space-y-[var(--space-2)]">
+              <Label htmlFor="service-price">Price (EUR)</Label>
+              <Input
+                id="service-price"
+                inputMode="decimal"
+                value={form.priceInput}
+                onChange={(e) => setForm({ ...form, priceInput: e.target.value })}
+              />
+            </div>
+          ) : null}
           {barbers.length > 0 ? (
             <fieldset className="space-y-[var(--space-2)]">
               <legend className="text-sm font-medium">Barbers</legend>

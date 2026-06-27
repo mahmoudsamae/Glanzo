@@ -84,7 +84,9 @@ export function ServicesLedgerList({
             </p>
           </div>
 
-          <span className="salon-dash-service-price text-data">{centsToEurDisplay(service.priceCents)}</span>
+          <span className="salon-dash-service-price text-data">
+            {service.showPrice ? centsToEurDisplay(service.priceCents) : "—"}
+          </span>
 
           <div className="flex items-center gap-[var(--space-1)] opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
             <button

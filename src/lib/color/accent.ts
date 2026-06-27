@@ -21,6 +21,7 @@ const THEME_BACKGROUNDS: Record<MinisiteTemplate, string> = {
   nicoles: "oklch(0.96 0.018 85)",
   flux: "oklch(0.13 0.035 265)",
   mecca: "oklch(0.12 0.015 75)",
+  forge: "oklch(0.08 0.012 55)",
 };
 
 type Rgb = { r: number; g: number; b: number };

@@ -13,6 +13,7 @@ import {
   setPlatformShopMinisiteTemplatesAction,
   setPlatformShopStatusAction,
   setPlatformShopBookingAutoAssignAction,
+  setPlatformMinisiteManagedAction,
 } from "../api";
 import { normalizeAllowedMinisiteTemplates } from "@/lib/minisite/allowed-templates";
 import { MINISITE_TEMPLATES } from "@/lib/minisite/template-registry";
@@ -80,6 +81,9 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
   const [autoAssignBarber, setAutoAssignBarber] = useState(shop.booking_auto_assign_barber);
   const [bookingModeSuccess, setBookingModeSuccess] = useState<string | null>(null);
   const [bookingModeError, setBookingModeError] = useState<string | null>(null);
+  const [minisiteManaged, setMinisiteManaged] = useState(shop.minisite_managed);
+  const [managedSuccess, setManagedSuccess] = useState<string | null>(null);
+  const [managedError, setManagedError] = useState<string | null>(null);
 
   const minisiteUrl = buildShopMinisiteUrl(shop.slug);
   const isSuspended = shop.status === "suspended";
@@ -252,6 +256,24 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
     });
   }
 
+  function saveMinisiteManaged() {
+    setManagedError(null);
+    setManagedSuccess(null);
+    startTransition(async () => {
+      const result = await setPlatformMinisiteManagedAction(shop.id, minisiteManaged);
+      if (!result.ok) {
+        setManagedError("Einstellung konnte nicht gespeichert werden.");
+        return;
+      }
+      setManagedSuccess(
+        minisiteManaged
+          ? "Website wird jetzt von Glanzo verwaltet — Inhaber kann nicht mehr bearbeiten."
+          : "Inhaber kann die Website wieder selbst bearbeiten.",
+      );
+      router.refresh();
+    });
+  }
+
   const templateSettingsChanged =
     selectedTemplate !== shop.minisite_template ||
     allowedTemplates.slice().sort().join(",") !==
@@ -344,6 +366,54 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
               />
             ) : null}
           </section>
+
+          <AdminPanel
+            title="Website einrichten"
+            description="Salon-Website komplett vorbereiten — Bilder, Texte, Template. Der Inhaber öffnet nur die fertige Seite."
+          >
+            {managedSuccess ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-ok)]">{managedSuccess}</p>
+            ) : null}
+            {managedError ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-bad)]">{managedError}</p>
+            ) : null}
+
+            <div className="flex flex-col gap-[var(--space-4)]">
+              <Link
+                href={`/admin/shops/${shop.id}/minisite`}
+                className="platform-admin-btn-primary inline-flex w-fit items-center justify-center px-[var(--space-4)] py-[var(--space-2)] text-sm"
+              >
+                Website-Editor öffnen
+              </Link>
+
+              <label className="flex cursor-pointer items-start gap-[var(--space-3)] rounded-md border border-[var(--ink-3)] px-[var(--space-4)] py-[var(--space-3)]">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={minisiteManaged}
+                  onChange={(event) => setMinisiteManaged(event.target.checked)}
+                />
+                <span>
+                  <span className="block text-sm font-medium text-[var(--text-0)]">
+                    Website von Glanzo verwaltet
+                  </span>
+                  <span className="mt-[var(--space-1)] block text-xs text-[var(--text-2)]">
+                    Inhaber sieht keine Bearbeitungs-Tools — nur die live Website. Ideal wenn du alles
+                    für ihn einrichtest.
+                  </span>
+                </span>
+              </label>
+
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending || minisiteManaged === shop.minisite_managed}
+                onClick={saveMinisiteManaged}
+              >
+                Verwaltungsmodus speichern
+              </Button>
+            </div>
+          </AdminPanel>
 
           <AdminPanel
             title="Minisite Templates"

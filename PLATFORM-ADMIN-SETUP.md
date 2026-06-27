@@ -12,7 +12,14 @@ Alternativ: einmal unter `/register` registrieren und die User-ID aus dem Dashbo
 
 ## 2. User-ID in `platform_admins` eintragen
 
-**SQL Editor** → New query:
+**Einfach:** fertiges Skript im Repo:
+
+`supabase/scripts/create-platform-admin.sql`
+
+1. Datei öffnen, E-Mail in **Option A** anpassen (oder **Option B** für neuen User mit Passwort)
+2. Supabase Dashboard → **SQL Editor** → Inhalt einfügen → **Run**
+
+**Manuell** (nur UUID bekannt):
 
 ```sql
 INSERT INTO public.platform_admins (user_id)

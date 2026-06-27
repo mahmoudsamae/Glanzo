@@ -151,14 +151,14 @@ export async function requireOnboardingAccess(): Promise<void> {
 }
 
 export async function requirePlatformAdmin(): Promise<void> {
-  const state = await getActorState();
+  const actor = await getActor();
 
-  if (state.kind === "unauthenticated") {
+  if (!actor) {
     redirect("/admin");
   }
 
-  if (!state.actor.isPlatformAdmin) {
-    redirect(resolvePostAuthRedirect(state.actor));
+  if (!actor.isPlatformAdmin) {
+    redirect(resolvePostAuthRedirect(actor));
   }
 }
 

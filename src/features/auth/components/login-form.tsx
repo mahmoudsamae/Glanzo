@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { clientEnv } from "@/lib/env";
 import type { AuthActionResult } from "@/lib/auth/types";
+import { isNextRedirectError } from "@/lib/auth/next-redirect";
 
 import { AuthLink } from "./auth-shell";
 import { SubmitButton } from "@/components/shared/submit-button";
@@ -56,9 +57,13 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
           return;
         }
         if (result.redirectTo) {
+          router.refresh();
           router.push(result.redirectTo);
         }
-      } catch {
+      } catch (error) {
+        if (isNextRedirectError(error)) {
+          throw error;
+        }
         setErrorMessage("Something went wrong. Try again.");
       }
     });

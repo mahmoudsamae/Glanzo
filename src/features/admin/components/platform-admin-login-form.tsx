@@ -11,6 +11,7 @@ import { SubmitButton } from "@/components/shared/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AuthActionResult } from "@/lib/auth/types";
+import { isNextRedirectError } from "@/lib/auth/next-redirect";
 
 const loginSchema = z.object({
   email: z.string().email("Gültige E-Mail eingeben"),
@@ -46,9 +47,12 @@ export function PlatformAdminLoginForm({ loginAction }: PlatformAdminLoginFormPr
           setErrorMessage(result.message);
           return;
         }
-        router.push(result.redirectTo ?? "/admin");
         router.refresh();
-      } catch {
+        router.push(result.redirectTo ?? "/admin");
+      } catch (error) {
+        if (isNextRedirectError(error)) {
+          throw error;
+        }
         setErrorMessage("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
       }
     });

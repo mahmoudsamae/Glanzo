@@ -1,0 +1,2596 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
+
+/* Forge — heavy masculine barbershop: void black, warm copper, Syne display */
+
+.theme-forge {
+  --ms-forge-void: #070605;
+  --ms-forge-surface: #11100e;
+  --ms-forge-elevated: #1a1815;
+  --ms-forge-copper: #c47a2c;
+  --ms-forge-copper-bright: #e09545;
+  --ms-forge-cream: #ede6dc;
+  --ms-forge-muted: #8f867c;
+  --ms-forge-border: #2a2622;
+
+  /* Map Nicoles tokens so shared section components inherit Forge palette */
+  --ms-nicoles-teal: var(--ms-forge-surface);
+  --ms-nicoles-teal-deep: var(--ms-forge-void);
+  --ms-nicoles-gold: var(--ms-forge-copper);
+  --ms-nicoles-cream: var(--ms-forge-elevated);
+  --ms-nicoles-ink: var(--ms-forge-cream);
+  --ms-nicoles-ink-muted: var(--ms-forge-muted);
+  --ms-nicoles-nav-text: var(--ms-forge-cream);
+
+  /** Sticky header height — first heroes use viewport minus this so Scroll stays visible. */
+  --ms-forge-nav-height: 4.5rem;
+  --ms-forge-viewport-below-nav: calc(100svh - var(--ms-forge-nav-height));
+
+  --ms-bg: var(--ms-forge-void);
+  --ms-bg-elevated: var(--ms-forge-surface);
+  --ms-text: var(--ms-forge-cream);
+  --ms-text-muted: var(--ms-forge-muted);
+  --ms-border: var(--ms-forge-border);
+  --ms-border-subtle: color-mix(in oklch, var(--ms-forge-border) 70%, transparent);
+  --ms-overlay: rgb(7 6 5 / 0.78);
+  --ms-font-wonk: 0;
+  --ms-display-scale: 1;
+
+  background-color: var(--ms-forge-void);
+  color: var(--ms-forge-cream);
+}
+
+.theme-forge.minisite-forge-fonts {
+  font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
+  font-optical-sizing: auto;
+}
+
+.theme-forge.minisite-forge-fonts .font-display,
+.theme-forge.minisite-forge-fonts .ms-forge-display,
+.theme-forge.minisite-forge-fonts .ms-nicoles-display {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.theme-forge .ms-nicoles-photo,
+.theme-forge img.ms-nicoles-photo {
+  filter: saturate(0.9) contrast(1.06) brightness(0.95);
+}
+
+/* ——— Motion ——— */
+@keyframes ms-forge-ken-burns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ms-forge-scroll-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+
+@keyframes ms-forge-reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 2.5rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-forge-reveal-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-2rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-forge-reveal-right {
+  from {
+    opacity: 0;
+    transform: translate3d(2rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-forge-reveal-left-wide {
+  from {
+    opacity: 0;
+    transform: translate3d(-4.5rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-forge-reveal-right-wide {
+  from {
+    opacity: 0;
+    transform: translate3d(4.5rem, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes ms-forge-shine-rotate {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes ms-forge-reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ms-forge-reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ms-forge-hero-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.75rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.ms-forge-root {
+  isolation: isolate;
+  max-width: 100%;
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+
+html:has(.ms-forge-root) {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-forge-root,
+  html:has(.ms-forge-root) {
+    scroll-behavior: auto;
+  }
+}
+
+.ms-forge-reveal {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal.is-inview {
+  animation-duration: 0.95s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  animation-fill-mode: both;
+  animation-delay: var(--forge-delay, 0ms);
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--up.is-inview {
+  animation-name: ms-forge-reveal-up;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--left.is-inview {
+  animation-name: ms-forge-reveal-left;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--right.is-inview {
+  animation-name: ms-forge-reveal-right;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--fade.is-inview {
+  animation-name: ms-forge-reveal-fade;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--scale.is-inview {
+  animation-name: ms-forge-reveal-scale;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--wide.ms-forge-reveal--left.is-inview {
+  animation-name: ms-forge-reveal-left-wide;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-reveal--wide.ms-forge-reveal--right.is-inview {
+  animation-name: ms-forge-reveal-right-wide;
+}
+
+.ms-forge-hero-enter {
+  opacity: 0;
+}
+
+.ms-forge-root.ms-forge-ready .ms-forge-hero-enter {
+  animation: ms-forge-hero-enter 1s cubic-bezier(0.2, 0, 0, 1) both;
+  animation-delay: var(--forge-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-forge-reveal,
+  .ms-forge-hero-enter {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .ms-forge-shine-frame__glow::before {
+    animation: none !important;
+    opacity: 0.35;
+  }
+
+  .ms-forge-shine-frame--card:hover {
+    transform: none;
+  }
+}
+
+/* Nicoles section reveals under Forge */
+.theme-forge .ms-nicoles-section.ms-cinema-section {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity 0.85s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.85s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.theme-forge.ms-forge-ready .ms-nicoles-section.ms-cinema-section--visible,
+.theme-forge.ms-cinema-ready .ms-nicoles-section.ms-cinema-section--visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ——— Hero ——— */
+.ms-forge-hero {
+  position: relative;
+  min-height: var(--ms-forge-viewport-below-nav);
+  overflow: hidden;
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-hero-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  min-height: var(--ms-forge-viewport-below-nav);
+  grid-template-columns: 1fr;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.ms-forge-hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-12) var(--space-5);
+  z-index: 2;
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-hero-copy {
+    padding: var(--space-16) clamp(var(--space-8), 6vw, var(--space-16));
+    padding-right: var(--space-8);
+    max-width: 38rem;
+    justify-self: end;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .ms-forge-hero-copy {
+    max-width: 42rem;
+    padding-left: clamp(var(--space-10), 8vw, 6rem);
+  }
+}
+
+.ms-forge-hero-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-hero-title {
+  margin-top: var(--space-4);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-hero-sub {
+  margin-top: var(--space-5);
+  max-width: 28rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-hero-badge {
+  margin-top: var(--space-6);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-inline-start: 2px solid var(--ms-forge-copper);
+  padding-inline-start: var(--space-4);
+}
+
+.ms-forge-hero-badge strong {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: 1.125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-hero-socials {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+}
+
+.ms-forge-hero-social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 42%, transparent);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ms-forge-cream);
+  background: color-mix(in oklch, var(--ms-forge-void) 72%, transparent);
+  backdrop-filter: blur(6px);
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-instant);
+}
+
+.ms-forge-hero-social-pill:hover {
+  border-color: var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-copper) 14%, transparent);
+  transform: translateY(-1px);
+}
+
+.ms-forge-hero-social-pill:focus-visible {
+  outline: 2px solid var(--ms-forge-copper);
+  outline-offset: 2px;
+}
+
+.ms-forge-hero-media {
+  position: relative;
+  min-height: clamp(18rem, 52vw, 28rem);
+  width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-hero-media {
+    min-height: var(--ms-forge-viewport-below-nav);
+    height: 100%;
+  }
+}
+
+.ms-forge-hero-image-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ms-forge-elevated);
+}
+
+.ms-forge-hero-image-wrap .ms-nicoles-photo,
+.ms-forge-hero-image-wrap img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.ms-forge-hero-image-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    var(--ms-forge-void) 0%,
+    color-mix(in oklch, var(--ms-forge-void) 55%, transparent) 22%,
+    color-mix(in oklch, var(--ms-forge-void) 15%, transparent) 42%,
+    transparent 58%
+  );
+  pointer-events: none;
+}
+
+@media (max-width: 1023px) {
+  .ms-forge-hero-image-wrap::after {
+    background: linear-gradient(
+      180deg,
+      var(--ms-forge-void) 0%,
+      color-mix(in oklch, var(--ms-forge-void) 40%, transparent) 28%,
+      transparent 55%
+    );
+  }
+}
+
+.ms-forge-hero-image {
+  animation: ms-forge-ken-burns 22s ease-in-out infinite alternate;
+}
+
+.ms-forge-hero-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.ms-forge-scroll-cue {
+  position: absolute;
+  bottom: var(--space-6);
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ms-forge-copper);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  animation: ms-forge-scroll-pulse 2.6s ease-in-out infinite;
+}
+
+.ms-forge-scroll-cue span {
+  display: block;
+  width: 1px;
+  height: 2.5rem;
+  background: linear-gradient(to bottom, var(--ms-forge-copper), transparent);
+}
+
+/* ——— Section overrides (Nicoles components on dark Forge) ——— */
+.theme-forge .ms-nicoles-services-preview,
+.theme-forge .ms-nicoles-about-preview,
+.theme-forge .ms-nicoles-team-preview,
+.theme-forge .ms-nicoles-news,
+.theme-forge .ms-nicoles-pre-footer {
+  background: var(--ms-forge-surface) !important;
+  color: var(--ms-forge-cream);
+}
+
+.theme-forge .ms-nicoles-aktionstage {
+  background: var(--ms-forge-void) !important;
+}
+
+.theme-forge .ms-nicoles-prices-page-title,
+.theme-forge .ms-nicoles-prices-page {
+  background: var(--ms-forge-surface) !important;
+}
+
+.theme-forge .ms-nicoles-eyebrow {
+  color: var(--ms-forge-copper);
+}
+
+.theme-forge .ms-nicoles-pill-cta {
+  border-color: color-mix(in oklch, var(--ms-forge-copper) 60%, transparent);
+  background: var(--ms-forge-copper);
+  color: var(--ms-forge-void);
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.theme-forge .ms-nicoles-pill-cta:hover {
+  background: var(--ms-forge-copper-bright);
+  transform: translateY(-1px);
+}
+
+.theme-forge .ms-nicoles-nav {
+  background: color-mix(in oklch, var(--ms-forge-void) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--ms-forge-border);
+}
+
+.theme-forge .ms-nicoles-nav--scrolled {
+  background: color-mix(in oklch, var(--ms-forge-void) 96%, transparent);
+}
+
+.theme-forge .ms-nicoles-footer {
+  background: var(--ms-forge-void);
+  border-top: 1px solid var(--ms-forge-border);
+}
+
+.theme-forge .ms-nicoles-footer h2,
+.theme-forge .ms-nicoles-footer dt,
+.theme-forge .ms-nicoles-footer dd,
+.theme-forge .ms-nicoles-footer p,
+.theme-forge .ms-nicoles-footer a {
+  color: var(--ms-forge-cream);
+}
+
+.theme-forge .ms-nicoles-footer dt {
+  color: var(--ms-forge-muted);
+}
+
+.theme-forge .ms-nicoles-footer-gold-bar {
+  background: var(--ms-forge-copper);
+  color: var(--ms-forge-void);
+}
+
+.theme-forge .ms-nicoles-footer-gold-bar p {
+  color: var(--ms-forge-void);
+}
+
+.theme-forge .ms-cinema-book-bar {
+  background: color-mix(in oklch, var(--ms-forge-void) 92%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.theme-forge .ms-nicoles-hero-badge {
+  background: color-mix(in oklch, var(--ms-forge-copper) 18%, var(--ms-forge-elevated));
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 35%, transparent);
+}
+
+.theme-forge .ms-nicoles-salon-banner-overlay {
+  background: linear-gradient(
+    180deg,
+    rgb(7 6 5 / 0.15) 0%,
+    rgb(7 6 5 / 0.55) 55%,
+    rgb(7 6 5 / 0.88) 100%
+  ) !important;
+}
+
+.theme-forge *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.theme-forge *::-webkit-scrollbar-track {
+  background: var(--ms-forge-void);
+}
+
+.theme-forge *::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--ms-forge-copper);
+}
+
+.theme-forge {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ms-forge-copper) var(--ms-forge-void);
+}
+
+/* ——— Shared Forge sections ——— */
+.ms-forge-section {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity 0.85s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.85s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.theme-forge.ms-forge-ready .ms-forge-section.ms-cinema-section--visible,
+.theme-forge.ms-cinema-ready .ms-forge-section.ms-cinema-section--visible {
+  opacity: 1;
+  transform: none;
+}
+
+.ms-forge-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-section-title {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-section-text {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ms-forge-muted);
+}
+
+/* ——— Shine frame (images, cards, panels) ——— */
+.ms-forge-shine-frame {
+  --forge-shine-inset: 3px;
+  position: relative;
+  isolation: isolate;
+  padding: var(--forge-shine-inset);
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklch, var(--ms-forge-copper) 55%, var(--ms-forge-border)),
+    var(--ms-forge-border) 45%,
+    color-mix(in oklch, var(--ms-forge-copper) 40%, var(--ms-forge-border))
+  );
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 50%, var(--ms-forge-border));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--ms-forge-copper) 12%, transparent),
+    0 12px 28px -16px rgb(0 0 0 / 0.55);
+}
+
+.ms-forge-shine-frame--panel {
+  --forge-shine-inset: 2px;
+  box-shadow:
+    0 28px 72px -36px rgb(0 0 0 / 0.9),
+    0 0 0 1px color-mix(in oklch, var(--ms-forge-copper) 12%, transparent);
+}
+
+.ms-forge-shine-frame--card {
+  --forge-shine-inset: 2px;
+  overflow: visible;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 0.35s ease;
+}
+
+.ms-forge-shine-frame--card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--ms-forge-copper) 22%, transparent),
+    0 1rem 2.5rem rgb(0 0 0 / 0.4);
+}
+
+.ms-forge-shine-frame__glow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.ms-forge-shine-frame__glow::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in oklch, var(--ms-forge-copper) 95%, white) 38deg,
+    color-mix(in oklch, var(--ms-forge-copper-bright) 80%, white) 56deg,
+    transparent 98deg,
+    transparent 360deg
+  );
+  animation: ms-forge-shine-rotate 5.5s linear infinite;
+}
+
+.ms-forge-shine-frame__inner {
+  position: absolute;
+  inset: var(--forge-shine-inset);
+  z-index: 1;
+  overflow: hidden;
+  background: var(--ms-forge-elevated);
+}
+
+.ms-forge-shine-frame--panel .ms-forge-shine-frame__inner,
+.ms-forge-shine-frame--card .ms-forge-shine-frame__inner {
+  position: relative;
+  inset: auto;
+  overflow: visible;
+}
+
+.ms-forge-shine-frame--panel .ms-forge-shine-frame__inner {
+  padding: clamp(var(--space-6), 4vw, var(--space-10)) clamp(var(--space-5), 5vw, var(--space-10));
+  background: color-mix(in oklch, var(--ms-forge-void) 78%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--ms-forge-cream) 10%, transparent);
+}
+
+.ms-forge-shine-frame--card .ms-forge-shine-frame__inner {
+  overflow: hidden;
+  background: var(--ms-forge-elevated);
+}
+
+.ms-forge-shine-frame__corners {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ms-forge-shine-frame__corners span {
+  position: absolute;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-color: color-mix(in oklch, var(--ms-forge-copper) 85%, transparent);
+  opacity: 0.85;
+}
+
+.ms-forge-shine-frame__corners span:nth-child(1) {
+  top: 0.65rem;
+  left: 0.65rem;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.ms-forge-shine-frame__corners span:nth-child(2) {
+  top: 0.65rem;
+  right: 0.65rem;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+
+.ms-forge-shine-frame__corners span:nth-child(3) {
+  bottom: 0.65rem;
+  left: 0.65rem;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+
+.ms-forge-shine-frame__corners span:nth-child(4) {
+  right: 0.65rem;
+  bottom: 0.65rem;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+/* ——— About ——— */
+.ms-forge-about {
+  background: var(--ms-forge-surface);
+  padding: var(--space-12) var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .ms-forge-about {
+    padding-inline: var(--space-6);
+  }
+}
+
+.ms-forge-about-grid {
+  display: grid;
+  max-width: 72rem;
+  margin-inline: auto;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-about-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-10);
+  }
+}
+
+.ms-forge-about-media {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 16rem;
+}
+
+.ms-forge-about-photo {
+  position: relative;
+  overflow: visible;
+  background: transparent;
+}
+
+.ms-forge-about-photo--a {
+  aspect-ratio: 3 / 4;
+  width: 42%;
+}
+
+.ms-forge-about-photo--b {
+  aspect-ratio: 3 / 5;
+  width: 48%;
+  margin-bottom: calc(var(--space-6) * -1);
+}
+
+/* ——— Salon banner ——— */
+.ms-forge-salon-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: min(22rem, 55vw);
+  max-height: min(28rem, 70vh);
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-salon-banner-media {
+  position: absolute;
+  inset: 0;
+}
+
+.ms-forge-salon-banner-image {
+  object-position: center 35%;
+}
+
+.ms-forge-salon-banner-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, var(--ms-forge-elevated), var(--ms-forge-void)),
+    var(--ms-forge-void);
+}
+
+.ms-forge-salon-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(7 6 5 / 0.35) 0%,
+    rgb(7 6 5 / 0.62) 50%,
+    rgb(7 6 5 / 0.92) 100%
+  );
+}
+
+.ms-forge-salon-banner-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: min(22rem, 55vw);
+  max-height: min(28rem, 70vh);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-10) var(--space-5);
+  text-align: center;
+}
+
+.ms-forge-salon-banner-logo {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 55%, transparent);
+  object-fit: contain;
+  background: color-mix(in oklch, var(--ms-forge-void) 70%, transparent);
+  padding: 0.35rem;
+}
+
+.ms-forge-salon-banner-title {
+  max-width: 40rem;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.35rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ms-forge-cream);
+}
+
+/* ——— Services (home + page) ——— */
+.ms-forge-services {
+  background: var(--ms-forge-void);
+  padding: var(--space-14) var(--space-5);
+}
+
+.ms-forge-services-header {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.ms-forge-services-grid,
+.ms-forge-services-grid ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ms-forge-services-grid {
+  background: var(--ms-forge-surface);
+  padding: var(--space-14) var(--space-5);
+}
+
+.ms-forge-services .ms-forge-services-grid,
+.ms-forge-services > ul.ms-forge-services-grid {
+  background: transparent;
+  padding: 0;
+  margin-top: var(--space-10);
+}
+
+.ms-forge-services > ul,
+ul.ms-forge-services-grid,
+.ms-forge-services-grid > ul {
+  display: grid;
+  max-width: 72rem;
+  margin-inline: auto;
+  gap: var(--space-5);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .ms-forge-services > ul,
+  ul.ms-forge-services-grid,
+  .ms-forge-services-grid > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-services > ul,
+  ul.ms-forge-services-grid,
+  .ms-forge-services-grid > ul {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+.ms-forge-service-card.ms-forge-shine-frame--card {
+  display: block;
+}
+
+.ms-forge-service-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-service-card--page .ms-forge-service-card-media {
+  aspect-ratio: 5 / 4;
+}
+
+.ms-forge-service-card-placeholder {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    var(--ms-forge-elevated) 0%,
+    color-mix(in oklch, var(--ms-forge-copper) 12%, var(--ms-forge-void)) 100%
+  );
+}
+
+.ms-forge-service-card-body {
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  text-align: left;
+}
+
+.ms-forge-service-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ms-forge-service-card-title {
+  margin: 0;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-service-card-title-rule {
+  width: 2.5rem;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--ms-forge-copper),
+    color-mix(in oklch, var(--ms-forge-copper) 20%, transparent)
+  );
+}
+
+.ms-forge-service-card-desc {
+  margin: var(--space-3) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: color-mix(in oklch, var(--ms-forge-muted) 92%, var(--ms-forge-cream));
+}
+
+.ms-forge-service-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid color-mix(in oklch, var(--ms-forge-copper) 20%, var(--ms-forge-border));
+}
+
+.ms-forge-service-card-price-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ms-forge-service-card-price {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ms-forge-copper-bright);
+}
+
+.ms-forge-service-card-meta {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ms-forge-muted) 88%, transparent);
+}
+
+.ms-forge-service-card-book {
+  flex-shrink: 0;
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 60%, transparent);
+  background: var(--ms-forge-copper);
+  color: var(--ms-forge-void);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    background-color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.ms-forge-service-card-book:hover {
+  background: var(--ms-forge-copper-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px -10px color-mix(in oklch, var(--ms-forge-copper) 55%, transparent);
+}
+
+.ms-forge-service-card-book--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ——— Leistungen subpage ——— */
+.ms-forge-prices-hero--fullscreen {
+  min-height: var(--ms-forge-viewport-below-nav);
+}
+
+.ms-forge-prices-hero-shell {
+  position: relative;
+  min-height: var(--ms-forge-viewport-below-nav);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.ms-forge-prices-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.ms-forge-prices-hero-media {
+  position: absolute;
+  inset: 0;
+}
+
+.ms-forge-prices-hero-ken,
+.ms-forge-prices-hero-media .ms-nicoles-photo,
+.ms-forge-prices-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.ms-forge-prices-hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 45%,
+    transparent 0%,
+    rgb(7 6 5 / 0.55) 100%
+  );
+}
+
+.ms-forge-prices-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgb(7 6 5 / 0.35) 0%,
+    rgb(7 6 5 / 0.5) 45%,
+    rgb(7 6 5 / 0.88) 100%
+  );
+}
+
+.ms-forge-prices-hero-shell .ms-forge-hero-noise {
+  z-index: 3;
+}
+
+.ms-forge-prices-hero-content {
+  position: relative;
+  z-index: 4;
+  margin: auto;
+  width: 100%;
+  max-width: 40rem;
+  padding: var(--space-16) var(--space-5) calc(var(--space-16) + 4rem);
+  text-align: center;
+}
+
+.ms-forge-prices-hero-mark {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.75rem;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-prices-hero-title {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-prices-hero-intro {
+  margin-top: var(--space-4);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-section-stack {
+  position: relative;
+  padding-bottom: calc(var(--space-10) + 3.5rem);
+}
+
+.ms-forge-scroll-cue--section-end {
+  bottom: var(--space-5);
+}
+
+/* ——— Forge footer ——— */
+.ms-forge-footer {
+  position: relative;
+  overflow: hidden;
+  background: var(--ms-forge-void);
+  border-top: 1px solid var(--ms-forge-border);
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-footer-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.ms-forge-footer-glow {
+  position: absolute;
+  inset: auto 0 0;
+  height: 55%;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 100%,
+    color-mix(in oklch, var(--ms-forge-copper) 12%, transparent),
+    transparent 68%
+  );
+  pointer-events: none;
+}
+
+.ms-forge-footer-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-10);
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-12) var(--space-4) var(--space-10);
+}
+
+@media (min-width: 768px) {
+  .ms-forge-footer-inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.ms-forge-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ms-forge-footer-col--social {
+  align-self: stretch;
+}
+
+.ms-forge-footer-eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-footer-heading {
+  margin: 0;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-footer-contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ms-forge-footer-contact-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 32%, var(--ms-forge-border));
+  border-radius: 0.625rem;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 88%, transparent);
+  color: var(--ms-forge-cream);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-instant),
+    box-shadow var(--t-fast);
+}
+
+.ms-forge-footer-contact-card--link {
+  text-decoration: none;
+}
+
+.ms-forge-footer-contact-card:hover {
+  border-color: color-mix(in oklch, var(--ms-forge-copper) 58%, transparent);
+  background: color-mix(in oklch, var(--ms-forge-copper) 10%, var(--ms-forge-elevated));
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.55);
+}
+
+.ms-forge-footer-contact-card:focus-visible {
+  outline: 2px solid var(--ms-forge-copper);
+  outline-offset: 2px;
+}
+
+.ms-forge-footer-contact-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  color: var(--ms-forge-copper-bright);
+  background: color-mix(in oklch, var(--ms-forge-copper) 14%, transparent);
+}
+
+.ms-forge-footer-contact-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.ms-forge-footer-contact-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-footer-contact-value {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ms-forge-cream);
+  word-break: break-word;
+}
+
+.ms-forge-footer-contact-chevron {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  color: color-mix(in oklch, var(--ms-forge-muted) 70%, transparent);
+  transition: transform var(--t-fast);
+}
+
+.ms-forge-footer-contact-card:hover .ms-forge-footer-contact-chevron {
+  color: var(--ms-forge-copper-bright);
+  transform: translateX(2px);
+}
+
+.ms-forge-footer-hours-panel {
+  padding: var(--space-4);
+  border: 1px solid color-mix(in oklch, var(--ms-forge-border) 90%, transparent);
+  border-radius: 0.625rem;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 72%, transparent);
+}
+
+.ms-forge-footer-hours {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ms-forge-footer-hours-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.ms-forge-footer-hours-row dt {
+  margin: 0;
+  font-weight: 500;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-footer-hours-row dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--ms-forge-cream);
+  text-align: right;
+}
+
+.ms-forge-footer-hours-row--closed dd {
+  color: color-mix(in oklch, var(--ms-forge-copper) 72%, var(--ms-forge-muted));
+}
+
+.ms-forge-footer-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ms-forge-footer-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 36%, var(--ms-forge-border));
+  border-radius: 0.75rem;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 90%, transparent);
+  color: var(--ms-forge-cream);
+  text-decoration: none;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-instant),
+    box-shadow var(--t-fast);
+}
+
+.ms-forge-footer-social-btn svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.ms-forge-footer-social-btn:hover {
+  border-color: var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-copper) 16%, var(--ms-forge-elevated));
+  color: var(--ms-forge-copper-bright);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px -14px rgb(0 0 0 / 0.65);
+}
+
+.ms-forge-footer-social-btn:focus-visible {
+  outline: 2px solid var(--ms-forge-copper);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .ms-forge-footer-col--social .ms-forge-footer-socials {
+    max-width: 11.5rem;
+  }
+}
+
+.ms-forge-footer-bar {
+  position: relative;
+  z-index: 1;
+  border-top: 3px solid var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-surface) 92%, var(--ms-forge-copper) 8%);
+}
+
+.ms-forge-footer-bar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .ms-forge-footer-bar-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.ms-forge-footer-copy {
+  margin: 0;
+  font-size: 0.75rem;
+  color: color-mix(in oklch, var(--ms-forge-cream) 78%, transparent);
+}
+
+.ms-forge-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--ms-forge-muted) 90%, transparent);
+}
+
+.ms-forge-contact-sheet {
+  position: relative;
+  z-index: 51;
+  border-color: color-mix(in oklch, var(--ms-forge-copper) 35%, transparent) !important;
+  background: var(--ms-forge-void) !important;
+  color: var(--ms-forge-cream);
+  isolation: isolate;
+}
+
+.ms-forge-contact-sheet-overlay {
+  background: rgb(7 6 5 / 0.82) !important;
+}
+
+.ms-forge-contact-sheet-detail {
+  margin-top: var(--space-2);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--ms-forge-cream);
+}
+
+/* legacy title block removed from layout — title lives on hero */
+.ms-forge-prices-title {
+  display: none;
+}
+
+.ms-forge-prices-title-inner {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.ms-forge-prices-title-mark {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.75rem;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-prices-title-text {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ms-forge-cream);
+}
+
+/* ——— Price list (dark) ——— */
+.ms-forge-price-list {
+  position: relative;
+  overflow: hidden;
+  background: var(--ms-forge-void);
+  padding: var(--space-12) var(--space-5) var(--space-16);
+}
+
+.ms-forge-price-list-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.ms-forge-price-list-bg .ms-nicoles-photo,
+.ms-forge-price-list-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ms-forge-price-list-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgb(7 6 5 / 0.92) 0%,
+    rgb(7 6 5 / 0.88) 50%,
+    rgb(7 6 5 / 0.94) 100%
+  );
+}
+
+.ms-forge-price-list-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 43.75rem;
+  margin-inline: auto;
+}
+
+.ms-forge-price-group + .ms-forge-price-group {
+  margin-top: var(--space-10);
+}
+
+.ms-forge-price-group-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-price-rows {
+  margin-top: var(--space-5);
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ms-forge-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.ms-forge-price-row-label,
+.ms-forge-price-row-price {
+  font-size: 1rem;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-price-row-label {
+  flex-shrink: 0;
+}
+
+.ms-forge-price-row-price {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--ms-forge-copper-bright);
+}
+
+.ms-forge-price-row-leader {
+  flex: 1;
+  min-width: var(--space-6);
+  margin-inline: var(--space-3);
+  border-bottom: 1px dotted color-mix(in oklch, var(--ms-forge-muted) 50%, transparent);
+  transform: translateY(-0.2em);
+}
+
+/* Preview overrides */
+.minisite-preview .ms-forge-prices-hero-media {
+  min-height: auto;
+}
+
+.minisite-preview .ms-forge-salon-banner {
+  max-height: none;
+}
+
+.minisite-preview .ms-forge-services-grid > ul {
+  grid-template-columns: 1fr;
+}
+
+/* ——— Team ——— */
+.ms-forge-team {
+  background: var(--ms-forge-void);
+  padding: var(--space-14) var(--space-5);
+}
+
+.ms-forge-team-inner {
+  max-width: 48rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ms-forge-team-photos {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  list-style: none;
+  padding: 0;
+}
+
+.ms-forge-team-photo.ms-forge-shine-frame--media {
+  position: relative;
+  width: clamp(5.5rem, 22vw, 8.5rem);
+  aspect-ratio: 1;
+  overflow: visible;
+  background: transparent;
+  border: none;
+}
+
+/* ——— News ——— */
+.ms-forge-news {
+  background: var(--ms-forge-surface);
+  padding: var(--space-14) var(--space-5);
+  border-top: 1px solid var(--ms-forge-border);
+}
+
+.ms-forge-news-inner {
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+.ms-forge-news-grid {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-10);
+  list-style: none;
+  padding: 0;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .ms-forge-news-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-news-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.ms-forge-news-card.ms-forge-shine-frame--card {
+  display: block;
+}
+
+.ms-forge-news-card:hover {
+  transform: translateY(-3px);
+}
+
+.ms-forge-news-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-news-card-title {
+  padding: var(--space-4);
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ms-forge-cream);
+  text-align: left;
+}
+
+/* ——— Portrait framing (team / staff) ——— */
+.ms-forge-portrait-cover {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* ——— Über uns subpage ——— */
+.ms-forge-about-page-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.ms-forge-about-page-hero-shell {
+  position: relative;
+  width: 100%;
+  min-height: var(--ms-forge-viewport-below-nav);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .ms-forge-about-page-hero-shell {
+    min-height: min(var(--ms-forge-viewport-below-nav), 56rem);
+    aspect-ratio: 21 / 9;
+    height: auto;
+  }
+}
+
+.ms-forge-about-page-hero-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ms-forge-about-page-hero-ken {
+  animation: ms-forge-ken-burns 26s ease-in-out infinite alternate;
+}
+
+.ms-forge-about-page-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 130% 90% at 50% 100%, rgb(7 6 5 / 0.96) 0%, rgb(7 6 5 / 0.45) 42%, transparent 68%),
+    linear-gradient(180deg, rgb(7 6 5 / 0.42) 0%, transparent 38%, rgb(7 6 5 / 0.55) 100%);
+  pointer-events: none;
+}
+
+.ms-forge-about-page-hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  box-shadow: inset 0 0 100px rgb(0 0 0 / 0.42);
+  pointer-events: none;
+}
+
+.ms-forge-about-page-hero-shell .ms-forge-hero-noise {
+  z-index: 1;
+}
+
+.ms-forge-about-page-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-8) var(--space-5) clamp(var(--space-10), 11vh, var(--space-16));
+  text-align: center;
+}
+
+.ms-forge-about-page-hero-panel {
+  width: min(100%, 44rem);
+}
+
+.ms-forge-about-page-hero-mark-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.ms-forge-about-page-hero-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--ms-forge-copper) 70%, transparent),
+    transparent
+  );
+}
+
+.ms-forge-about-page-mark {
+  display: inline-block;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: var(--ms-forge-copper);
+  text-shadow: 0 0 18px color-mix(in oklch, var(--ms-forge-copper) 45%, transparent);
+}
+
+.ms-forge-about-page-title {
+  margin-inline: auto;
+  max-width: 42rem;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2rem, 6.5vw, 3.35rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-about-page-hero-title-rule {
+  width: 4rem;
+  height: 2px;
+  margin: var(--space-4) auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--ms-forge-copper),
+    transparent
+  );
+}
+
+.ms-forge-about-page-story {
+  margin-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 38rem;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline-start: var(--space-4);
+  border-inline-start: 2px solid color-mix(in oklch, var(--ms-forge-copper) 75%, transparent);
+  text-align: left;
+}
+
+.ms-forge-about-page-story p {
+  margin: 0;
+  font-size: clamp(0.9375rem, 2.2vw, 1.0625rem);
+  line-height: 1.8;
+  color: color-mix(in oklch, var(--ms-forge-cream) 88%, transparent);
+  text-wrap: pretty;
+}
+
+.ms-forge-about-page-story-lead {
+  font-size: clamp(1rem, 2.4vw, 1.125rem);
+  line-height: 1.75;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-about-page-intro-cta {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-top: 1px solid color-mix(in oklch, var(--ms-forge-copper) 22%, var(--ms-forge-border));
+}
+
+@media (min-width: 768px) {
+  .ms-forge-about-page-hero-content {
+    justify-content: center;
+    padding-bottom: clamp(var(--space-12), 12vh, var(--space-16));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-forge-about-page-hero-ken {
+    animation: none !important;
+  }
+}
+
+.ms-forge-about-page-team {
+  background: var(--ms-forge-void);
+  padding: var(--space-14) var(--space-5);
+  border-top: 1px solid var(--ms-forge-border);
+}
+
+.ms-forge-about-page-team-label {
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+.ms-forge-about-page-team-list {
+  max-width: 56rem;
+  margin-inline: auto;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.ms-forge-about-page-profile {
+  display: grid;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 52rem;
+  margin-inline: auto;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-about-page-profile {
+    grid-template-columns: minmax(0, 19.5rem) minmax(0, 1fr);
+    gap: var(--space-8);
+  }
+
+  .ms-forge-about-page-profile--reversed {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 19.5rem);
+  }
+
+  .ms-forge-about-page-profile--reversed .ms-forge-about-page-profile-media-wrap {
+    order: 2;
+  }
+
+  .ms-forge-about-page-profile--reversed .ms-forge-about-page-profile-copy {
+    order: 1;
+  }
+}
+
+.ms-forge-about-page-profile-media-wrap {
+  min-width: 0;
+  width: 100%;
+  max-width: 19.5rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-about-page-profile-media-wrap {
+    margin-inline: 0;
+  }
+
+  .ms-forge-about-page-profile--reversed .ms-forge-about-page-profile-media-wrap {
+    margin-inline: 0 auto;
+  }
+
+  .ms-forge-about-page-profile:not(.ms-forge-about-page-profile--reversed) .ms-forge-about-page-profile-media-wrap {
+    margin-inline: auto 0;
+  }
+}
+
+.ms-forge-about-page-profile-media.ms-forge-shine-frame {
+  position: relative;
+}
+
+.ms-forge-about-page-profile-media {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 21.5rem;
+  background: var(--ms-forge-elevated);
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-about-page-profile-media {
+    max-height: 20.5rem;
+    aspect-ratio: 4 / 5;
+  }
+}
+
+.ms-forge-about-page-profile-name {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-about-page-profile-role {
+  margin-top: var(--space-3);
+}
+
+.ms-forge-about-page-profile-text {
+  margin-top: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ms-forge-about-page-profile-text p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-about-page-cta {
+  background: color-mix(in oklch, var(--ms-forge-copper) 8%, var(--ms-forge-surface));
+  padding: var(--space-14) var(--space-5);
+  border-top: 1px solid color-mix(in oklch, var(--ms-forge-copper) 22%, var(--ms-forge-border));
+  text-align: center;
+}
+
+.ms-forge-about-page-cta-inner {
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.ms-forge-about-page-cta-title {
+  margin-top: var(--space-3);
+}
+
+.ms-forge-about-page-cta-text {
+  margin-top: var(--space-4);
+  margin-inline: auto;
+  max-width: 28rem;
+}
+
+.ms-forge-about-page-cta-action {
+  margin-top: var(--space-8);
+  display: flex;
+  justify-content: center;
+}
+
+.minisite-preview .ms-forge-about-page-hero-shell {
+  min-height: 14rem;
+}
+
+.minisite-preview .ms-forge-about-page-profile-media {
+  max-height: 13rem;
+}
+
+/* ——— Kontakt page ——— */
+.ms-forge-kontakt-hero--fullscreen {
+  min-height: var(--ms-forge-viewport-below-nav);
+}
+
+.ms-forge-kontakt-hero-shell {
+  position: relative;
+  display: flex;
+  min-height: var(--ms-forge-viewport-below-nav);
+  width: 100%;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.ms-forge-kontakt-hero {
+  position: relative;
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-kontakt-hero-media {
+  position: absolute;
+  inset: 0;
+}
+
+.ms-forge-kontakt-hero-ken,
+.ms-forge-kontakt-hero-media .ms-nicoles-photo,
+.ms-forge-kontakt-hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+}
+
+.ms-forge-kontakt-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(7 6 5 / 0.35) 0%,
+    rgb(7 6 5 / 0.55) 45%,
+    rgb(7 6 5 / 0.92) 100%
+  );
+}
+
+.ms-forge-kontakt-hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 70% at 50% 100%, transparent 35%, rgb(7 6 5 / 0.55));
+}
+
+.ms-forge-kontakt-hero-shell .ms-forge-hero-noise {
+  z-index: 1;
+}
+
+.ms-forge-kontakt-hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-10) var(--space-4) calc(var(--space-12) + 3.5rem);
+}
+
+.ms-forge-kontakt-hero-mark {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.75rem;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-kontakt-hero-title {
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-kontakt-hero-intro {
+  margin-top: var(--space-4);
+  max-width: 36rem;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-kontakt-reach {
+  background: var(--ms-forge-surface);
+  border-top: 1px solid var(--ms-forge-border);
+  border-bottom: 1px solid var(--ms-forge-border);
+}
+
+.ms-forge-kontakt-reach-inner {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.ms-forge-kontakt-reach-eyebrow {
+  margin: 0 0 var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-kontakt-reach-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--ms-forge-copper) 40%, transparent) transparent;
+}
+
+.ms-forge-kontakt-reach-chip {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 28%, var(--ms-forge-border));
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 90%, transparent);
+  color: var(--ms-forge-cream);
+  text-decoration: none;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-instant);
+}
+
+.ms-forge-kontakt-reach-chip:hover {
+  border-color: var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-copper) 10%, var(--ms-forge-elevated));
+  transform: translateY(-1px);
+}
+
+.ms-forge-kontakt-reach-chip--static {
+  cursor: default;
+}
+
+.ms-forge-kontakt-reach-chip-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  color: var(--ms-forge-copper-bright);
+  background: color-mix(in oklch, var(--ms-forge-copper) 14%, transparent);
+}
+
+.ms-forge-kontakt-reach-chip-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.ms-forge-kontakt-reach-chip-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-kontakt-reach-chip-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.ms-forge-kontakt-reach-socials {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: var(--space-1);
+  padding-left: var(--space-2);
+  border-left: 1px solid color-mix(in oklch, var(--ms-forge-border) 90%, transparent);
+}
+
+.ms-forge-kontakt-reach-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 32%, var(--ms-forge-border));
+  border-radius: 999px;
+  color: var(--ms-forge-cream);
+  background: color-mix(in oklch, var(--ms-forge-elevated) 90%, transparent);
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-instant);
+}
+
+.ms-forge-kontakt-reach-social-btn:hover {
+  border-color: var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-copper) 14%, var(--ms-forge-elevated));
+  color: var(--ms-forge-copper-bright);
+  transform: translateY(-1px);
+}
+
+.ms-forge-kontakt-main {
+  background: var(--ms-forge-void);
+}
+
+.ms-forge-kontakt-main-grid {
+  display: grid;
+  gap: var(--space-10);
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: var(--space-12) var(--space-4);
+}
+
+@media (min-width: 1024px) {
+  .ms-forge-kontakt-main-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--space-12);
+    align-items: start;
+  }
+}
+
+.ms-forge-kontakt-form-panel {
+  padding: var(--space-6);
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 22%, var(--ms-forge-border));
+  border-radius: 0.875rem;
+  background: color-mix(in oklch, var(--ms-forge-surface) 88%, transparent);
+}
+
+.ms-forge-kontakt-form-eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-kontakt-form-title {
+  margin: var(--space-3) 0 0;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-kontakt-form-lead {
+  margin: var(--space-3) 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-kontakt-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.ms-forge-kontakt-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ms-forge-kontakt-field-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-kontakt-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in oklch, var(--ms-forge-border) 95%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 92%, transparent);
+  color: var(--ms-forge-cream);
+  font: inherit;
+  transition:
+    border-color var(--t-fast),
+    box-shadow var(--t-fast);
+}
+
+.ms-forge-kontakt-input::placeholder {
+  color: color-mix(in oklch, var(--ms-forge-muted) 72%, transparent);
+}
+
+.ms-forge-kontakt-input:focus {
+  outline: none;
+  border-color: color-mix(in oklch, var(--ms-forge-copper) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ms-forge-copper) 18%, transparent);
+}
+
+.ms-forge-kontakt-input--area {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.ms-forge-kontakt-form-actions {
+  padding-top: var(--space-2);
+}
+
+.ms-forge-kontakt-submit {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--ms-forge-copper);
+  color: var(--ms-forge-void);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    transform var(--t-instant),
+    box-shadow var(--t-fast);
+}
+
+.ms-forge-kontakt-submit:hover {
+  background: var(--ms-forge-copper-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px -14px color-mix(in oklch, var(--ms-forge-copper) 55%, transparent);
+}
+
+.ms-forge-kontakt-directions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ms-forge-kontakt-directions-eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-kontakt-directions-title {
+  margin: 0;
+  font-family: "Syne", var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--ms-forge-cream);
+}
+
+.ms-forge-kontakt-directions-map-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.875rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 22%, var(--ms-forge-border));
+  aspect-ratio: 4 / 3;
+  background: var(--ms-forge-elevated);
+}
+
+.ms-forge-kontakt-directions-map-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  filter: grayscale(0.45) sepia(0.22) contrast(0.9) brightness(0.68) saturate(0.75);
+  transform: scale(1.03);
+  pointer-events: auto;
+}
+
+.ms-forge-kontakt-directions-map-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 65% at 50% 42%, transparent 28%, rgb(7 6 5 / 0.42) 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--ms-forge-copper) 10%, transparent),
+      transparent 35%,
+      rgb(7 6 5 / 0.35)
+    );
+  mix-blend-mode: multiply;
+}
+
+.ms-forge-kontakt-directions-map-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 2px));
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 0.45));
+  animation: ms-forge-map-pin-float 3.2s ease-in-out infinite;
+}
+
+.ms-forge-kontakt-directions-map-pin-dot {
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 2px solid var(--ms-forge-cream);
+  border-radius: 999px;
+  background: var(--ms-forge-copper);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--ms-forge-copper) 35%, transparent);
+}
+
+.ms-forge-kontakt-directions-map-pin-tail {
+  width: 2px;
+  height: 0.55rem;
+  margin-top: -1px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--ms-forge-copper), color-mix(in oklch, var(--ms-forge-copper) 20%, transparent));
+}
+
+@keyframes ms-forge-map-pin-float {
+  0%,
+  100% {
+    transform: translate(-50%, calc(-100% - 2px));
+  }
+  50% {
+    transform: translate(-50%, calc(-100% - 8px));
+  }
+}
+
+.ms-forge-kontakt-directions-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.875rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 22%, var(--ms-forge-border));
+  aspect-ratio: 4 / 3;
+  background: color-mix(in oklch, var(--ms-forge-elevated) 80%, transparent);
+}
+
+.ms-forge-kontakt-directions-photo,
+.ms-forge-kontakt-directions-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ms-forge-kontakt-directions-map-fallback {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ms-forge-muted);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in oklch, var(--ms-forge-copper) 8%, transparent),
+      transparent 55%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 23px,
+      color-mix(in oklch, var(--ms-forge-border) 55%, transparent) 24px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 23px,
+      color-mix(in oklch, var(--ms-forge-border) 55%, transparent) 24px
+    );
+}
+
+.ms-forge-kontakt-directions-pin {
+  font-size: 1.25rem;
+  color: var(--ms-forge-copper);
+}
+
+.ms-forge-kontakt-directions-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ms-forge-muted);
+}
+
+.ms-forge-kontakt-directions-cta {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.25rem;
+  border: 1px solid color-mix(in oklch, var(--ms-forge-copper) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--ms-forge-copper) 12%, transparent);
+  color: var(--ms-forge-cream);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast),
+    transform var(--t-instant);
+}
+
+.ms-forge-kontakt-directions-cta:hover {
+  border-color: var(--ms-forge-copper);
+  background: color-mix(in oklch, var(--ms-forge-copper) 20%, transparent);
+  transform: translateY(-1px);
+}
+
+.minisite-preview .ms-forge-kontakt-hero-shell {
+  min-height: 12rem;
+}
+
+.minisite-preview .ms-forge-kontakt-reach-track {
+  flex-wrap: wrap;
+}
+

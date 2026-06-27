@@ -2600,6 +2600,15 @@
     padding: var(--space-4);
   }
 
+  .salon-dash-editor-section .salon-dash-editor-section {
+    background: color-mix(in oklch, var(--ink-1) 88%, transparent);
+    border-color: var(--ink-3);
+  }
+
+  .salon-dash-editor-section .salon-dash-editor-section .salon-dash-editor-section__trigger {
+    padding: var(--space-3);
+  }
+
   .salon-dash-minisite-form-actions {
     display: flex;
     flex-wrap: wrap;

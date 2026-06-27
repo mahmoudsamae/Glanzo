@@ -1,5 +1,5 @@
 import {
-  resolveGoogleMapsHref,
+  resolveGoogleMapsHrefFromContent,
   resolveKontaktAddress,
   resolveKontaktEmail,
   resolveKontaktHours,
@@ -19,7 +19,7 @@ export function NicolesKontaktInfo({ data }: NicolesKontaktInfoProps) {
   const email = resolveKontaktEmail(content);
   const address = resolveKontaktAddress(content);
   const hours = resolveKontaktHours(data);
-  const mapsHref = resolveGoogleMapsHref(content, address);
+  const mapsHref = resolveGoogleMapsHrefFromContent(content, address);
 
   return (
     <section

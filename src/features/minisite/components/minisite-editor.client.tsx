@@ -13,6 +13,7 @@ import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";
 import type { MinisiteSaveInput } from "@/lib/validations/minisite-editor";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
 import type { MinisiteEditorData } from "@/lib/minisite/editor-types";
+import { patchNicolesNewsItem } from "@/lib/minisite/nicoles-sections";
 
 import { saveMinisiteAction } from "../api";
 import { MinisiteSectionsPanel } from "./minisite-sections-panel.client";
@@ -21,13 +22,27 @@ import type { MinisitePreviewPane as MinisitePreviewPaneType } from "./minisite-
 
 type PreviewComponent = typeof MinisitePreviewPaneType;
 
+type MinisiteSaveResult = { ok: true } | { ok: false; code?: string };
+
 type MinisiteEditorProps = {
   initial: MinisiteEditorData;
+  saveAction?: (input: MinisiteSaveInput) => Promise<MinisiteSaveResult>;
+  backHref?: string;
+  header?: {
+    kicker: string;
+    title: string;
+    subtitle: string;
+  };
 };
 
 type MobileTab = "form" | "preview";
 
-export function MinisiteEditor({ initial }: MinisiteEditorProps) {
+export function MinisiteEditor({
+  initial,
+  saveAction = saveMinisiteAction,
+  backHref,
+  header,
+}: MinisiteEditorProps) {
   const [mobileTab, setMobileTab] = useState<MobileTab>("form");
   const [template, setTemplate] = useState(initial.template);
   const [accentHex, setAccentHex] = useState(initial.accentHex);
@@ -60,36 +75,128 @@ export function MinisiteEditor({ initial }: MinisiteEditorProps) {
   async function handleUpload(kind: "logo" | "cover" | "gallery", file: File) {
     setUploading(kind);
     setError(null);
+
+    const path = await uploadMediaFile(kind, file);
+    if (!path) return;
+    applyUploadedPath(kind, path);
+  }
+
+  async function handleSectionImageUpload(
+    target: {
+      section: string;
+      field: "image_path" | "image_paths";
+      index?: number;
+    },
+    file: File,
+  ) {
+    const uploadKey =
+      target.section === "news" ? `news-${target.index ?? 0}` : `section-${target.section}`;
+    setUploading(uploadKey);
+    setError(null);
+
+    const path = await uploadMediaFile("gallery", file);
+    setUploading(null);
+    if (!path) return;
+
+    setContent((current) => {
+      if (target.section === "news") {
+        return patchNicolesNewsItem(current, target.index ?? 0, { image_path: path });
+      }
+
+      const sections = { ...(current.sections ?? {}) };
+      const block = { ...(sections[target.section as keyof typeof sections] ?? {}) };
+
+      if (target.field === "image_path") {
+        sections[target.section as keyof typeof sections] = { ...block, image_path: path };
+      } else {
+        const paths = [...((block as { image_paths?: string[] }).image_paths ?? [])];
+        if (target.index !== undefined) {
+          paths[target.index] = path;
+        } else {
+          paths.push(path);
+        }
+        sections[target.section as keyof typeof sections] = {
+          ...block,
+          image_paths: paths.filter(Boolean).slice(0, 8),
+        };
+      }
+
+      return { ...current, sections };
+    });
+    setToast("Bild hochgeladen — bitte speichern.");
+  }
+
+  async function uploadMediaFile(kind: "logo" | "cover" | "gallery", file: File): Promise<string | null> {
+    if (initial.editorMode === "admin") {
+      const { compressImageToWebp } = await import("@/lib/minisite/compress-image.client");
+      const { uploadPlatformMinisiteMediaAction } = await import("@/features/admin/api");
+      try {
+        const blob = await compressImageToWebp(file);
+        const formData = new FormData();
+        formData.append("file", new File([blob], "upload.webp", { type: "image/webp" }));
+        const result = await uploadPlatformMinisiteMediaAction(initial.shopId, kind, formData);
+        setUploading(null);
+        if (!result.ok) {
+          setError(result.message);
+          return null;
+        }
+        return result.path;
+      } catch {
+        setUploading(null);
+        setError("Bild konnte nicht hochgeladen werden.");
+        return null;
+      }
+    }
+
     const { uploadShopMediaFile } = await import("../lib/upload-media.client");
     const result = await uploadShopMediaFile(initial.shopId, kind, file);
     setUploading(null);
     if (!result.ok) {
       setError(result.message);
-      return;
+      return null;
     }
+    return result.path;
+  }
+
+  function applyUploadedPath(kind: "logo" | "cover" | "gallery", path: string) {
     if (kind === "logo") {
-      setContent((current) => ({ ...current, logo_path: result.path }));
+      setContent((current) => ({ ...current, logo_path: path }));
     } else if (kind === "cover") {
-      setContent((current) => ({ ...current, cover_path: result.path }));
+      setContent((current) => ({ ...current, cover_path: path }));
     } else {
       setContent((current) => {
-        const gallery = [...(current.gallery ?? []), result.path].slice(0, 8);
+        const gallery = [...(current.gallery ?? []), path].slice(0, 8);
         return { ...current, gallery };
       });
     }
+    setToast("Bild hochgeladen — bitte speichern.");
   }
 
   function save() {
     setError(null);
     startTransition(async () => {
-      const result = await saveMinisiteAction(draft);
+      const result = await saveAction(draft);
       if (!result.ok) {
-        setError("Speichern fehlgeschlagen.");
+        const message =
+          result.code === "MANAGED"
+            ? "Diese Website wird von Glanzo verwaltet."
+            : result.code === "VALIDATION"
+              ? "Inhalt ungültig — bitte Felder prüfen und erneut speichern."
+              : "Speichern fehlgeschlagen.";
+        setError(message);
         return;
       }
       setToast("Live.");
     });
   }
+
+  const isAdmin = initial.editorMode === "admin";
+  const pageHeader = header ?? {
+    kicker: "Public site",
+    title: "Minisite",
+    subtitle: "Vorschau live · Speichern = sofort live",
+  };
+  const canPickTemplate = isAdmin || initial.allowedTemplates.length > 1;
 
   const formPane = (
     <MinisiteSectionsPanel
@@ -102,18 +209,29 @@ export function MinisiteEditor({ initial }: MinisiteEditorProps) {
       draft={draft}
       uploading={uploading}
       onAccentChange={setAccentHex}
-      onTemplateChange={initial.allowedTemplates.length > 1 ? setTemplate : undefined}
+      onTemplateChange={canPickTemplate ? setTemplate : undefined}
       onContentChange={setContent}
       onUpload={(kind, file) => void handleUpload(kind, file)}
+      onSectionImageUpload={(target, file) => void handleSectionImageUpload(target, file)}
     />
   );
 
   return (
     <DashboardPage width="full" className="salon-dash-minisite-page">
+      {backHref ? (
+        <div className="mb-[var(--space-4)]">
+          <Link
+            href={backHref}
+            className="text-sm text-[var(--text-2)] transition-colors hover:text-[var(--brass)]"
+          >
+            ← Zurück
+          </Link>
+        </div>
+      ) : null}
       <DashboardPageHeader
-        kicker="Public site"
-        title="Minisite"
-        subtitle="Vorschau live · Speichern = sofort live"
+        kicker={pageHeader.kicker}
+        title={pageHeader.title}
+        subtitle={pageHeader.subtitle}
       />
 
       <div className="mb-[var(--space-4)] flex gap-[var(--space-2)] lg:hidden">
@@ -147,7 +265,7 @@ export function MinisiteEditor({ initial }: MinisiteEditorProps) {
               disabled={isPending}
               onClick={save}
             >
-              {isPending ? "Speichert…" : "Alles speichern"}
+              {isPending ? "Speichert…" : isAdmin ? "Website veröffentlichen" : "Alles speichern"}
             </DashboardPrimaryButton>
             <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
               <Link href={viewSiteUrl} target="_blank" rel="noopener noreferrer">

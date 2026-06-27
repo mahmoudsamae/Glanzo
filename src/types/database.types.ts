@@ -444,6 +444,7 @@ export type Database = {
           created_at: string;
           currency: string;
           id: string;
+          minisite_managed: boolean;
           name: string;
           opening_hours: Json;
           reminders_enabled: boolean;
@@ -461,6 +462,7 @@ export type Database = {
           created_at?: string;
           currency?: string;
           id?: string;
+          minisite_managed?: boolean;
           name: string;
           opening_hours?: Json;
           reminders_enabled?: boolean;
@@ -478,6 +480,7 @@ export type Database = {
           created_at?: string;
           currency?: string;
           id?: string;
+          minisite_managed?: boolean;
           name?: string;
           opening_hours?: Json;
           reminders_enabled?: boolean;
@@ -529,33 +532,42 @@ export type Database = {
         Row: {
           archived_at: string | null;
           created_at: string;
+          description: string | null;
           duration_min: number;
           id: string;
+          image_path: string | null;
           name: string;
           price_cents: number;
           shop_id: string;
+          show_price: boolean;
           sort_order: number;
           updated_at: string;
         };
         Insert: {
           archived_at?: string | null;
           created_at?: string;
+          description?: string | null;
           duration_min: number;
           id?: string;
+          image_path?: string | null;
           name: string;
           price_cents: number;
           shop_id: string;
+          show_price?: boolean;
           sort_order?: number;
           updated_at?: string;
         };
         Update: {
           archived_at?: string | null;
           created_at?: string;
+          description?: string | null;
           duration_min?: number;
           id?: string;
+          image_path?: string | null;
           name?: string;
           price_cents?: number;
           shop_id?: string;
+          show_price?: boolean;
           sort_order?: number;
           updated_at?: string;
         };
@@ -803,7 +815,21 @@ export type Database = {
         Args: { p_shop_id: string; p_enabled: boolean };
         Returns: Json;
       };
+      platform_set_minisite_managed: {
+        Args: { p_shop_id: string; p_managed: boolean };
+        Returns: Json;
+      };
+      platform_update_minisite: {
+        Args: {
+          p_shop_id: string;
+          p_template: Database["public"]["Enums"]["minisite_template"];
+          p_accent_hex: string;
+          p_content: Json;
+        };
+        Returns: Json;
+      };
       is_valid_iana_timezone: { Args: { tz: string }; Returns: boolean };
+      ensure_user_profile: { Args: Record<string, never>; Returns: Database["public"]["Tables"]["profiles"]["Row"] };
       user_membership_id: { Args: { p_shop_id: string }; Returns: string };
       user_shop_ids: { Args: Record<string, never>; Returns: string[] };
       uuid_v7: { Args: Record<string, never>; Returns: string };
@@ -813,7 +839,7 @@ export type Database = {
       appointment_source: "online" | "walk_in";
       appointment_status: "booked" | "completed" | "no_show" | "cancelled";
       membership_role: "owner" | "barber";
-      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles" | "mecca";
+      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles" | "mecca" | "forge";
       notification_channel: "email";
       notification_template:
         | "booking_confirmed"

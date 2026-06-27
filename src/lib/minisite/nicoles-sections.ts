@@ -120,6 +120,38 @@ export const DEFAULT_NICOLES_NEWS: NonNullable<MinisiteContent["nicoles_news"]> 
   { id: "news-3", title: "Walk-ins willkommen" },
 ];
 
+export function editableNicolesNewsItem(
+  content: MinisiteContent,
+  index: number,
+): NonNullable<MinisiteContent["nicoles_news"]>[number] {
+  const saved = content.nicoles_news?.[index];
+  if (saved) {
+    return saved;
+  }
+  return DEFAULT_NICOLES_NEWS[index] ?? { id: `news-${index + 1}`, title: "" };
+}
+
+export function patchNicolesNewsItem(
+  content: MinisiteContent,
+  index: number,
+  patch: Partial<{ title: string; image_path: string | undefined }>,
+): MinisiteContent {
+  const items = [...(content.nicoles_news ?? [])];
+  while (items.length <= index) {
+    const fallback = DEFAULT_NICOLES_NEWS[items.length];
+    items.push(fallback ?? { id: `news-${items.length + 1}`, title: "" });
+  }
+  const previous = editableNicolesNewsItem(content, index);
+  items[index] = {
+    ...previous,
+    ...items[index],
+    ...patch,
+    id: items[index]?.id ?? previous.id,
+  };
+  const kept = items.filter((item) => item.title.trim() || item.image_path);
+  return { ...content, nicoles_news: kept.length ? kept : undefined };
+}
+
 function isNicolesHomeKey(value: string): value is NicolesHomeSectionKey {
   return (NICOLES_HOME_SECTION_KEYS as readonly string[]).includes(value);
 }

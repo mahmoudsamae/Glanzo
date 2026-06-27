@@ -61,13 +61,17 @@ export function BoutiqueServicesTiles({ data }: BoutiqueServicesTilesProps) {
 
       <ul className="mx-auto mt-[var(--space-8)] grid max-w-4xl grid-cols-1 gap-[var(--space-3)] min-[520px]:grid-cols-3">
         {tiles.map((service, index) => {
-          const imageUrl = tileImage(content, index);
+          const serviceImage = service.image_path?.trim()
+            ? shopMediaPublicUrl(service.image_path)
+            : tileImage(content, index);
+          const showPrice = service.show_price !== false;
+          const description = service.description?.trim();
           return (
             <li key={service.id} className="ms-boutique-service-tile">
               <div className="ms-boutique-service-tile-media relative aspect-square overflow-hidden">
-                {imageUrl ? (
+                {serviceImage ? (
                   <Image
-                    src={imageUrl}
+                    src={serviceImage}
                     alt=""
                     fill
                     sizes="(max-width: 520px) 100vw, 240px"
@@ -81,9 +85,15 @@ export function BoutiqueServicesTiles({ data }: BoutiqueServicesTilesProps) {
                 <p className="font-display text-sm uppercase tracking-[0.14em] text-[color:var(--ms-boutique-ink)]">
                   {service.name}
                 </p>
-                <p className="mt-[var(--space-1)] text-sm tabular-nums text-[color:var(--ms-accent-on-bg)]">
-                  {formatPriceCents(service.price_cents)}
-                </p>
+                {showPrice ? (
+                  <p className="mt-[var(--space-1)] text-sm tabular-nums text-[color:var(--ms-accent-on-bg)]">
+                    {formatPriceCents(service.price_cents)}
+                  </p>
+                ) : description ? (
+                  <p className="mt-[var(--space-1)] text-sm text-[color:var(--ms-boutique-ink-muted)]">
+                    {description}
+                  </p>
+                ) : null}
               </div>
             </li>
           );

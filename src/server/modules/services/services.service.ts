@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { isValidShopMediaPath } from "@/lib/validations/minisite-editor";
 import {
   createServiceInputSchema,
   updateServiceInputSchema,
@@ -51,6 +52,13 @@ export async function createService(
     return { ok: false, code: "VALIDATION" };
   }
 
+  if (
+    parsed.data.imagePath &&
+    !isValidShopMediaPath(shopId, parsed.data.imagePath, "service")
+  ) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
   const supabase = await createServerSupabaseClient();
   const { data: maxRow } = await supabase
     .from("services")
@@ -68,10 +76,13 @@ export async function createService(
       shop_id: shopId,
       name: parsed.data.name,
       duration_min: parsed.data.durationMin,
-      price_cents: parsed.data.priceCents,
+      price_cents: parsed.data.showPrice ? (parsed.data.priceCents ?? 0) : 0,
+      show_price: parsed.data.showPrice,
+      description: parsed.data.description?.trim() || null,
+      image_path: parsed.data.imagePath?.trim() || null,
       sort_order: sortOrder,
     })
-    .select("id, name, duration_min, price_cents")
+    .select("id, name, duration_min, price_cents, show_price, description, image_path")
     .single();
 
   if (error || !data) {
@@ -80,7 +91,7 @@ export async function createService(
 
   if (parsed.data.membershipIds.length > 0) {
     const { error: assignError } = await supabase.from("service_staff").insert(
-      parsed.data.membershipIds.map((membershipId) => ({
+      parsed.data.membershipIds.map((membershipId: string) => ({
         shop_id: shopId,
         service_id: data.id,
         membership_id: membershipId,
@@ -125,6 +136,13 @@ export async function updateService(
     return { ok: false, code: "VALIDATION" };
   }
 
+  if (
+    parsed.data.imagePath &&
+    !isValidShopMediaPath(shopId, parsed.data.imagePath, "service")
+  ) {
+    return { ok: false, code: "VALIDATION" };
+  }
+
   const supabase = await createServerSupabaseClient();
   const existing = await getServiceById(supabase, shopId, parsed.data.id);
   if (!existing || existing.archived_at) {
@@ -136,13 +154,25 @@ export async function updateService(
     duration_min?: number;
     sort_order?: number;
     price_cents?: number;
+    show_price?: boolean;
+    description?: string | null;
+    image_path?: string | null;
   } = {};
   if (parsed.data.name !== undefined) patch.name = parsed.data.name;
   if (parsed.data.durationMin !== undefined) patch.duration_min = parsed.data.durationMin;
   if (parsed.data.sortOrder !== undefined) patch.sort_order = parsed.data.sortOrder;
+  if (parsed.data.showPrice !== undefined) patch.show_price = parsed.data.showPrice;
+  if (parsed.data.description !== undefined) {
+    patch.description = parsed.data.description?.trim() || null;
+  }
+  if (parsed.data.imagePath !== undefined) {
+    patch.image_path = parsed.data.imagePath?.trim() || null;
+  }
 
-  const priceChanged = parsed.data.priceCents !== undefined && parsed.data.priceCents !== existing.price_cents;
+  const priceChanged =
+    parsed.data.priceCents !== undefined && parsed.data.priceCents !== existing.price_cents;
   if (parsed.data.priceCents !== undefined) patch.price_cents = parsed.data.priceCents;
+  if (parsed.data.showPrice === false) patch.price_cents = 0;
 
   if (Object.keys(patch).length > 0) {
     const { error } = await supabase
@@ -164,7 +194,7 @@ export async function updateService(
 
     if (parsed.data.membershipIds.length > 0) {
       const { error: assignError } = await supabase.from("service_staff").insert(
-        parsed.data.membershipIds.map((membershipId) => ({
+        parsed.data.membershipIds.map((membershipId: string) => ({
           shop_id: shopId,
           service_id: parsed.data.id,
           membership_id: membershipId,

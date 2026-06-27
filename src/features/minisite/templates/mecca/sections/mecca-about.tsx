@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { meccaReveal } from "@/lib/minisite/mecca-motion";
 import { MECCA_SECTION_META } from "@/lib/minisite/mecca-sections";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
@@ -130,25 +131,7 @@ export function MeccaAboutSection({ data, shopSlug, preview = false }: MeccaAbou
       aria-label="Über uns"
     >
       <div className="ms-mecca-about-grid">
-        <div className="ms-mecca-about-media">
-          <div className="ms-mecca-about-image-wrap">
-            <div className="ms-mecca-about-image">
-              {imageUrl ? (
-                <Image
-                  src={imageUrl}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 45vw, 100vw"
-                  className="ms-mecca-photo object-cover"
-                />
-              ) : (
-                <div className="ms-mecca-about-placeholder" aria-hidden />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="ms-mecca-about-copy">
+        <div {...meccaReveal("left", 0, "ms-mecca-about-copy")}>
           <p className="ms-mecca-about-label">{eyebrow}</p>
 
           <h2 className="ms-mecca-about-headline">
@@ -183,6 +166,24 @@ export function MeccaAboutSection({ data, shopSlug, preview = false }: MeccaAbou
               {ctaLabel}
             </Link>
           )}
+        </div>
+
+        <div {...meccaReveal("right", 120, "ms-mecca-about-media")}>
+          <div className="ms-mecca-about-image-wrap">
+            <div className="ms-mecca-about-image">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 45vw, 100vw"
+                  className="ms-mecca-photo object-cover"
+                />
+              ) : (
+                <div className="ms-mecca-about-placeholder" aria-hidden />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>

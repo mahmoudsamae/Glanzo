@@ -242,6 +242,28 @@ export async function setPlatformShopBookingAutoAssign(
   return { ok: true, data: { bookingAutoAssignBarber: payload.booking_auto_assign_barber } };
 }
 
+export async function setPlatformMinisiteManaged(
+  shopId: string,
+  managed: boolean,
+): Promise<PlatformResult<{ minisiteManaged: boolean }>> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("platform_set_minisite_managed", {
+    p_shop_id: shopId,
+    p_managed: managed,
+  });
+
+  if (error) {
+    if (/NOT_FOUND/i.test(error.message)) {
+      return { ok: false, code: "NOT_FOUND" };
+    }
+    return { ok: false, code: "UNKNOWN" };
+  }
+
+  revalidateShopPublic(shopId);
+  const payload = data as unknown as { minisite_managed: boolean };
+  return { ok: true, data: { minisiteManaged: payload.minisite_managed } };
+}
+
 export async function createPlatformOwnerInvite(
   shopId: string,
   ownerEmail: string,

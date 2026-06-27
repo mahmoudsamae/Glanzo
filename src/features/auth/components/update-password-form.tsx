@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/shared/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { AuthActionResult } from "@/lib/auth/types";
+import { isNextRedirectError } from "@/lib/auth/next-redirect";
 
 const updateSchema = z.object({
   password: z.string().min(8, "At least 8 characters"),
@@ -44,9 +45,13 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
           return;
         }
         if (result.redirectTo) {
+          router.refresh();
           router.push(result.redirectTo);
         }
-      } catch {
+      } catch (error) {
+        if (isNextRedirectError(error)) {
+          throw error;
+        }
         setErrorMessage("Something went wrong. Try again.");
       }
     });

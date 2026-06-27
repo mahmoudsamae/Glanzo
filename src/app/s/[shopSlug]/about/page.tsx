@@ -8,6 +8,8 @@ import {
   BoutiqueAmbient,
   BoutiqueNav,
   BoutiqueVisitPanel,
+  ForgeAboutPage,
+  ForgeSubpageChrome,
   NicolesAboutPage,
   NicolesAmbient,
   NicolesFooter,
@@ -31,6 +33,14 @@ export default async function AboutPage({
   const bookHref = `/s/${parsed.data}?book=1`;
   const basePath = `/s/${parsed.data}`;
   const isSuspended = data.shop.status === "suspended";
+
+  if (data.minisite.template === "forge") {
+    return (
+      <ForgeSubpageChrome data={data} shopSlug={parsed.data}>
+        <ForgeAboutPage data={data} bookHref={bookHref} />
+      </ForgeSubpageChrome>
+    );
+  }
 
   if (data.minisite.template === "nicoles") {
     return (

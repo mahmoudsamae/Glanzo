@@ -35,5 +35,9 @@ export async function saveMinisiteAction(input: unknown) {
   if (!ctx) {
     return { ok: false as const, code: "FORBIDDEN" };
   }
-  return updateMinisite(ctx.actor, ctx.shopId, input);
+  const result = await updateMinisite(ctx.actor, ctx.shopId, input);
+  if (!result.ok && result.code === "MANAGED") {
+    return { ok: false as const, code: "MANAGED" as const };
+  }
+  return result;
 }

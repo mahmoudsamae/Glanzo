@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { normalizeGoogleMapsUrl } from "@/lib/minisite/google-maps-url";
+
 const optionalHttpUrl = (label: string) =>
   z
     .string()
@@ -95,7 +97,7 @@ export function linksToSameAs(links: MinisiteLinks | undefined): string[] {
   if (links.whatsapp) {
     push(normalizeWhatsAppUrl(links.whatsapp));
   }
-  push(links.google_maps);
+  push(links.google_maps ? normalizeGoogleMapsUrl(links.google_maps) : undefined);
   push(links.website);
   return out;
 }

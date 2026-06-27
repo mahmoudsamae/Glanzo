@@ -12,7 +12,7 @@ export async function listServicesForShop(
   let query = supabase
     .from("services")
     .select(
-      "id, shop_id, name, duration_min, price_cents, sort_order, archived_at, created_at, updated_at",
+      "id, shop_id, name, duration_min, price_cents, show_price, description, image_path, sort_order, archived_at, created_at, updated_at",
     )
     .eq("shop_id", shopId)
     .order("sort_order", { ascending: true });
@@ -34,7 +34,7 @@ export async function getServiceById(
   const { data, error } = await supabase
     .from("services")
     .select(
-      "id, shop_id, name, duration_min, price_cents, sort_order, archived_at, created_at, updated_at",
+      "id, shop_id, name, duration_min, price_cents, show_price, description, image_path, sort_order, archived_at, created_at, updated_at",
     )
     .eq("shop_id", shopId)
     .eq("id", serviceId)

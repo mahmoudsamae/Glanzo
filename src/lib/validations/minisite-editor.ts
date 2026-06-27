@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isTemplateStockPath } from "@/lib/minisite/template-stock-images";
 import {
   minisiteContentSchema,
   minisiteTemplateSchema,
@@ -15,7 +16,7 @@ export const minisiteSaveInputSchema = z.object({
 
 export type MinisiteSaveInput = z.infer<typeof minisiteSaveInputSchema>;
 
-const MEDIA_KINDS = ["logo", "cover", "gallery"] as const;
+const MEDIA_KINDS = ["logo", "cover", "gallery", "service"] as const;
 export type ShopMediaKind = (typeof MEDIA_KINDS)[number];
 
 export function isValidShopMediaPath(
@@ -23,6 +24,10 @@ export function isValidShopMediaPath(
   path: string,
   kind?: ShopMediaKind,
 ): boolean {
+  if (isTemplateStockPath(path)) {
+    return true;
+  }
+
   if (!shopId || shopId.includes("/") || shopId.includes("..")) {
     return false;
   }

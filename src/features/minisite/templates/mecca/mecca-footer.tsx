@@ -82,7 +82,7 @@ export function MeccaFooter({ data }: MeccaFooterProps) {
   }
 
   return (
-    <footer id="ms-mecca-contact" className="ms-mecca-footer ms-mecca-section" aria-label="Footer">
+    <footer id="ms-mecca-footer" className="ms-mecca-footer ms-mecca-section" aria-label="Footer">
       <div className="ms-mecca-footer-inner">
         <div className="ms-mecca-footer-grid">
           <article>

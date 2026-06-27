@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { DashboardPanel } from "@/components/dashboard";
-import { MinisitePageSettings } from "@/features/minisite";
+import { MinisitePageSettings, MinisiteManagedNotice } from "@/features/minisite";
 import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
 import { loadMinisiteEditorData } from "@/server/modules/minisite/minisite.service";
 
@@ -15,6 +15,10 @@ export default async function WebsiteSettingsPage() {
         <p className="text-sm text-[var(--text-2)]">Mini-Site konnte nicht geladen werden.</p>
       </DashboardPanel>
     );
+  }
+
+  if (data.minisiteManaged) {
+    return <MinisiteManagedNotice shopSlug={data.shopSlug} shopName={data.publicData.shop.name} />;
   }
 
   return (

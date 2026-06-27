@@ -8,6 +8,8 @@ import {
   BoutiqueNav,
   BoutiquePriceBoard,
   BoutiqueServicesTiles,
+  ForgeSubpageChrome,
+  ForgePricesPage,
   NicolesAmbient,
   NicolesFooter,
   NicolesNav,
@@ -31,6 +33,14 @@ export default async function LeistungenPage({
   const bookHref = `/s/${parsed.data}?book=1`;
   const basePath = `/s/${parsed.data}`;
   const isSuspended = data.shop.status === "suspended";
+
+  if (data.minisite.template === "forge") {
+    return (
+      <ForgeSubpageChrome data={data} shopSlug={parsed.data}>
+        <ForgePricesPage data={data} />
+      </ForgeSubpageChrome>
+    );
+  }
 
   if (data.minisite.template === "nicoles") {
     return (

@@ -78,6 +78,14 @@ const BOOKING_SURFACES: Record<MinisiteTemplate, BookingSurface> = {
     border: "#2a2520",
     overlay: "rgb(8 6 4 / 0.92)",
   },
+  forge: {
+    bg: "#070605",
+    elevated: "#11100e",
+    text: "#ede6dc",
+    textMuted: "#8f867c",
+    border: "#2a2622",
+    overlay: "rgb(7 6 5 / 0.94)",
+  },
 };
 
 export function bookingSheetCssVars(

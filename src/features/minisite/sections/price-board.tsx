@@ -29,7 +29,11 @@ export function PriceBoardSection({ services, content }: PriceBoardProps) {
         </header>
 
         <ul className="ms-cinema-cascade flex flex-col gap-[var(--space-4)]">
-          {services.map((service, index) => (
+          {services.map((service, index) => {
+            const showPrice = service.show_price !== false;
+            const description = service.description?.trim();
+
+            return (
             <li
               key={service.id}
               className="ms-cinema-price-row flex items-baseline gap-0"
@@ -38,16 +42,21 @@ export function PriceBoardSection({ services, content }: PriceBoardProps) {
               <span className="shrink-0 font-display text-md text-[color:var(--ms-text)]">
                 {service.name}
               </span>
-              <span
-                className={`ms-cinema-leader ${PRICE_LEADER_CLASS}`}
-                style={{ ["--cascade-i" as string]: index }}
-                aria-hidden
-              />
-              <span className="ms-cinema-price shrink-0 text-data text-md tabular-nums text-[color:var(--ms-accent-on-bg)]">
-                {formatPriceCents(service.price_cents)}
-              </span>
+              {showPrice || description ? (
+                <>
+                  <span
+                    className={`ms-cinema-leader ${PRICE_LEADER_CLASS}`}
+                    style={{ ["--cascade-i" as string]: index }}
+                    aria-hidden
+                  />
+                  <span className="ms-cinema-price shrink-0 text-data text-md tabular-nums text-[color:var(--ms-accent-on-bg)]">
+                    {showPrice ? formatPriceCents(service.price_cents) : description}
+                  </span>
+                </>
+              ) : null}
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </section>

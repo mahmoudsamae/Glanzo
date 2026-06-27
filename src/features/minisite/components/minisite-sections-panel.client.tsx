@@ -31,6 +31,8 @@ import {
   type BoutiqueSectionKey,
 } from "@/lib/minisite/boutique-sections";
 import { getMinisiteAnchors, defaultNavLinksForTemplate } from "@/lib/minisite/template-anchors";
+import { isMultiPageMinisiteTemplate } from "@/lib/minisite/multi-page-template";
+import { bookingNavHrefForTemplate } from "@/lib/minisite/nav-links";
 import {
   NICOLES_SECTION_META,
   resolveNicolesHomeSectionOrder,
@@ -53,6 +55,7 @@ import { STARTER_KITS } from "@/lib/minisite/starter-kits/registry";
 import { MINISITE_TEMPLATES } from "../templates/registry";
 import { StarterKitPicker } from "./starter-kit-picker.client";
 import { MinisiteEditorSection } from "./minisite-editor-section.client";
+import { ForgeMinisitePanel } from "./forge/forge-minisite-panel.client";
 
 type SectionKey = keyof NonNullable<MinisiteContent["show"]>;
 
@@ -69,15 +72,16 @@ const SECTION_TOGGLES: Array<{ key: SectionKey; label: string; description: stri
 ];
 
 function isModularMinisiteTemplate(template: MinisiteTemplate): boolean {
-  return template === "boutique" || template === "nicoles";
+  return template === "boutique" || isMultiPageMinisiteTemplate(template);
 }
 
 function navHrefPresetsForTemplate(template: MinisiteTemplate) {
   const anchors = getMinisiteAnchors(template);
-  const aboutHref = template === "nicoles" ? "/about" : `#${anchors.about}`;
-  const pricesHref = template === "nicoles" ? "/leistungen" : `#${anchors.prices}`;
-  const kontaktHref = template === "nicoles" ? "/kontakt" : `#${anchors.contact}`;
-  const terminHref = template === "nicoles" ? "/terminbuchung" : "__book__";
+  const multiPage = isMultiPageMinisiteTemplate(template);
+  const aboutHref = multiPage ? "/about" : `#${anchors.about}`;
+  const pricesHref = multiPage ? "/leistungen" : `#${anchors.prices}`;
+  const kontaktHref = multiPage ? "/kontakt" : `#${anchors.contact}`;
+  const terminHref = bookingNavHrefForTemplate(template);
   return [
     { label: "Start", value: `#${anchors.top}` },
     { label: "Über uns", value: aboutHref },
@@ -100,6 +104,14 @@ type MinisiteSectionsPanelProps = {
   onTemplateChange?: (template: MinisiteTemplate) => void;
   onContentChange: (content: MinisiteContent) => void;
   onUpload: (kind: "logo" | "cover" | "gallery", file: File) => void;
+  onSectionImageUpload?: (
+    target: {
+      section: NicolesHomeSectionKey | "prices" | "contact" | "news";
+      field: "image_path" | "image_paths";
+      index?: number;
+    },
+    file: File,
+  ) => void;
 };
 
 const BOUTIQUE_TEXT_SECTIONS: BoutiqueSectionKey[] = ["hero", "services", "promo", "prices", "gallery", "team", "guidelines"];
@@ -312,9 +324,11 @@ function NicolesSectionFieldsEditor({
 
 function NicolesPricesPageEditor({
   content,
+  template,
   onContentChange,
 }: {
   content: MinisiteContent;
+  template?: MinisiteTemplate;
   onContentChange: (c: MinisiteContent) => void;
 }) {
   const cards = resolveNicolesServiceCards(content);
@@ -354,6 +368,12 @@ function NicolesPricesPageEditor({
         <p className="mb-[var(--space-2)] text-xs font-medium uppercase tracking-wider text-[var(--text-2)]">
           Service-Karten (6)
         </p>
+        {template === "forge" ? (
+          <p className="mb-[var(--space-3)] text-xs text-[var(--text-2)]">
+            Forge zeigt Leistungen direkt aus deinem Dashboard-Katalog (mit Foto, Beschreibung und Preis). Die Karten
+            unten gelten nur für das Nicoles-Template.
+          </p>
+        ) : null}
         <ul className="space-y-[var(--space-2)]">
           {cards.slice(0, 6).map((card, index) => (
             <li key={card.id} className="rounded border border-[var(--ink-3)] p-[var(--space-3)]">
@@ -635,6 +655,7 @@ export function MinisiteSectionsPanel({
   onTemplateChange,
   onContentChange,
   onUpload,
+  onSectionImageUpload,
 }: MinisiteSectionsPanelProps) {
   const [openBlockId, setOpenBlockId] = useState<string | null>(null);
   const accentChip = deriveAccentPalette(accentHex, template);
@@ -789,7 +810,38 @@ export function MinisiteSectionsPanel({
         </div>
       </MinisiteEditorSection>
 
+      {template === "forge" ? (
+        <ForgeMinisitePanel
+          shopName={shopName}
+          content={content}
+          gallery={content.gallery ?? []}
+          uploading={uploading}
+          onContentChange={onContentChange}
+          onUpload={onUpload}
+          onSectionImageUpload={onSectionImageUpload}
+          navLinks={navLinks}
+          saveNavLinks={saveNavLinks}
+          navHrefPresets={navHrefPresets}
+          defaultNavHref={defaultNavHref}
+          blocks={blocks}
+          openBlockId={openBlockId}
+          setOpenBlockId={setOpenBlockId}
+          saveBlocks={saveBlocks}
+          addBlock={addBlock}
+          aboutBlockFields={(block) => (
+            <AboutBlockFields
+              block={block}
+              gallery={content.gallery ?? []}
+              uploading={uploading}
+              onPatch={(patch) => patchBlock(block.id, patch)}
+              onUpload={onUpload}
+            />
+          )}
+        />
+      ) : null}
+
       {/* ── 3. Hero & Identität ── */}
+      {template !== "forge" ? (
       <MinisiteEditorSection
         id="hero"
         title="Hero & Identität"
@@ -888,15 +940,16 @@ export function MinisiteSectionsPanel({
           </div>
         </div>
       </MinisiteEditorSection>
+      ) : null}
 
       {/* ── 4. Navigation (modular templates) ── */}
-      {modularTemplate ? (
+      {modularTemplate && template !== "forge" ? (
         <MinisiteEditorSection
           id="nav"
           title="Navigation"
           description="Menüpunkte — auf Mobile als Drawer, auf Desktop als Leiste."
         >
-          {template === "nicoles" ? (
+          {isMultiPageMinisiteTemplate(template) ? (
             <div className="mb-[var(--space-4)]">
               <Label htmlFor="nav-tagline">Nav-Tagline</Label>
               <Input
@@ -981,18 +1034,19 @@ export function MinisiteSectionsPanel({
       ) : null}
 
       {/* ── 5. Über uns ── */}
+      {template !== "forge" ? (
       <MinisiteEditorSection
         id="about"
         title="Über uns"
         description={
           template === "boutique"
             ? "Bausteine für die Über-uns-Seite — Hero, Text, Team-Profile, Collage, Sprach-Band."
-            : template === "nicoles"
+            : isMultiPageMinisiteTemplate(template)
               ? "Bausteine für /about — Hero, Text, Team-Profile mit Foto und Bio."
               : "Kurztext der unter der Überschrift erscheint."
         }
       >
-        {template === "boutique" || template === "nicoles" ? (
+        {isModularMinisiteTemplate(template) ? (
           <div className="space-y-[var(--space-4)]">
             <div className="flex flex-wrap gap-[var(--space-2)]">
               {ABOUT_BLOCK_TYPES.map((type) => (
@@ -1073,16 +1127,21 @@ export function MinisiteSectionsPanel({
           </div>
         )}
       </MinisiteEditorSection>
+      ) : null}
 
       {/* ── 6. Seitenabschnitte ── */}
-      {modularTemplate ? (
+      {modularTemplate && template !== "forge" ? (
         <MinisiteEditorSection
           id="boutique-sections"
-          title={template === "nicoles" ? "Seitenabschnitte (Nicoles)" : "Seitenabschnitte (Boutique)"}
+          title={
+            isMultiPageMinisiteTemplate(template)
+              ? "Seitenabschnitte (Nicoles)"
+              : "Seitenabschnitte (Boutique)"
+          }
           description="Überschriften und Texte für Hero, Leistungen, Promo-Band, Team usw."
           defaultOpen
         >
-          {template === "nicoles" ? (
+          {isMultiPageMinisiteTemplate(template) ? (
             <NicolesSectionFieldsEditor content={content} onContentChange={onContentChange} />
           ) : (
             <BoutiqueSectionFieldsEditor content={content} onContentChange={onContentChange} />
@@ -1090,17 +1149,17 @@ export function MinisiteSectionsPanel({
         </MinisiteEditorSection>
       ) : null}
 
-      {template === "nicoles" ? (
+      {isMultiPageMinisiteTemplate(template) && template !== "forge" ? (
         <MinisiteEditorSection
           id="nicoles-prices-page"
           title="Leistungen & Preise Seite"
           description="Inhalt für /leistungen — Hero, Service-Karten und Preisliste."
         >
-          <NicolesPricesPageEditor content={content} onContentChange={onContentChange} />
+          <NicolesPricesPageEditor content={content} template={template} onContentChange={onContentChange} />
         </MinisiteEditorSection>
       ) : null}
 
-      {template === "nicoles" ? (
+      {isMultiPageMinisiteTemplate(template) && template !== "forge" ? (
         <MinisiteEditorSection
           id="nicoles-termin-page"
           title="Terminbuchung Seite"
@@ -1110,7 +1169,7 @@ export function MinisiteSectionsPanel({
         </MinisiteEditorSection>
       ) : null}
 
-      {template === "nicoles" ? (
+      {isMultiPageMinisiteTemplate(template) && template !== "forge" ? (
         <MinisiteEditorSection
           id="nicoles-kontakt-page"
           title="Kontakt Seite"

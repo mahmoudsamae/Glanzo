@@ -57,7 +57,7 @@ export function MeccaShell({ data, shopSlug, preview = false }: MeccaShellProps)
 
   return (
     <div className="ms-mecca-root relative flex min-h-full flex-1 flex-col">
-      {preview ? null : <MeccaAmbient />}
+      <MeccaAmbient />
       <MeccaNav
         shopName={data.shop.name}
         content={content}

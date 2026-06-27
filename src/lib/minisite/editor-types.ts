@@ -9,4 +9,8 @@ export type MinisiteEditorData = {
   accentHex: string;
   content: MinisiteContent;
   publicData: ShopPublicData;
+  /** When true, owner dashboard must not allow edits (platform-managed site). */
+  minisiteManaged?: boolean;
+  /** Who is using the editor UI. */
+  editorMode?: "owner" | "admin";
 };

@@ -1,3 +1,4 @@
+import { meccaReveal } from "@/lib/minisite/mecca-motion";
 import { MECCA_SECTION_META } from "@/lib/minisite/mecca-sections";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
@@ -138,14 +139,18 @@ export function MeccaReviewsSection({ data }: MeccaReviewsSectionProps) {
   return (
     <section id="ms-mecca-reviews" className="ms-mecca-reviews ms-mecca-section" aria-label="Bewertungen">
       <div className="ms-mecca-reviews-inner">
-        <header className="ms-mecca-reviews-header">
+        <header {...meccaReveal("up", 0, "ms-mecca-reviews-header")}>
           <p className="ms-mecca-reviews-eyebrow">{eyebrow}</p>
           <h2 className="ms-mecca-reviews-title">{title}</h2>
         </header>
 
-        <div className="ms-mecca-reviews-track" role="list">
+        <div className="ms-mecca-reviews-track" role="list" data-mecca-stagger>
           {reviews.map((review) => (
-            <article key={review.id} className="ms-mecca-review-card" role="listitem">
+            <article
+              key={review.id}
+              className="ms-mecca-review-card ms-mecca-reveal ms-mecca-reveal--up"
+              role="listitem"
+            >
               <p className="ms-mecca-stars" aria-label={`${review.stars} von 5 Sternen`}>
                 {renderStars(review.stars)}
               </p>

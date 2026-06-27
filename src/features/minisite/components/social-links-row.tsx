@@ -10,6 +10,7 @@ import {
 import type { MinisiteLinks } from "@/lib/validations/minisite-links";
 import { normalizeWhatsAppUrl } from "@/lib/validations/minisite-links";
 import { instagramProfileUrl } from "@/lib/minisite/instagram-url";
+import { normalizeGoogleMapsUrl } from "@/lib/minisite/google-maps-url";
 
 type SocialLinksRowProps = {
   links: MinisiteLinks | undefined;
@@ -55,7 +56,7 @@ function buildItems(links: MinisiteLinks | undefined, legacyInstagram?: string |
   if (links?.google_maps) {
     items.push({
       key: "google_maps",
-      href: links.google_maps,
+      href: normalizeGoogleMapsUrl(links.google_maps),
       label: "Google Maps",
       Icon: MapPin,
     });

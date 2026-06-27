@@ -1,5 +1,8 @@
 import type { MinisiteTemplate } from "@/lib/validations/public-shop";
 
+import { isMultiPageMinisiteTemplate } from "@/lib/minisite/multi-page-template";
+import { bookingNavHrefForTemplate } from "@/lib/minisite/nav-links";
+
 export type MinisiteAnchors = {
   top: string;
   about: string;
@@ -74,6 +77,14 @@ const ANCHORS: Record<MinisiteTemplate, MinisiteAnchors> = {
     gallery: "ms-mecca-gallery",
     contact: "ms-mecca-contact",
   },
+  forge: {
+    top: "ms-forge-top",
+    about: "ms-nicoles-about",
+    services: "ms-nicoles-services",
+    prices: "ms-nicoles-prices",
+    gallery: "ms-nicoles-gallery",
+    contact: "ms-nicoles-contact",
+  },
 };
 
 export function getMinisiteAnchors(template: MinisiteTemplate): MinisiteAnchors {
@@ -84,18 +95,18 @@ export function defaultNavLinksForTemplate(template: MinisiteTemplate) {
   const a = getMinisiteAnchors(template);
   return [
     { id: "nav-home", label: "Home", href: `#${a.top}`, visible: true },
-    { id: "nav-about", label: "Über uns", href: template === "nicoles" ? "/about" : `#${a.about}`, visible: true },
+    { id: "nav-about", label: "Über uns", href: isMultiPageMinisiteTemplate(template) ? "/about" : `#${a.about}`, visible: true },
     {
       id: "nav-prices",
       label: "Leistungen & Preise",
-      href: template === "nicoles" ? "/leistungen" : `#${a.prices}`,
+      href: isMultiPageMinisiteTemplate(template) ? "/leistungen" : `#${a.prices}`,
       visible: true,
     },
-    { id: "nav-book", label: "Terminbuchung", href: template === "nicoles" ? "/terminbuchung" : "__book__", visible: true },
+    { id: "nav-book", label: "Terminbuchung", href: bookingNavHrefForTemplate(template), visible: true },
     {
       id: "nav-contact",
       label: "Kontakt",
-      href: template === "nicoles" ? "/kontakt" : `#${a.contact}`,
+      href: isMultiPageMinisiteTemplate(template) ? "/kontakt" : `#${a.contact}`,
       visible: true,
     },
   ];

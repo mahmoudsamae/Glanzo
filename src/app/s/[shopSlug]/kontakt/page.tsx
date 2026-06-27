@@ -4,6 +4,8 @@ import { shopSlugSchema } from "@/lib/validations/shop";
 import { loadPublicShopBySlug } from "@/server/modules/shops/shops.loader";
 import {
   BookBarSection,
+  ForgeKontaktPage,
+  ForgeSubpageChrome,
   NicolesAmbient,
   NicolesFooter,
   NicolesKontaktPage,
@@ -27,6 +29,14 @@ export default async function KontaktPage({
   const bookHref = `/s/${parsed.data}?book=1`;
   const basePath = `/s/${parsed.data}`;
   const isSuspended = data.shop.status === "suspended";
+
+  if (data.minisite.template === "forge") {
+    return (
+      <ForgeSubpageChrome data={data} shopSlug={parsed.data}>
+        <ForgeKontaktPage data={data} />
+      </ForgeSubpageChrome>
+    );
+  }
 
   if (data.minisite.template === "nicoles") {
     return (

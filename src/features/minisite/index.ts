@@ -1,5 +1,6 @@
 export { saveMinisiteAction, fetchMinisiteEditorAction } from "./api";
 export { MinisiteEditor } from "./components/minisite-editor.client";
+export { MinisiteManagedNotice } from "./components/minisite-managed-notice";
 export { MinisitePageSettings } from "./components/minisite-page-settings.client";
 export { MinisiteShell } from "./templates/minisite-shell";
 export { getMinisiteTemplate, MINISITE_TEMPLATES } from "./templates/registry";
@@ -20,3 +21,7 @@ export { NicolesKontaktPage } from "./templates/nicoles/kontakt/nicoles-kontakt-
 export { NicolesNav } from "./templates/nicoles/nicoles-nav.client";
 export { NicolesPricesPage } from "./templates/nicoles/prices/nicoles-prices-page";
 export { NicolesTerminbuchungPage } from "./templates/nicoles/terminbuchung/nicoles-terminbuchung-page";
+export { ForgeKontaktPage } from "./templates/forge/kontakt/forge-kontakt-page";
+export { ForgeSubpageChrome } from "./templates/forge/forge-subpage-chrome";
+export { ForgeAboutPage } from "./templates/forge/about/forge-about-page";
+export { ForgePricesPage } from "./templates/forge/prices/forge-prices-page";

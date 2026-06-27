@@ -1,4 +1,5 @@
 import { resolveNicolesKontaktHeroImage } from "@/lib/minisite/nicoles-stock-images";
+import { resolveGoogleMapsHref } from "@/lib/minisite/google-maps-url";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
 
 import { formatOpeningHoursLines } from "@/lib/shops/opening-hours.format";
@@ -58,13 +59,12 @@ export function resolveKontaktMapDirections(content: ShopPublicData["minisite"][
   return content.sections?.contact?.text?.trim() || content.visitor_guidelines?.trim() || DEFAULT_KONTAKT_MAP_DIRECTIONS;
 }
 
-export function resolveGoogleMapsHref(
+export function resolveGoogleMapsHrefFromContent(
   content: ShopPublicData["minisite"]["content"],
   address: string,
 ): string {
-  const custom = content.links?.google_maps?.trim();
-  if (custom) {
-    return custom;
-  }
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  return resolveGoogleMapsHref({
+    googleMaps: content.links?.google_maps,
+    address,
+  });
 }

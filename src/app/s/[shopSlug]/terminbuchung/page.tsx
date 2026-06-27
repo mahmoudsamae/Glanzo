@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 
 import { shopSlugSchema } from "@/lib/validations/shop";
 import { loadPublicShopBySlug } from "@/server/modules/shops/shops.loader";
@@ -27,6 +27,10 @@ export default async function TerminbuchungPage({
   const bookHref = `/s/${parsed.data}?book=1`;
   const basePath = `/s/${parsed.data}`;
   const isSuspended = data.shop.status === "suspended";
+
+  if (data.minisite.template === "forge") {
+    redirect(`/s/${parsed.data}?book=1`);
+  }
 
   if (data.minisite.template === "nicoles") {
     return (

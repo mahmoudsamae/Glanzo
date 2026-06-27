@@ -56,6 +56,12 @@ export const MINISITE_TEMPLATES: Record<MinisiteTemplate, MinisiteTemplateConfig
     themeClass: "theme-mecca",
     fontClass: "minisite-font minisite-mecca-fonts",
   },
+  forge: {
+    key: "forge",
+    label: "Forge",
+    themeClass: "theme-forge",
+    fontClass: "minisite-font minisite-forge-fonts",
+  },
 };
 
 export function getMinisiteTemplate(key: MinisiteTemplate): MinisiteTemplateConfig {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { meccaHeroEnter } from "@/lib/minisite/mecca-motion";
 import { MECCA_SECTION_META } from "@/lib/minisite/mecca-sections";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
 
@@ -38,31 +39,39 @@ function getHeroField(
 function splitHeroHeadline(
   title: string,
   subtitle: string | undefined,
-  shopName: string,
-): { line1: string; line2: string } {
+): { line1: string; line2: string; line3: string } {
   if (subtitle?.trim()) {
-    return { line1: title.trim(), line2: subtitle.trim() };
+    const parts = subtitle.split("|").map((part) => part.trim()).filter(Boolean);
+    if (parts.length >= 2) {
+      return { line1: title.trim(), line2: parts[0] ?? "", line3: parts[1] ?? "" };
+    }
+    return { line1: title.trim(), line2: subtitle.trim(), line3: "" };
   }
 
-  const dotIndex = title.indexOf(".");
-  if (dotIndex !== -1 && dotIndex < title.length - 1) {
-    return {
-      line1: title.slice(0, dotIndex + 1).trim(),
-      line2: title.slice(dotIndex + 1).trim(),
-    };
+  const pipeParts = title.split("|").map((part) => part.trim()).filter(Boolean);
+  if (pipeParts.length >= 3) {
+    return { line1: pipeParts[0] ?? "", line2: pipeParts[1] ?? "", line3: pipeParts[2] ?? "" };
   }
 
   const words = title.trim().split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    const lastWord = words[words.length - 1] ?? "";
-    const line1Words = words.slice(0, -1);
+  if (words.length >= 3) {
     return {
-      line1: line1Words.join(" "),
-      line2: lastWord,
+      line1: words.slice(0, 2).join(" "),
+      line2: words.slice(2, -1).join(" ") || (words[2] ?? ""),
+      line3: words[words.length - 1] ?? "",
     };
   }
 
-  return { line1: title.trim() || shopName, line2: shopName };
+  const dotIndex = title.indexOf(".");
+  if (dotIndex !== -1) {
+    return {
+      line1: title.slice(0, dotIndex + 1).trim(),
+      line2: title.slice(dotIndex + 1).trim(),
+      line3: "",
+    };
+  }
+
+  return { line1: title.trim(), line2: "", line3: "" };
 }
 
 function MeccaHeroBookIcon() {
@@ -99,7 +108,7 @@ export function MeccaHeroSection({ data, bookHref, preview = false }: MeccaHeroS
   const eyebrow = getHeroField(content, "eyebrow", meta.defaults.eyebrow ?? "PREMIUM SALON");
   const title = getHeroField(content, "title", meta.defaults.title ?? "Erlebe deinen besten Look.");
   const subtitle = content.sections?.hero?.subtitle?.trim();
-  const { line1, line2 } = splitHeroHeadline(title, subtitle, shop.name);
+  const { line1, line2, line3 } = splitHeroHeadline(title, subtitle);
 
   const bookLabel =
     getHeroField(content, "cta_label", "") ||
@@ -110,12 +119,7 @@ export function MeccaHeroSection({ data, bookHref, preview = false }: MeccaHeroS
   const sideLabel = content.sections?.hero?.text?.trim() || shop.name;
 
   return (
-    <section
-      id={MECCA_TOP_ID}
-      data-mecca-hero
-      className="ms-mecca-hero ms-mecca-section"
-      aria-label="Hero"
-    >
+    <section id={MECCA_TOP_ID} data-mecca-hero className="ms-mecca-hero" aria-label="Hero">
       {coverUrl ? (
         <Image
           src={coverUrl}
@@ -138,21 +142,22 @@ export function MeccaHeroSection({ data, bookHref, preview = false }: MeccaHeroS
       </p>
 
       <div className="ms-mecca-hero-inner">
-        <p className="ms-mecca-hero-eyebrow">
+        <p {...meccaHeroEnter(0, "ms-mecca-hero-eyebrow")}>
           <svg viewBox="0 0 8 8" aria-hidden className="ms-mecca-hero-eyebrow-dot size-1.5">
             <circle cx="4" cy="4" r="3.5" fill="currentColor" />
           </svg>
           {eyebrow}
         </p>
 
-        <div className="ms-mecca-hero-divider" aria-hidden />
+        <div aria-hidden {...meccaHeroEnter(80, "ms-mecca-hero-divider")} />
 
-        <h1>
+        <h1 {...meccaHeroEnter(140, "ms-mecca-display")}>
           <span className="ms-mecca-hero-title-white">{line1}</span>
-          <span className="ms-mecca-hero-title-gold">{line2}</span>
+          {line2 ? <span className="ms-mecca-hero-title-gold">{line2}</span> : null}
+          {line3 ? <span className="ms-mecca-hero-title-white">{line3}</span> : null}
         </h1>
 
-        <div className="ms-mecca-hero-cta-row">
+        <div {...meccaHeroEnter(260, "ms-mecca-hero-cta-row")}>
           {isSuspended ? (
             <span className="ms-mecca-hero-cta-primary opacity-70" aria-disabled="true">
               Online-Buchung pausiert

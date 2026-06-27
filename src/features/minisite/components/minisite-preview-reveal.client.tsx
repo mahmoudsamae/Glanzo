@@ -10,10 +10,17 @@ export function MinisitePreviewReveal() {
       return;
     }
 
-    preview.classList.add("ms-cinema-ready", "ms-signature-ready", "ms-boutique-ready", "ms-nicoles-ready", "ms-flux-ready");
+    preview.classList.add(
+      "ms-cinema-ready",
+      "ms-signature-ready",
+      "ms-boutique-ready",
+      "ms-nicoles-ready",
+      "ms-flux-ready",
+      "ms-forge-ready",
+    );
     preview
       .querySelectorAll(
-        ".ms-cinema-section, .ms-signature-section, .ms-boutique-section, .ms-nicoles-section, .ms-flux-section",
+        ".ms-cinema-section, .ms-signature-section, .ms-boutique-section, .ms-nicoles-section, .ms-flux-section, .ms-forge-reveal",
       )
       .forEach((el) => {
         el.classList.add(
@@ -22,6 +29,7 @@ export function MinisitePreviewReveal() {
           "ms-boutique-section--visible",
           "ms-nicoles-section--visible",
           "ms-flux-section--visible",
+          "is-inview",
         );
       });
 
@@ -32,6 +40,7 @@ export function MinisitePreviewReveal() {
         "ms-boutique-ready",
         "ms-nicoles-ready",
         "ms-flux-ready",
+        "ms-forge-ready",
       );
     };
   }, []);

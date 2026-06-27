@@ -1,26 +1,16 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { authFlowLog } from "@/lib/auth/flow-log";
 
 import type { Actor, ActorMembership } from "./types";
 
-/**
- * Session → profile + active memberships + platform-admin flag.
- * One PostgREST round-trip via nested select.
- */
-export async function getActor(): Promise<Actor | null> {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return null;
-  }
-
-  const [profileResult, adminResult] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select(
-        `
+async function loadProfileWithMemberships(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  userId: string,
+) {
+  return supabase
+    .from("profiles")
+    .select(
+      `
         *,
         memberships (
           id,
@@ -35,18 +25,63 @@ export async function getActor(): Promise<Actor | null> {
           )
         )
       `,
-      )
-      .eq("id", user.id)
-      .maybeSingle(),
-    supabase.rpc("is_platform_admin"),
-  ]);
+    )
+    .eq("id", userId)
+    .maybeSingle();
+}
 
-  const profile = profileResult.data;
-  const profileError = profileResult.error;
+/**
+ * Session → profile + active memberships + platform-admin flag.
+ * One PostgREST round-trip via nested select.
+ */
+export async function getActor(): Promise<Actor | null> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (profileError || !profile) {
+  if (userError) {
+    authFlowLog("get-user", { ok: false, message: userError.message });
     return null;
   }
+
+  if (!user) {
+    return null;
+  }
+
+  let profileResult = await loadProfileWithMemberships(supabase, user.id);
+
+  if (profileResult.error || !profileResult.data) {
+    authFlowLog("profile-load", {
+      ok: false,
+      userId: user.id,
+      message: profileResult.error?.message ?? "missing-profile",
+    });
+
+    const { error: ensureError } = await supabase.rpc("ensure_user_profile");
+    if (ensureError) {
+      authFlowLog("profile-ensure", {
+        ok: false,
+        userId: user.id,
+        message: ensureError.message,
+      });
+      return null;
+    }
+
+    profileResult = await loadProfileWithMemberships(supabase, user.id);
+    if (profileResult.error || !profileResult.data) {
+      authFlowLog("profile-reload", {
+        ok: false,
+        userId: user.id,
+        message: profileResult.error?.message ?? "still-missing-profile",
+      });
+      return null;
+    }
+  }
+
+  const profile = profileResult.data;
+  const [adminResult] = await Promise.all([supabase.rpc("is_platform_admin")]);
 
   const memberships: ActorMembership[] = (profile.memberships ?? [])
     .filter((membership) => membership.archived_at === null && membership.shop)

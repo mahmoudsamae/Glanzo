@@ -22,6 +22,7 @@ export function NicolesAktionstage({ data }: NicolesAktionstageProps) {
 
   return (
     <section
+      id="ms-forge-aktionstage"
       className="ms-nicoles-aktionstage ms-nicoles-section ms-cinema-section relative overflow-hidden"
       aria-label="Aktionstage"
     >

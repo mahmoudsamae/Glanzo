@@ -11,6 +11,7 @@ import {
   setPlatformShopMinisiteTemplates,
   setPlatformShopTemplate,
   setPlatformShopBookingAutoAssign,
+  setPlatformMinisiteManaged,
 } from "@/server/modules/platform/platform.service";
 import {
   setPlatformOwnerEmail,
@@ -18,6 +19,11 @@ import {
 } from "@/server/modules/platform/platform-owner-credentials.service";
 import { requirePlatformAdmin } from "@/server/modules/shops/create-shop.service";
 import { checkShopSlugAvailability } from "@/server/modules/shops/create-shop.service";
+import {
+  loadMinisiteEditorDataForPlatformAdmin,
+  updateMinisiteForPlatformAdmin,
+} from "@/server/modules/minisite/minisite.service";
+import { uploadPlatformShopMediaAction } from "@/server/modules/minisite/upload-platform-media";
 
 async function adminGate() {
   await requirePlatformAdmin();
@@ -103,4 +109,32 @@ export async function setPlatformShopMinisiteTemplatesAction(
 export async function setPlatformShopBookingAutoAssignAction(shopId: string, enabled: boolean) {
   await adminGate();
   return setPlatformShopBookingAutoAssign(shopId, enabled);
+}
+
+export async function loadPlatformMinisiteEditorAction(shopId: string) {
+  await adminGate();
+  const data = await loadMinisiteEditorDataForPlatformAdmin(shopId);
+  if (!data) {
+    return { ok: false as const, code: "NOT_FOUND" };
+  }
+  return { ok: true as const, data };
+}
+
+export async function savePlatformMinisiteAction(shopId: string, input: unknown) {
+  await adminGate();
+  return updateMinisiteForPlatformAdmin(shopId, input);
+}
+
+export async function setPlatformMinisiteManagedAction(shopId: string, managed: boolean) {
+  await adminGate();
+  return setPlatformMinisiteManaged(shopId, managed);
+}
+
+export async function uploadPlatformMinisiteMediaAction(
+  shopId: string,
+  kind: "logo" | "cover" | "gallery",
+  formData: FormData,
+) {
+  await adminGate();
+  return uploadPlatformShopMediaAction(shopId, kind, formData);
 }

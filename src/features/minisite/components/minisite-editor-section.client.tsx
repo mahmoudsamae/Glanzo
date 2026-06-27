@@ -2,11 +2,20 @@
 
 import { ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import { cn } from "@/lib/utils";
 
 const STORAGE_PREFIX = "glanzo:minisite-section:";
+const SECTION_EVENT = "glanzo:minisite-section-change";
+
+function readStoredOpen(id: string, defaultOpen: boolean): boolean {
+  const stored = window.localStorage.getItem(`${STORAGE_PREFIX}${id}`);
+  if (stored !== null) {
+    return stored === "true";
+  }
+  return defaultOpen;
+}
 
 export type MinisiteEditorSectionProps = {
   id: string;
@@ -23,23 +32,27 @@ export function MinisiteEditorSection({
   defaultOpen = false,
   children,
 }: MinisiteEditorSectionProps) {
-  const [open, setOpen] = useState(() => {
-    if (typeof window === "undefined") {
-      return defaultOpen;
-    }
-    const stored = window.localStorage.getItem(`${STORAGE_PREFIX}${id}`);
-    if (stored !== null) {
-      return stored === "true";
-    }
-    return defaultOpen;
-  });
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const handler = (event: Event) => {
+        const detail = (event as CustomEvent<{ id?: string }>).detail;
+        if (!detail?.id || detail.id === id) {
+          onStoreChange();
+        }
+      };
+      window.addEventListener(SECTION_EVENT, handler);
+      return () => window.removeEventListener(SECTION_EVENT, handler);
+    },
+    [id],
+  );
+
+  const getSnapshot = useCallback(() => readStoredOpen(id, defaultOpen), [defaultOpen, id]);
+  const open = useSyncExternalStore(subscribe, getSnapshot, () => defaultOpen);
 
   function toggle() {
-    setOpen((current) => {
-      const next = !current;
-      window.localStorage.setItem(`${STORAGE_PREFIX}${id}`, String(next));
-      return next;
-    });
+    const next = !readStoredOpen(id, defaultOpen);
+    window.localStorage.setItem(`${STORAGE_PREFIX}${id}`, String(next));
+    window.dispatchEvent(new CustomEvent(SECTION_EVENT, { detail: { id } }));
   }
 
   return (

@@ -95,6 +95,7 @@ export const platformShopDetailSchema = z
     dead_outbox_count: z.number().int(),
     minisite_template: z.string(),
     minisite_accent_hex: z.string(),
+    minisite_managed: z.boolean().default(false),
     allowed_minisite_templates: z.array(minisiteTemplateSchema).default([]),
     outbox_by_template: z.record(z.record(z.number())).optional(),
     audit_trail: z.array(z.record(z.unknown())).default([]),

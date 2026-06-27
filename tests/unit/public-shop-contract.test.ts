@@ -94,7 +94,7 @@ describe("shopPublicDataSchema", () => {
       ...VALID_PAYLOAD,
       minisite: {
         ...VALID_PAYLOAD.minisite,
-        content: { phone: "+491701234567" },
+        content: { phone: "+491701234567", unknown_field: "x" },
       },
     });
     expect(result.success).toBe(false);

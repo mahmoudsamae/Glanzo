@@ -8,11 +8,14 @@ export type AuthErrorCode =
   | "RESET_FAILED"
   | "UPDATE_PASSWORD_FAILED"
   | "NOT_PLATFORM_ADMIN"
+  | "SESSION_NOT_ESTABLISHED"
+  | "PROFILE_SETUP_FAILED"
   | "UNKNOWN";
 
 const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   INVALID_CREDENTIALS: "That email or password isn't right.",
-  EMAIL_NOT_CONFIRMED: "Confirm your email first — check your inbox.",
+  EMAIL_NOT_CONFIRMED:
+    "Confirm your email first — check your inbox, or ask your admin to disable email confirmation in Supabase.",
   EMAIL_TAKEN: "That email is already registered. Try signing in instead.",
   WEAK_PASSWORD: "Choose a password with at least 8 characters.",
   RATE_LIMITED: "Too many tries. Give it a minute.",
@@ -21,6 +24,10 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   UPDATE_PASSWORD_FAILED: "That link may have expired. Request a new reset.",
   NOT_PLATFORM_ADMIN:
     "Dieses Konto hat keinen Plattform-Zugang. Bitte in Supabase platform_admins eintragen.",
+  SESSION_NOT_ESTABLISHED:
+    "Sign-in did not complete. Refresh the page and try again, or complete shop setup after registering.",
+  PROFILE_SETUP_FAILED:
+    "Your account exists but profile setup failed. Try again or contact support.",
   UNKNOWN: "Something went wrong. Try again.",
 };
 

@@ -20,6 +20,7 @@ export function NicolesPreFooter({ data }: NicolesPreFooterProps) {
 
   return (
     <section
+      id="ms-forge-pre-footer"
       className="ms-nicoles-pre-footer ms-nicoles-section ms-cinema-section grid grid-cols-1 lg:grid-cols-3"
       aria-label="Markenabschluss"
     >
