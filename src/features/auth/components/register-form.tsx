@@ -13,9 +13,9 @@ import type { AuthActionResult } from "@/lib/auth/types";
 import { isNextRedirectError } from "@/lib/auth/next-redirect";
 
 const registerSchema = z.object({
-  displayName: z.string().trim().min(1, "Display name is required"),
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(8, "At least 8 characters"),
+  displayName: z.string().trim().min(1, "Anzeigename ist erforderlich"),
+  email: z.string().email("Bitte eine gültige E-Mail eingeben"),
+  password: z.string().min(8, "Mindestens 8 Zeichen"),
 });
 
 type RegisterValues = z.infer<typeof registerSchema>;
@@ -60,7 +60,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
         if (isNextRedirectError(error)) {
           throw error;
         }
-        setErrorMessage("Something went wrong. Try again.");
+        setErrorMessage("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
       }
     });
   }
@@ -68,7 +68,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="displayName">Display name</Label>
+        <Label htmlFor="displayName">Anzeigename</Label>
         <Input id="displayName" autoComplete="name" className="salon-auth-input" {...form.register("displayName")} />
         {form.formState.errors.displayName ? (
           <p className="text-sm text-destructive">{form.formState.errors.displayName.message}</p>
@@ -76,7 +76,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
       </div>
 
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">E-Mail</Label>
         <Input id="email" type="email" autoComplete="email" className="salon-auth-input" {...form.register("email")} />
         {form.formState.errors.email ? (
           <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
@@ -84,7 +84,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
       </div>
 
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">Passwort</Label>
         <Input
           id="password"
           type="password"
@@ -100,7 +100,7 @@ export function RegisterForm({ registerAction, nextPath }: RegisterFormProps) {
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
       <SubmitButton pending={isPending} className="salon-auth-submit">
-        Create account
+        Konto erstellen
       </SubmitButton>
     </form>
   );

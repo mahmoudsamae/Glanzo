@@ -54,21 +54,21 @@ export function CustomerProfileView({
         </a>
         {profile.email ? <p className="text-sm text-muted-foreground">{profile.email}</p> : null}
         <p className="text-sm text-[var(--text-2)]">
-          {profile.visitsCount} visits · {profile.noShowCount} no-shows · €
-          {(profile.totalSpentCents / 100).toFixed(2)} spent
+          {profile.visitsCount} Besuche · {profile.noShowCount} No-Shows · €
+          {(profile.totalSpentCents / 100).toFixed(2)} ausgegeben
         </p>
       </header>
 
       <section className="mt-[var(--space-8)]">
-        <h2 className="mb-[var(--space-3)] text-sm font-medium">Visit history</h2>
+        <h2 className="mb-[var(--space-3)] text-sm font-medium">Besuchsverlauf</h2>
         {profile.visits.length === 0 ? (
-          <EmptyState title="No visits yet." />
+          <EmptyState title="Noch keine Besuche." />
         ) : (
           <ul className="divide-y divide-border">
             {profile.visits.map((visit) => (
               <li key={visit.id} className="flex h-9 items-center gap-[var(--space-2)] text-sm">
                 <span className="text-data tabular-nums">
-                  {new Date(visit.startsAt).toLocaleDateString("en-GB")}
+                  {new Date(visit.startsAt).toLocaleDateString("de-DE")}
                 </span>
                 <span className="flex-1 truncate">{visit.serviceName}</span>
                 <span className="truncate text-muted-foreground">{visit.barberName}</span>
@@ -83,7 +83,7 @@ export function CustomerProfileView({
       </section>
 
       <section className="mt-[var(--space-8)]">
-        <h2 className="mb-[var(--space-2)] text-sm font-medium">Notes</h2>
+        <h2 className="mb-[var(--space-2)] text-sm font-medium">Notizen</h2>
         <textarea
           className="min-h-24 w-full rounded-sm border border-border bg-transparent px-[var(--space-3)] py-[var(--space-2)] text-sm"
           value={notes}
@@ -101,16 +101,16 @@ export function CustomerProfileView({
           className="mt-[var(--space-8)]"
           onClick={() => setDeleteOpen(true)}
         >
-          Delete customer
+          Kunde löschen
         </Button>
       ) : null}
 
       <ConfirmSheet
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title="Delete customer?"
-        description="This removes the customer record. Past appointments keep their snapshot data on the ledger."
-        confirmLabel="Delete"
+        title="Kunde löschen?"
+        description="Der Kundendatensatz wird entfernt. Vergangene Termine behalten ihre Snapshot-Daten im Ledger."
+        confirmLabel="Löschen"
         pending={isPending}
         onConfirm={confirmDelete}
       />

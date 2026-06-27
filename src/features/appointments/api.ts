@@ -1,6 +1,7 @@
 "use server";
 
 import { getActiveMembership } from "@/lib/dashboard/active-shop";
+import { canViewShopRevenue } from "@/lib/dashboard/nav-config";
 import {
   moveAppointmentInputSchema,
   updateAppointmentStatusInputSchema,
@@ -81,6 +82,17 @@ export async function fetchTodaySummaryAction(input: { date: string }) {
   if (!data) {
     return { ok: false as const, code: "NOT_FOUND" };
   }
+
+  if (!canViewShopRevenue(ctx.membership.role)) {
+    return {
+      ok: true as const,
+      data: {
+        ...data,
+        expectedRevenueCents: 0,
+      },
+    };
+  }
+
   return { ok: true as const, data };
 }
 

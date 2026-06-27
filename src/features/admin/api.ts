@@ -12,6 +12,7 @@ import {
   setPlatformShopTemplate,
   setPlatformShopBookingAutoAssign,
   setPlatformMinisiteManaged,
+  setPlatformShopDashboardNav,
 } from "@/server/modules/platform/platform.service";
 import {
   setPlatformOwnerEmail,
@@ -128,6 +129,11 @@ export async function savePlatformMinisiteAction(shopId: string, input: unknown)
 export async function setPlatformMinisiteManagedAction(shopId: string, managed: boolean) {
   await adminGate();
   return setPlatformMinisiteManaged(shopId, managed);
+}
+
+export async function setPlatformShopDashboardNavAction(shopId: string, navKeys: string[] | null) {
+  await adminGate();
+  return setPlatformShopDashboardNav(shopId, navKeys);
 }
 
 export async function uploadPlatformMinisiteMediaAction(

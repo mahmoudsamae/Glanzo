@@ -17,8 +17,8 @@ import { AuthLink } from "./auth-shell";
 import { SubmitButton } from "@/components/shared/submit-button";
 
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("Bitte eine gültige E-Mail eingeben"),
+  password: z.string().min(1, "Passwort ist erforderlich"),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -64,7 +64,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
         if (isNextRedirectError(error)) {
           throw error;
         }
-        setErrorMessage("Something went wrong. Try again.");
+        setErrorMessage("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
       }
     });
   }
@@ -72,7 +72,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">E-Mail</Label>
         <Input
           id="email"
           type="email"
@@ -87,8 +87,8 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
 
       <div className="space-y-[var(--space-2)]">
         <div className="flex items-center justify-between gap-[var(--space-2)]">
-          <Label htmlFor="password">Password</Label>
-          <AuthLink href="/forgot-password">Forgot password?</AuthLink>
+          <Label htmlFor="password">Passwort</Label>
+          <AuthLink href="/forgot-password">Passwort vergessen?</AuthLink>
         </div>
         <Input
           id="password"
@@ -105,7 +105,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
       <SubmitButton pending={isPending} className="salon-auth-submit">
-        Sign in
+        Anmelden
       </SubmitButton>
 
       {googleEnabled && googleSignInAction ? (
@@ -116,7 +116,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
           disabled={isPending}
           onClick={() => startTransition(async () => googleSignInAction())}
         >
-          Continue with Google
+          Mit Google fortfahren
         </Button>
       ) : null}
     </form>

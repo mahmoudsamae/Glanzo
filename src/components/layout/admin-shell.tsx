@@ -19,7 +19,7 @@ export function AdminShell({ adminEmail, signOutAction, children }: AdminShellPr
               <div className="flex min-w-0 items-baseline gap-[var(--space-2)]">
                 <span className="platform-admin-hero-title truncate font-display text-lg">Glanzo</span>
                 <span className="shrink-0 rounded-full border border-[color-mix(in_oklch,var(--brass)_25%,var(--ink-3))] bg-[color-mix(in_oklch,var(--brass)_8%,var(--ink-1))] px-[var(--space-2)] py-0.5 text-[10px] uppercase tracking-[0.16em] text-[var(--brass)]">
-                  Platform
+                  Plattform
                 </span>
               </div>
               <AdminShellNav className="hidden sm:flex" />

@@ -5,7 +5,7 @@ import { getActiveMembership } from "@/lib/dashboard/active-shop";
 import { getActor } from "@/server/modules/auth/get-actor";
 import { dateInShopTimezone } from "@/server/modules/availability/time-windows";
 import { loadServicesCatalog } from "@/server/modules/services/services.loader";
-import { requireDashboardAccess } from "@/server/modules/shops/create-shop.service";
+import { requireDashboardNavKey } from "@/server/modules/shops/create-shop.service";
 
 import { CalendarClient } from "./calendar-client";
 
@@ -14,7 +14,7 @@ type CalendarPageProps = {
 };
 
 export default async function CalendarPage({ searchParams }: CalendarPageProps) {
-  await requireDashboardAccess();
+  await requireDashboardNavKey("calendar");
 
   const actor = await getActor();
   const membership = getActiveMembership(actor?.memberships ?? []);

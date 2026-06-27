@@ -23,10 +23,10 @@ export function JoinInvitePanel({ token, shopName }: JoinInvitePanelProps) {
       const result = await acceptStaffInviteAction(token);
       if (!result.ok) {
         if (result.code === "ALREADY_MEMBER") {
-          setError("You're already a member of this shop.");
+          setError("Du bist bereits Mitglied dieses Salons.");
           return;
         }
-        setError("This invite is no longer valid.");
+        setError("Diese Einladung ist nicht mehr gültig.");
         return;
       }
       router.push("/d");
@@ -36,11 +36,11 @@ export function JoinInvitePanel({ token, shopName }: JoinInvitePanelProps) {
   return (
     <div className="space-y-[var(--space-4)]">
       <p className="text-base text-[var(--text-2)]">
-        You&apos;ll join <strong className="text-[var(--text-0)]">{shopName}</strong> as a barber.
+        Du trittst <strong className="text-[var(--text-0)]">{shopName}</strong> als Barber bei.
       </p>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="button" className="w-full" disabled={isPending} onClick={accept}>
-        Accept invite
+        Einladung annehmen
       </Button>
     </div>
   );

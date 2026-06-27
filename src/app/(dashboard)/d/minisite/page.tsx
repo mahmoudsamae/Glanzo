@@ -1,10 +1,10 @@
 import { MinisiteEditorLoader } from "./minisite-editor-loader.client";
 import { MinisiteManagedNotice } from "@/features/minisite";
 import { loadMinisiteEditorData } from "@/server/modules/minisite/minisite.service";
-import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
+import { requireOwnerDashboardNavKey } from "@/server/modules/shops/create-shop.service";
 
 export default async function MinisitePage() {
-  const { actor, shopId } = await requireOwnerDashboardAccess();
+  const { actor, shopId } = await requireOwnerDashboardNavKey("minisite");
   const data = await loadMinisiteEditorData(actor, shopId);
 
   if (!data) {

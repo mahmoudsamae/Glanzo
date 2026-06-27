@@ -48,12 +48,13 @@ type TodayShellProps = {
   isLoading: boolean;
   isError: boolean;
   isRefreshing?: boolean;
+  showRevenue?: boolean;
   onRefetch: () => void;
   onSelectAppointment: (appointment: AppointmentListItem) => void;
 };
 
 function formatRowTime(iso: string, timezone: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("de-DE", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -69,6 +70,7 @@ export function TodayShell({
   isLoading,
   isError,
   isRefreshing = false,
+  showRevenue = true,
   onRefetch,
   onSelectAppointment,
 }: TodayShellProps) {
@@ -99,8 +101,8 @@ export function TodayShell({
   if (isError || !data) {
     return (
       <EmptyState
-        title="Today unavailable"
-        actionLabel="Try again"
+        title="Heute nicht verfügbar"
+        actionLabel="Erneut versuchen"
         onAction={onRefetch}
       />
     );
@@ -114,7 +116,7 @@ export function TodayShell({
       <header className="dash-today-header max-w-xl">
         <div className="flex items-start justify-between gap-[var(--space-3)]">
           <div>
-            <p className="salon-dash-kicker text-xs">Today</p>
+            <p className="salon-dash-kicker text-xs">Heute</p>
             <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">
               {weekday},{" "}
               <span className="text-data text-[var(--text-1)]">{day}</span> {month}
@@ -127,10 +129,10 @@ export function TodayShell({
             className="salon-dash-btn-outline shrink-0"
             disabled={isRefreshing}
             onClick={onRefetch}
-            aria-label="Refresh today"
+            aria-label="Heute aktualisieren"
           >
             <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
-            Refresh
+            Aktualisieren
           </Button>
         </div>
         <div className="mt-[var(--space-4)]">
@@ -139,35 +141,46 @@ export function TodayShell({
       </header>
 
       <div className="mt-[var(--space-8)] grid max-w-3xl gap-[var(--space-3)] sm:grid-cols-2">
-        <div className="salon-dash-hero-metric sm:col-span-2">
-          <span className="dash-metric-settle inline-block">
-            <MetricNumber
-              value={data.expectedRevenueCents}
-              format={(cents) => `€${(cents / 100).toFixed(2)}`}
-              className="font-display text-[64px] leading-none text-data text-[var(--text-0)]"
-            />
-          </span>
-          {subline ? (
-            <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
-          ) : null}
-        </div>
-        <DashboardMetricTile label="Bookings" value={data.appointmentCount} hint="On today's calendar" />
-        <DashboardMetricTile label="Open gaps" value={data.gapCount} hint="Slots between appointments" />
-        <DashboardMetricTile label="No-shows" value={data.noShowCount} hint="Marked today" />
+        {showRevenue ? (
+          <div className="salon-dash-hero-metric sm:col-span-2">
+            <span className="dash-metric-settle inline-block">
+              <MetricNumber
+                value={data.expectedRevenueCents}
+                format={(cents) => `€${(cents / 100).toFixed(2)}`}
+                className="font-display text-[64px] leading-none text-data text-[var(--text-0)]"
+              />
+            </span>
+            {subline ? (
+              <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
+            ) : null}
+          </div>
+        ) : (
+          <div className="salon-dash-hero-metric sm:col-span-2">
+            <p className="font-display text-[2rem] leading-tight text-[var(--text-0)]">
+              {data.appointmentCount} Termin{data.appointmentCount === 1 ? "" : "e"}
+            </p>
+            {subline ? (
+              <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
+            ) : null}
+          </div>
+        )}
+        <DashboardMetricTile label="Termine" value={data.appointmentCount} hint="Im heutigen Kalender" />
+        <DashboardMetricTile label="Freie Lücken" value={data.gapCount} hint="Zwischen Terminen" />
+        <DashboardMetricTile label="No-Shows" value={data.noShowCount} hint="Heute markiert" />
       </div>
 
       {active.length === 0 ? (
         <div className="mt-[var(--space-8)] max-w-xl">
           <EmptyState
-            title="A quiet morning."
-            actionLabel="Add walk-in"
+            title="Ein ruhiger Morgen."
+            actionLabel="Laufkundschaft"
             onAction={() => router.push("/d/calendar")}
           />
         </div>
       ) : (
         <DashboardPanel
-          title="Today's chair"
-          description={`${active.length} booking${active.length === 1 ? "" : "s"} on the books`}
+          title="Heutiger Stuhl"
+          description={`${active.length} Termin${active.length === 1 ? "" : "e"} im Kalender`}
           className="mt-[var(--space-8)] max-w-2xl"
         >
           <DashboardRowList>
@@ -178,12 +191,12 @@ export function TodayShell({
                   key={appointment.id}
                   onClick={() => onSelectAppointment(appointment)}
                   avatar={formatRowTime(appointment.startsAt, timezone)}
-                  title={appointment.customerName ?? "Walk-in"}
+                  title={appointment.customerName ?? "Laufkundschaft"}
                   subtitle={appointment.serviceName}
                   badges={<StatusDot label={appointmentStatusLabel(appointment.status)} />}
                   trailing={
                     <span className={cn("text-sm tabular-nums", past ? "text-[var(--text-2)]" : "text-[var(--text-0)]")}>
-                      {past ? "Done" : "Up next"}
+                      {past ? "Erledigt" : "Als Nächstes"}
                     </span>
                   }
                 />

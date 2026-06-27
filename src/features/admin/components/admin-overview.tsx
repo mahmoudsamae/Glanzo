@@ -35,9 +35,9 @@ export function AdminOverview({ overview, suspendedShops }: AdminOverviewProps) 
 
       <AdminMetricGrid
         metrics={[
-          { label: "Shops aktiv", value: overview.shops.active, accent: "ok" },
+          { label: "Salons aktiv", value: overview.shops.active, accent: "ok" },
           { label: "Suspendiert", value: overview.shops.suspended, accent: "warn" },
-          { label: "Signups 7d", value: overview.signups.last_7d },
+          { label: "Anmeldungen 7T", value: overview.signups.last_7d },
           { label: "Buchungen 7d", value: overview.bookings.last_7d },
         ]}
       />

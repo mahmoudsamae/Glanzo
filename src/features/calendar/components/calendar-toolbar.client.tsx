@@ -62,7 +62,7 @@ export function CalendarToolbar({
             size="sm"
             onClick={() => onDateChange(shiftIsoDate(date, -1, timezone))}
           >
-            Prev
+            Zurück
           </Button>
           <Button
             type="button"
@@ -70,7 +70,7 @@ export function CalendarToolbar({
             size="sm"
             onClick={() => onDateChange(shiftIsoDate(date, 1, timezone))}
           >
-            Next
+            Weiter
           </Button>
         </div>
       </div>
@@ -83,7 +83,7 @@ export function CalendarToolbar({
             size="sm"
             onClick={() => onViewChange("day")}
           >
-            Day
+            Tag
           </Button>
           <Button
             type="button"
@@ -91,7 +91,7 @@ export function CalendarToolbar({
             size="sm"
             onClick={() => onViewChange("week")}
           >
-            Week
+            Woche
           </Button>
         </div>
 
@@ -110,7 +110,7 @@ export function CalendarToolbar({
         ) : null}
 
         <Button type="button" variant="ghost" size="sm" onClick={onToggleCancelled}>
-          {showCancelled ? "Hide cancelled" : "Show cancelled"}
+          {showCancelled ? "Stornierte ausblenden" : "Stornierte anzeigen"}
         </Button>
       </div>
     </header>

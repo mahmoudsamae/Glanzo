@@ -95,17 +95,19 @@ export function workingDayProgress(
   return (nowMin - openMin) / (closeMin - openMin);
 }
 
-/** Subline with only non-zero parts, e.g. "9 appointments · 2 gaps · 1 no-show". */
+/** Subline with only non-zero parts, e.g. "9 Termine · 2 Lücken · 1 No-Show". */
 export function formatTodaySubline(summary: TodaySummary): string {
   const parts: string[] = [];
   if (summary.appointmentCount > 0) {
-    parts.push(`${summary.appointmentCount} appointment${summary.appointmentCount === 1 ? "" : "s"}`);
+    parts.push(
+      `${summary.appointmentCount} Termin${summary.appointmentCount === 1 ? "" : "e"}`,
+    );
   }
   if (summary.gapCount > 0) {
-    parts.push(`${summary.gapCount} gap${summary.gapCount === 1 ? "" : "s"}`);
+    parts.push(`${summary.gapCount} Lücke${summary.gapCount === 1 ? "" : "n"}`);
   }
   if (summary.noShowCount > 0) {
-    parts.push(`${summary.noShowCount} no-show${summary.noShowCount === 1 ? "" : "s"}`);
+    parts.push(`${summary.noShowCount} No-Show${summary.noShowCount === 1 ? "" : "s"}`);
   }
   return parts.join(" · ");
 }

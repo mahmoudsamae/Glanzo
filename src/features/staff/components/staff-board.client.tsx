@@ -91,7 +91,7 @@ function OwnerStaff({
     startTransition(async () => {
       const result = await createStaffInviteAction({ email });
       if (!result.ok) {
-        setError("Could not create invite.");
+        setError("Einladung konnte nicht erstellt werden.");
         return;
       }
       setLastLink(buildJoinUrl(result.data.token));
@@ -114,12 +114,12 @@ function OwnerStaff({
   return (
     <DashboardPage width="lg">
       <DashboardPageHeader
-        kicker="Your team"
-        title="Staff"
-        subtitle="Invite barbers, copy join links, and see who has access."
+        kicker="Dein Team"
+        title="Team"
+        subtitle="Barber einladen, Join-Links kopieren und sehen, wer Zugriff hat."
       />
 
-      <DashboardPanel title="Invite a barber" description="Send a join link — they create their own login.">
+      <DashboardPanel title="Barber einladen" description="Join-Link senden — sie erstellen ihren eigenen Login.">
         <div className="flex flex-col gap-[var(--space-3)] sm:flex-row">
           <Input
             type="email"
@@ -129,7 +129,7 @@ function OwnerStaff({
             onChange={(e) => setEmail(e.target.value)}
           />
           <DashboardPrimaryButton type="button" disabled={isPending || !email} onClick={createInvite}>
-            Create link
+            Link erstellen
           </DashboardPrimaryButton>
         </div>
         {lastLink ? (
@@ -138,7 +138,7 @@ function OwnerStaff({
               {lastLink}
             </code>
             <Button type="button" variant="outline" size="sm" onClick={() => copyLink(lastLink)}>
-              Copy
+              Kopieren
             </Button>
           </div>
         ) : null}
@@ -146,14 +146,14 @@ function OwnerStaff({
       </DashboardPanel>
 
       {invites.length > 0 ? (
-        <DashboardPanel title="Pending invites" description="Links waiting to be accepted." className="mt-[var(--space-4)]">
+        <DashboardPanel title="Offene Einladungen" description="Links warten auf Annahme." className="mt-[var(--space-4)]">
           <DashboardRowList>
             {invites.map((invite) => (
               <DashboardRowCard
                 key={invite.id}
                 avatar="@"
                 title={invite.email}
-                subtitle="Awaiting acceptance"
+                subtitle="Wartet auf Annahme"
                 trailing={
                   <div className="flex gap-[var(--space-2)]">
                     <Button
@@ -162,10 +162,10 @@ function OwnerStaff({
                       size="sm"
                       onClick={() => copyLink(buildJoinUrl(invite.token))}
                     >
-                      Copy link
+                      Link kopieren
                     </Button>
                     <Button type="button" variant="ghost" size="sm" onClick={() => revoke(invite.id)}>
-                      Revoke
+                      Widerrufen
                     </Button>
                   </div>
                 }
@@ -175,10 +175,10 @@ function OwnerStaff({
         </DashboardPanel>
       ) : null}
 
-      <DashboardPanel title="Team" description={`${members.length} members`} className="mt-[var(--space-4)]">
+      <DashboardPanel title="Team" description={`${members.length} Mitglieder`} className="mt-[var(--space-4)]">
         <DashboardRowList>
           {members.map((member) => {
-            const name = member.profile?.display_name?.trim() || "Staff";
+            const name = member.profile?.display_name?.trim() || "Teammitglied";
             return (
               <DashboardRowCard
                 key={member.id}
@@ -186,10 +186,10 @@ function OwnerStaff({
                 title={name}
                 badges={
                   <DashboardBadge tone={member.role === "owner" ? "brass" : "neutral"}>
-                    {member.role}
+                    {member.role === "owner" ? "Inhaber" : "Barber"}
                   </DashboardBadge>
                 }
-                trailing={<StatusDot label={member.role} tone={member.role === "owner" ? "owner" : "barber"} />}
+                trailing={<StatusDot label={member.role === "owner" ? "Inhaber" : "Barber"} tone={member.role === "owner" ? "owner" : "barber"} />}
               />
             );
           })}
@@ -265,11 +265,11 @@ function BarberSchedule({
   return (
     <div className="mx-auto w-full max-w-3xl space-y-[var(--space-8)] px-[var(--space-4)] py-[var(--space-8)]">
       <header>
-        <h1 className="font-display text-2xl text-[var(--text-0)]">My schedule</h1>
+        <h1 className="font-display text-2xl text-[var(--text-0)]">Mein Dienstplan</h1>
       </header>
 
       <section className="space-y-[var(--space-4)]">
-        <h2 className="text-sm font-medium">Weekly hours</h2>
+        <h2 className="text-sm font-medium">Wochenzeiten</h2>
         {[0, 1, 2, 3, 4, 5, 6].map((weekday) => {
           const key = staffWeekdayIndexToKey(weekday);
           const shifts = hoursByDay[weekday] ?? [];
@@ -278,7 +278,7 @@ function BarberSchedule({
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">{STAFF_WEEKDAY_LABELS[key]}</p>
                 <Button type="button" variant="ghost" size="sm" onClick={() => addShift(weekday)}>
-                  Add shift
+                  Schicht hinzufügen
                 </Button>
               </div>
               <div className="mt-[var(--space-2)] flex flex-wrap gap-[var(--space-2)]">
@@ -297,20 +297,20 @@ function BarberSchedule({
       </section>
 
       <section className="space-y-[var(--space-3)]">
-        <h2 className="text-sm font-medium">Time off</h2>
+        <h2 className="text-sm font-medium">Abwesenheit</h2>
         <div className="grid gap-[var(--space-2)] sm:grid-cols-2">
           <div>
             <Label htmlFor="off-start">Start</Label>
             <Input id="off-start" type="date" value={offStart} onChange={(e) => setOffStart(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="off-end">End</Label>
+            <Label htmlFor="off-end">Ende</Label>
             <Input id="off-end" type="date" value={offEnd} onChange={(e) => setOffEnd(e.target.value)} />
           </div>
         </div>
-        <Input placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+        <Input placeholder="Notiz (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
         <Button type="button" disabled={isPending} onClick={addVacation}>
-          Add time off
+          Abwesenheit eintragen
         </Button>
         <ul className="space-y-[var(--space-2)] text-sm text-[var(--text-2)]">
           {timeOff.map((block) => (

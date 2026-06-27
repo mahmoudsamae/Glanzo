@@ -13,11 +13,11 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
 
   return (
     <AuthShell
-      title="Start your shop"
-      subtitle="The 15-minute promise begins here."
+      title="Starte deinen Salon"
+      subtitle="In wenigen Minuten bist du live."
       footer={
         <>
-          Already have an account? <AuthLink href={loginHref}>Sign in</AuthLink>
+          Schon registriert? <AuthLink href={loginHref}>Anmelden</AuthLink>
         </>
       }
     >

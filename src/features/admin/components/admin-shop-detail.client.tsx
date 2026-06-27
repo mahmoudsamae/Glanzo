@@ -14,8 +14,16 @@ import {
   setPlatformShopStatusAction,
   setPlatformShopBookingAutoAssignAction,
   setPlatformMinisiteManagedAction,
+  setPlatformShopDashboardNavAction,
 } from "../api";
 import { normalizeAllowedMinisiteTemplates } from "@/lib/minisite/allowed-templates";
+import {
+  DASHBOARD_NAV_KEYS,
+  DASHBOARD_NAV_KEY_DESCRIPTIONS,
+  DASHBOARD_NAV_KEY_LABELS,
+  type DashboardNavKey,
+  sanitizeDashboardNavKeysInput,
+} from "@/lib/dashboard/nav-config";
 import { MINISITE_TEMPLATES } from "@/lib/minisite/template-registry";
 import type { MinisiteTemplate } from "@/lib/validations/public-shop";
 import { buildInviteAbsoluteUrl } from "@/lib/admin/invite-url";
@@ -84,6 +92,13 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
   const [minisiteManaged, setMinisiteManaged] = useState(shop.minisite_managed);
   const [managedSuccess, setManagedSuccess] = useState<string | null>(null);
   const [managedError, setManagedError] = useState<string | null>(null);
+  const [selectedNavKeys, setSelectedNavKeys] = useState<DashboardNavKey[]>(() =>
+    shop.dashboard_nav_keys.length > 0
+      ? sanitizeDashboardNavKeysInput(shop.dashboard_nav_keys)
+      : [...DASHBOARD_NAV_KEYS],
+  );
+  const [navSuccess, setNavSuccess] = useState<string | null>(null);
+  const [navError, setNavError] = useState<string | null>(null);
 
   const minisiteUrl = buildShopMinisiteUrl(shop.slug);
   const isSuspended = shop.status === "suspended";
@@ -274,6 +289,38 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
     });
   }
 
+  function toggleDashboardNavKey(key: DashboardNavKey) {
+    setSelectedNavKeys((current) => {
+      const isSelected = current.includes(key);
+      if (isSelected && current.length === 1) {
+        return current;
+      }
+      return isSelected ? current.filter((item) => item !== key) : [...current, key];
+    });
+  }
+
+  function saveDashboardNav() {
+    setNavError(null);
+    setNavSuccess(null);
+    startTransition(async () => {
+      const useDefaults = selectedNavKeys.length === DASHBOARD_NAV_KEYS.length;
+      const result = await setPlatformShopDashboardNavAction(
+        shop.id,
+        useDefaults ? null : selectedNavKeys,
+      );
+      if (!result.ok) {
+        setNavError("Dashboard-Menü konnte nicht gespeichert werden.");
+        return;
+      }
+      setNavSuccess(
+        useDefaults
+          ? "Standard-Menü aktiv — alle passenden Bereiche sichtbar."
+          : "Dashboard-Menü für diesen Salon gespeichert.",
+      );
+      router.refresh();
+    });
+  }
+
   const templateSettingsChanged =
     selectedTemplate !== shop.minisite_template ||
     allowedTemplates.slice().sort().join(",") !==
@@ -284,6 +331,12 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
         .slice()
         .sort()
         .join(",");
+
+  const navSettingsChanged =
+    shop.dashboard_nav_keys.length > 0
+      ? selectedNavKeys.slice().sort().join(",") !==
+        sanitizeDashboardNavKeysInput(shop.dashboard_nav_keys).slice().sort().join(",")
+      : selectedNavKeys.length !== DASHBOARD_NAV_KEYS.length;
 
   return (
     <AdminFadeIn className="flex flex-col gap-[var(--space-8)]">
@@ -366,6 +419,68 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
               />
             ) : null}
           </section>
+
+          <AdminPanel
+            title="Dashboard-Menü"
+            description="Welche Bereiche Inhaber und Team in der Seitenleiste sehen. Owner-only Einträge gelten nur für Inhaber."
+          >
+            {navSuccess ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-ok)]">{navSuccess}</p>
+            ) : null}
+            {navError ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-bad)]">{navError}</p>
+            ) : null}
+
+            <div className="grid gap-[var(--space-2)] sm:grid-cols-2">
+              {DASHBOARD_NAV_KEYS.map((key) => {
+                const checked = selectedNavKeys.includes(key);
+                return (
+                  <label
+                    key={key}
+                    className={`flex cursor-pointer items-start gap-[var(--space-3)] rounded-md border px-[var(--space-4)] py-[var(--space-3)] transition-colors ${
+                      checked
+                        ? "border-[var(--brass)] bg-[var(--ink-2)]"
+                        : "border-[var(--ink-3)] hover:border-[var(--ink-4)]"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={checked}
+                      onChange={() => toggleDashboardNavKey(key)}
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-[var(--text-0)]">
+                        {DASHBOARD_NAV_KEY_LABELS[key]}
+                      </span>
+                      <span className="mt-[var(--space-1)] block text-xs text-[var(--text-2)]">
+                        {DASHBOARD_NAV_KEY_DESCRIPTIONS[key]}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="mt-[var(--space-4)] flex flex-wrap gap-[var(--space-3)]">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isPending || !navSettingsChanged}
+                onClick={saveDashboardNav}
+              >
+                Menü speichern
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isPending}
+                onClick={() => setSelectedNavKeys([...DASHBOARD_NAV_KEYS])}
+              >
+                Alle aktivieren
+              </Button>
+            </div>
+          </AdminPanel>
 
           <AdminPanel
             title="Website einrichten"

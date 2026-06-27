@@ -1,3 +1,8 @@
+import {
+  type DashboardNavKey,
+  isDashboardNavKeyAllowed,
+} from "@/lib/dashboard/nav-config";
+
 export type NavRole = "owner" | "barber";
 
 export type NavIconKey =
@@ -29,7 +34,7 @@ export type NavItem = {
 export const DASHBOARD_NAV: NavItem[] = [
   {
     key: "today",
-    label: "Today",
+    label: "Heute",
     href: "/d",
     icon: "today",
     enabled: true,
@@ -37,7 +42,7 @@ export const DASHBOARD_NAV: NavItem[] = [
   },
   {
     key: "calendar",
-    label: "Calendar",
+    label: "Kalender",
     href: "/d/calendar",
     icon: "calendar",
     enabled: true,
@@ -45,7 +50,7 @@ export const DASHBOARD_NAV: NavItem[] = [
   },
   {
     key: "customers",
-    label: "Customers",
+    label: "Kunden",
     href: "/d/customers",
     icon: "customers",
     enabled: true,
@@ -53,7 +58,7 @@ export const DASHBOARD_NAV: NavItem[] = [
   },
   {
     key: "more",
-    label: "More",
+    label: "Mehr",
     href: "/d",
     icon: "more",
     enabled: true,
@@ -67,7 +72,7 @@ export const DASHBOARD_NAV: NavItem[] = [
 export const OWNER_RAIL_NAV: NavItem[] = [
   {
     key: "services",
-    label: "Services",
+    label: "Leistungen",
     href: "/d/services",
     icon: "scissors",
     enabled: true,
@@ -76,7 +81,7 @@ export const OWNER_RAIL_NAV: NavItem[] = [
   },
   {
     key: "staff",
-    label: "Staff",
+    label: "Team",
     href: "/d/staff",
     icon: "users",
     enabled: true,
@@ -85,7 +90,7 @@ export const OWNER_RAIL_NAV: NavItem[] = [
   },
   {
     key: "minisite",
-    label: "Minisite",
+    label: "Website",
     href: "/d/minisite",
     icon: "store",
     enabled: true,
@@ -98,7 +103,7 @@ export const OWNER_RAIL_NAV: NavItem[] = [
 export const RAIL_DESKTOP_NAV: NavItem[] = [
   {
     key: "settings",
-    label: "Settings",
+    label: "Einstellungen",
     href: "/d/settings/shop",
     icon: "settings",
     enabled: true,
@@ -113,26 +118,61 @@ export const MORE_SHEET_NAV: NavItem[] = [
   ...RAIL_DESKTOP_NAV,
 ];
 
+function isNavKeyAllowed(item: NavItem, allowedNavKeys: DashboardNavKey[] | null): boolean {
+  if (item.key === "more" || item.isSheetTrigger) {
+    return true;
+  }
+  return isDashboardNavKeyAllowed(item.key as DashboardNavKey, allowedNavKeys);
+}
+
+function filterByShopNav(items: NavItem[], allowedNavKeys: DashboardNavKey[] | null): NavItem[] {
+  return items.filter((item) => isNavKeyAllowed(item, allowedNavKeys));
+}
+
 export function navItemsForSurface(
   surface: "mobile" | "desktop-rail",
   role: NavRole,
+  allowedNavKeys: DashboardNavKey[] | null = null,
 ): NavItem[] {
   if (surface === "mobile") {
-    return DASHBOARD_NAV.filter((item) => item.roles.includes(role));
+    const primary = filterByShopNav(
+      DASHBOARD_NAV.filter(
+        (item) => item.roles.includes(role) && !item.isSheetTrigger,
+      ),
+      allowedNavKeys,
+    );
+    const moreItems = moreSheetNavItems(role, allowedNavKeys);
+    const moreTrigger = DASHBOARD_NAV.find((item) => item.key === "more");
+    if (moreItems.length > 0 && moreTrigger) {
+      return [...primary, moreTrigger];
+    }
+    return primary;
   }
 
-  const primary = DASHBOARD_NAV.filter(
-    (item) => item.roles.includes(role) && !item.mobileOnly && !item.isSheetTrigger,
+  const primary = filterByShopNav(
+    DASHBOARD_NAV.filter(
+      (item) => item.roles.includes(role) && !item.mobileOnly && !item.isSheetTrigger,
+    ),
+    allowedNavKeys,
   );
   const ownerExtras =
     role === "owner"
-      ? [...OWNER_RAIL_NAV, ...RAIL_DESKTOP_NAV].filter((item) => item.roles.includes(role))
+      ? filterByShopNav(
+          [...OWNER_RAIL_NAV, ...RAIL_DESKTOP_NAV].filter((item) => item.roles.includes(role)),
+          allowedNavKeys,
+        )
       : [];
   return [...primary, ...ownerExtras];
 }
 
-export function moreSheetNavItems(role: NavRole): NavItem[] {
-  return MORE_SHEET_NAV.filter((item) => item.roles.includes(role) && item.enabled);
+export function moreSheetNavItems(
+  role: NavRole,
+  allowedNavKeys: DashboardNavKey[] | null = null,
+): NavItem[] {
+  return filterByShopNav(
+    MORE_SHEET_NAV.filter((item) => item.roles.includes(role) && item.enabled),
+    allowedNavKeys,
+  );
 }
 
 export function isNavItemActive(href: string, pathname: string): boolean {

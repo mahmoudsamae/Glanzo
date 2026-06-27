@@ -59,7 +59,7 @@ export function OpeningHoursEditor({ value, onChange }: OpeningHoursEditorProps)
                   />
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">Closed</p>
+                <p className="text-sm text-muted-foreground">Geschlossen</p>
               )}
             </div>
             <Button
@@ -68,7 +68,7 @@ export function OpeningHoursEditor({ value, onChange }: OpeningHoursEditorProps)
               size="sm"
               onClick={() => toggleDay(day, !isOpen)}
             >
-              {isOpen ? "Open" : "Closed"}
+              {isOpen ? "Geöffnet" : "Geschlossen"}
             </Button>
           </div>
         );

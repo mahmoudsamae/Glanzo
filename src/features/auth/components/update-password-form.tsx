@@ -13,7 +13,7 @@ import type { AuthActionResult } from "@/lib/auth/types";
 import { isNextRedirectError } from "@/lib/auth/next-redirect";
 
 const updateSchema = z.object({
-  password: z.string().min(8, "At least 8 characters"),
+  password: z.string().min(8, "Mindestens 8 Zeichen"),
 });
 
 type UpdateValues = z.infer<typeof updateSchema>;
@@ -52,7 +52,7 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
         if (isNextRedirectError(error)) {
           throw error;
         }
-        setErrorMessage("Something went wrong. Try again.");
+        setErrorMessage("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
       }
     });
   }
@@ -60,7 +60,7 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="password">New password</Label>
+        <Label htmlFor="password">Neues Passwort</Label>
         <Input
           id="password"
           type="password"
@@ -76,7 +76,7 @@ export function UpdatePasswordForm({ updateAction }: UpdatePasswordFormProps) {
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
       <SubmitButton pending={isPending} className="salon-auth-submit">
-        Update password
+        Passwort aktualisieren
       </SubmitButton>
     </form>
   );

@@ -48,13 +48,13 @@ export const WEEKDAY_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] a
 export type WeekdayKey = (typeof WEEKDAY_ORDER)[number];
 
 export const WEEKDAY_LABELS: Record<WeekdayKey, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
+  mon: "Montag",
+  tue: "Dienstag",
+  wed: "Mittwoch",
+  thu: "Donnerstag",
+  fri: "Freitag",
+  sat: "Samstag",
+  sun: "Sonntag",
 };
 
 export function parseOpeningHours(value: unknown): OpeningHours | null {

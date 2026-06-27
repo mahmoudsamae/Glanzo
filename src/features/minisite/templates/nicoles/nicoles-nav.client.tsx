@@ -70,6 +70,15 @@ export function NicolesNav({
   const logoUrl = content.logo_path ? shopMediaPublicUrl(content.logo_path) : null;
   const tagline = content.sections?.nav?.text?.trim() || "friseur- & barbershop";
   const links = useMemo(() => resolveEffectiveNavLinks(template, content), [template, content]);
+  const isForge = template === "forge";
+  const drawerNavLinks = useMemo(
+    () => links.filter((link) => !isTerminNavLink(link)),
+    [links],
+  );
+  const drawerBookLink = useMemo(
+    () => links.find((link) => isTerminNavLink(link)),
+    [links],
+  );
 
   const scrollLinks = useMemo(
     () =>
@@ -245,14 +254,32 @@ export function NicolesNav({
       </div>
 
       {open ? (
-        <nav className="ms-nicoles-nav-drawer lg:hidden" aria-label="Mobile Navigation">
-          {links.map((link) => (
-            <span key={link.id}>
-              {isTerminNavLink(link)
-                ? renderLink(link, "ms-nicoles-nav-drawer-link ms-nicoles-nav-cta ms-nicoles-nav-cta--block")
-                : renderLink(link, "ms-nicoles-nav-drawer-link")}
-            </span>
-          ))}
+        <nav
+          className={`ms-nicoles-nav-drawer lg:hidden${isForge ? " ms-nicoles-nav-drawer--forge" : ""}`}
+          aria-label="Mobile Navigation"
+        >
+          {isForge ? (
+            <>
+              <div className="ms-nicoles-nav-drawer-links">
+                {drawerNavLinks.map((link) => (
+                  <span key={link.id}>{renderLink(link, "ms-nicoles-nav-drawer-link")}</span>
+                ))}
+              </div>
+              {drawerBookLink ? (
+                <div className="ms-nicoles-nav-drawer-cta">
+                  {renderLink(drawerBookLink, "ms-nicoles-nav-drawer-link ms-nicoles-nav-drawer-cta-btn")}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            links.map((link) => (
+              <span key={link.id}>
+                {isTerminNavLink(link)
+                  ? renderLink(link, "ms-nicoles-nav-drawer-link ms-nicoles-nav-cta ms-nicoles-nav-cta--block")
+                  : renderLink(link, "ms-nicoles-nav-drawer-link")}
+              </span>
+            ))
+          )}
         </nav>
       ) : null}
     </header>

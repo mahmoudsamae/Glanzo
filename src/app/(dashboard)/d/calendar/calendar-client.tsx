@@ -63,7 +63,7 @@ export function CalendarClient({
     barberFilter,
     (code) => {
       setToast(
-        isBookingErrorCode(code) ? bookingErrorMessage(code) : `Move failed: ${code}`,
+        isBookingErrorCode(code) ? bookingErrorMessage(code) : `Verschieben fehlgeschlagen: ${code}`,
       );
     },
   );

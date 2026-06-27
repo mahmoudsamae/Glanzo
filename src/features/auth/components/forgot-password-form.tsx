@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import type { AuthActionResult } from "@/lib/auth/types";
 
 const forgotSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.string().email("Bitte eine gültige E-Mail eingeben"),
 });
 
 type ForgotValues = z.infer<typeof forgotSchema>;
@@ -39,7 +39,7 @@ export function ForgotPasswordForm({ resetAction }: ForgotPasswordFormProps) {
     startTransition(async () => {
       const result = await resetAction(formData);
       if (result.ok) {
-        setMessage("If that email is registered, a reset link is on its way.");
+        setMessage("Falls diese E-Mail registriert ist, senden wir dir einen Reset-Link.");
       } else {
         setErrorMessage(result.message);
       }
@@ -49,7 +49,7 @@ export function ForgotPasswordForm({ resetAction }: ForgotPasswordFormProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="salon-auth-form space-y-[var(--space-4)]">
       <div className="space-y-[var(--space-2)]">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">E-Mail</Label>
         <Input id="email" type="email" autoComplete="email" className="salon-auth-input" {...form.register("email")} />
         {form.formState.errors.email ? (
           <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
@@ -60,7 +60,7 @@ export function ForgotPasswordForm({ resetAction }: ForgotPasswordFormProps) {
       {errorMessage ? <p className="text-sm text-destructive">{errorMessage}</p> : null}
 
       <SubmitButton pending={isPending} className="salon-auth-submit">
-        Send reset link
+        Reset-Link senden
       </SubmitButton>
     </form>
   );

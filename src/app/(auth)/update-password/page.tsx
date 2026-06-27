@@ -3,7 +3,7 @@ import { updatePassword } from "@/server/modules/auth/actions";
 
 export default function UpdatePasswordPage() {
   return (
-    <AuthShell title="Choose a new password" subtitle="Make it at least 8 characters.">
+    <AuthShell title="Neues Passwort wählen" subtitle="Mindestens 8 Zeichen.">
       <UpdatePasswordForm updateAction={updatePassword} />
     </AuthShell>
   );

@@ -7,6 +7,7 @@ export type ActorMembership = {
   shopName: string;
   shopSlug: string;
   shopTimezone: string;
+  dashboardNavKeys: string[] | null;
   createdAt: string;
 };
 

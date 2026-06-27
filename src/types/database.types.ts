@@ -443,6 +443,7 @@ export type Database = {
           cancellation_window_min: number;
           created_at: string;
           currency: string;
+          dashboard_nav_keys: string[] | null;
           id: string;
           minisite_managed: boolean;
           name: string;
@@ -461,6 +462,7 @@ export type Database = {
           cancellation_window_min?: number;
           created_at?: string;
           currency?: string;
+          dashboard_nav_keys?: string[] | null;
           id?: string;
           minisite_managed?: boolean;
           name: string;
@@ -479,6 +481,7 @@ export type Database = {
           cancellation_window_min?: number;
           created_at?: string;
           currency?: string;
+          dashboard_nav_keys?: string[] | null;
           id?: string;
           minisite_managed?: boolean;
           name?: string;
@@ -817,6 +820,10 @@ export type Database = {
       };
       platform_set_minisite_managed: {
         Args: { p_shop_id: string; p_managed: boolean };
+        Returns: Json;
+      };
+      platform_set_shop_dashboard_nav: {
+        Args: { p_shop_id: string; p_nav_keys: string[] | null };
         Returns: Json;
       };
       platform_update_minisite: {

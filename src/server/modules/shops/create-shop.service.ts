@@ -1,5 +1,11 @@
 import { redirect } from "next/navigation";
 
+import { getActiveMembership } from "@/lib/dashboard/active-shop";
+import {
+  type DashboardNavKey,
+  isDashboardNavKeyAllowed,
+  normalizeDashboardNavKeys,
+} from "@/lib/dashboard/nav-config";
 import { revalidateShopPublic } from "@/lib/minisite/revalidate-shop-public";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { CheckSlugResult, CreateShopErrorCode, CreateShopResult } from "@/lib/auth/types";
@@ -9,7 +15,7 @@ import {
 } from "@/lib/validations/shop";
 import { getActor } from "@/server/modules/auth/get-actor";
 import { getActorState, resolvePostAuthRedirect } from "@/server/modules/auth/get-actor-state";
-import { getActiveMembership } from "@/lib/dashboard/active-shop";
+import type { ActorMembership } from "@/server/modules/auth/types";
 
 function mapRpcError(message: string): CreateShopErrorCode {
   const upper = message.toUpperCase();
@@ -116,6 +122,45 @@ export async function requireOwnerDashboardAccess(): Promise<{
   }
 
   return { actor, shopId: membership.shopId };
+}
+
+export async function requireDashboardNavKey(key: DashboardNavKey): Promise<{
+  actor: NonNullable<Awaited<ReturnType<typeof getActor>>>;
+  membership: ActorMembership;
+}> {
+  await requireDashboardAccess();
+  const actor = await getActor();
+  const membership = getActiveMembership(actor?.memberships ?? []);
+
+  if (!actor || !membership) {
+    redirect("/login");
+  }
+
+  const allowedNavKeys = normalizeDashboardNavKeys(membership.dashboardNavKeys);
+  if (!isDashboardNavKeyAllowed(key, allowedNavKeys)) {
+    redirect("/d");
+  }
+
+  return { actor, membership };
+}
+
+export async function requireOwnerDashboardNavKey(key: DashboardNavKey): Promise<{
+  actor: NonNullable<Awaited<ReturnType<typeof getActor>>>;
+  shopId: string;
+  membership: ActorMembership;
+}> {
+  const { actor, shopId } = await requireOwnerDashboardAccess();
+  const membership = getActiveMembership(actor.memberships);
+  if (!membership) {
+    redirect("/login");
+  }
+
+  const allowedNavKeys = normalizeDashboardNavKeys(membership.dashboardNavKeys);
+  if (!isDashboardNavKeyAllowed(key, allowedNavKeys)) {
+    redirect("/d");
+  }
+
+  return { actor, shopId, membership };
 }
 
 export async function requireDashboardAccess(): Promise<void> {

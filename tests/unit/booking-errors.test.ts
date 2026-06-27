@@ -38,8 +38,8 @@ describe("mapBookingRpcError", () => {
 
 describe("bookingErrorMessage", () => {
   it("returns user-safe copy for each code", () => {
-    expect(bookingErrorMessage("SLOT_TAKEN")).toMatch(/no longer available/i);
-    expect(bookingErrorMessage("TOO_LATE")).toMatch(/cancellation window/i);
+    expect(bookingErrorMessage("SLOT_TAKEN")).toMatch(/nicht mehr verfügbar/i);
+    expect(bookingErrorMessage("TOO_LATE")).toMatch(/Stornierungsfenster/i);
   });
 
   it("type guard recognizes booking codes", () => {

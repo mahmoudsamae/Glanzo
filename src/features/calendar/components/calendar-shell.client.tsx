@@ -156,9 +156,9 @@ export function CalendarShell({
   if (isError || !data) {
     return (
       <EmptyState
-        title="Calendar unavailable"
-        description="We could not load appointments for this day."
-        actionLabel="Try again"
+        title="Kalender nicht verfügbar"
+        description="Termine für diesen Tag konnten nicht geladen werden."
+        actionLabel="Erneut versuchen"
         onAction={onRefetch}
       />
     );
@@ -192,8 +192,8 @@ export function CalendarShell({
 
       {showEmptyDay ? (
         <EmptyState
-          title="No bookings this day."
-          actionLabel="Add walk-in"
+          title="Keine Termine an diesem Tag."
+          actionLabel="Laufkundschaft"
           onAction={() => setWalkInOpen(true)}
         />
       ) : urlState.view === "week" && weekBarber ? (
@@ -234,7 +234,7 @@ export function CalendarShell({
         type="button"
         className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px)+var(--space-4))] right-[var(--space-4)] z-40 size-12 rounded-full bg-[var(--brass)] text-[var(--ink-0)] shadow-lg lg:bottom-[var(--space-8)] lg:right-[var(--space-8)]"
         onClick={() => setWalkInOpen(true)}
-        aria-label="Add walk-in"
+        aria-label="Laufkundschaft hinzufügen"
       >
         +
       </Button>
@@ -244,7 +244,7 @@ export function CalendarShell({
           className="absolute right-[var(--space-8)] top-[var(--space-4)] z-40"
           onClick={() => setWalkInOpen(true)}
         >
-          Add walk-in
+          Laufkundschaft
         </Button>
       </div>
 

@@ -55,7 +55,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
         bookingAutoAssignBarber: autoAssignBarber,
       });
       if (!result.ok) {
-        setError("Could not save settings.");
+        setError("Einstellungen konnten nicht gespeichert werden.");
         return;
       }
       router.refresh();
@@ -64,24 +64,24 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
 
   return (
     <div className="space-y-[var(--space-4)]">
-      <DashboardPanel title="Shop identity" description="Public name and locked mini-site slug.">
+      <DashboardPanel title="Salon-Profil" description="Öffentlicher Name und gesperrter Website-Slug.">
         <p className="text-sm text-[var(--text-2)]">
           <span className="font-medium text-[var(--text-0)]">{shop.name}</span> ·{" "}
           <span className="text-data">{shop.slug}</span>
         </p>
         <p className="mt-[var(--space-2)] text-xs text-[var(--text-2)]">
-          Slug is locked — it powers your public mini-site URL and cannot change without breaking links.
+          Slug ist gesperrt — er bildet die URL deiner öffentlichen Website und kann ohne defekte Links nicht geändert werden.
         </p>
       </DashboardPanel>
 
-      <DashboardPanel title="Opening hours">
+      <DashboardPanel title="Öffnungszeiten">
         <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />
       </DashboardPanel>
 
-      <DashboardPanel title="Booking rules">
+      <DashboardPanel title="Buchungsregeln">
         <div className="grid gap-[var(--space-4)] sm:grid-cols-3">
           <div>
-            <Label htmlFor="lead-time">Lead time (min)</Label>
+            <Label htmlFor="lead-time">Vorlaufzeit (Min.)</Label>
             <input
               id="lead-time"
               type="number"
@@ -91,7 +91,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="cancel-window">Cancellation window (min)</Label>
+            <Label htmlFor="cancel-window">Stornierungsfenster (Min.)</Label>
             <input
               id="cancel-window"
               type="number"
@@ -101,7 +101,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="granularity">Slot granularity</Label>
+            <Label htmlFor="granularity">Terminraster</Label>
             <select
               id="granularity"
               className="salon-dash-search mt-[var(--space-2)] h-10 w-full rounded-md px-[var(--space-3)]"
@@ -136,7 +136,7 @@ export function ShopSettingsForm({ shop }: ShopSettingsFormProps) {
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <DashboardPrimaryButton type="button" disabled={isPending} onClick={save}>
-        Save settings
+        Einstellungen speichern
       </DashboardPrimaryButton>
     </div>
   );

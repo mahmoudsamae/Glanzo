@@ -59,7 +59,7 @@ export function ServicesLedgerList({
               size="icon"
               className="size-6 rounded-md"
               disabled={index === 0}
-              aria-label={`Move ${service.name} up`}
+              aria-label={`${service.name} nach oben`}
               onClick={() => onMove(index, -1)}
             >
               <ChevronUp className="size-3.5" strokeWidth={1.5} />
@@ -70,7 +70,7 @@ export function ServicesLedgerList({
               size="icon"
               className="size-6 rounded-md"
               disabled={index === services.length - 1}
-              aria-label={`Move ${service.name} down`}
+              aria-label={`${service.name} nach unten`}
               onClick={() => onMove(index, 1)}
             >
               <ChevronDown className="size-3.5" strokeWidth={1.5} />
@@ -92,7 +92,7 @@ export function ServicesLedgerList({
             <button
               type="button"
               className="inline-flex size-8 items-center justify-center rounded-md border border-border/70 text-[var(--text-2)] hover:border-[color-mix(in_oklch,var(--brass)_30%,var(--ink-3))] hover:text-[var(--text-0)]"
-              aria-label={`Edit ${service.name}`}
+              aria-label={`${service.name} bearbeiten`}
               onClick={() => onEdit(service)}
             >
               <Pencil className="size-3.5" strokeWidth={1.5} />
@@ -102,7 +102,7 @@ export function ServicesLedgerList({
               className="rounded-md px-[var(--space-2)] py-[var(--space-1)] text-xs text-[var(--text-2)] hover:text-[var(--signal-bad)]"
               onClick={() => onArchive(service)}
             >
-              Archive
+              Archivieren
             </button>
           </div>
         </MotionLi>

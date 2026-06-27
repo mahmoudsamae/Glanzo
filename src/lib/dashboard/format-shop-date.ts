@@ -4,7 +4,7 @@ export function formatShopTodayParts(timezone: string, now: Date = new Date()): 
   day: string;
   month: string;
 } {
-  const formatter = new Intl.DateTimeFormat("en-GB", {
+  const formatter = new Intl.DateTimeFormat("de-DE", {
     weekday: "long",
     day: "numeric",
     month: "long",

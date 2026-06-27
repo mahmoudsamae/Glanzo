@@ -42,7 +42,7 @@ export function CustomersList({ customers, onSearch, serverSearch }: CustomersLi
   return (
     <div className="flex flex-col gap-[var(--space-4)]">
       <DashboardSearch
-        placeholder="Search name or phone"
+        placeholder="Name oder Telefon suchen"
         value={localQuery}
         onChange={(event) => {
           setLocalQuery(event.target.value);
@@ -57,7 +57,7 @@ export function CustomersList({ customers, onSearch, serverSearch }: CustomersLi
         }}
       />
       {visible.length === 0 ? (
-        <EmptyState title="Your regulars will appear here after their first booking." />
+        <EmptyState title="Deine Stammkunden erscheinen hier nach der ersten Buchung." />
       ) : (
         <DashboardRowList layout="grid">
           {visible.map((customer) => (
@@ -69,11 +69,11 @@ export function CustomersList({ customers, onSearch, serverSearch }: CustomersLi
               subtitle={customer.phone}
               badges={
                 <>
-                  <DashboardBadge tone="brass">{customer.visitsCount} visits</DashboardBadge>
+                  <DashboardBadge tone="brass">{customer.visitsCount} Besuche</DashboardBadge>
                   <DashboardBadge>
-                    Last:{" "}
+                    Zuletzt:{" "}
                     {customer.lastVisitAt
-                      ? new Date(customer.lastVisitAt).toLocaleDateString("en-GB")
+                      ? new Date(customer.lastVisitAt).toLocaleDateString("de-DE")
                       : "—"}
                   </DashboardBadge>
                 </>

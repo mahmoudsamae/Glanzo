@@ -124,7 +124,7 @@ export function WalkInSheet({
   function handleCreate() {
     const membershipId = resolveMembershipId();
     if (!serviceId || !membershipId || !startsAt) {
-      setError("Pick a service, barber, and time.");
+      setError("Leistung, Barber und Uhrzeit wählen.");
       return;
     }
 
@@ -145,7 +145,7 @@ export function WalkInSheet({
 
       const result = await onCreate(payload);
       if (!result.ok) {
-        setError(result.code ?? "Could not create walk-in.");
+        setError(result.code ?? "Laufkundschaft konnte nicht angelegt werden.");
         return;
       }
       onOpenChange(false);
@@ -161,19 +161,19 @@ export function WalkInSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="gap-[var(--space-4)]">
         <SheetHeader>
-          <SheetTitle>Add walk-in</SheetTitle>
+          <SheetTitle>Laufkundschaft</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col gap-[var(--space-3)]">
           <div>
-            <Label htmlFor="walk-in-service">Service</Label>
+            <Label htmlFor="walk-in-service">Leistung</Label>
             <select
               id="walk-in-service"
               className="mt-[var(--space-1)] w-full rounded-sm border border-border bg-transparent px-[var(--space-3)] py-[var(--space-2)]"
               value={serviceId}
               onChange={(event) => setServiceId(event.target.value)}
             >
-              <option value="">Select service</option>
+              <option value="">Leistung wählen</option>
               {activeServices.map((service) => (
                 <option key={service.id} value={service.id}>
                   {service.name}
@@ -191,7 +191,7 @@ export function WalkInSheet({
                 value={barberChoice}
                 onChange={(event) => setBarberChoice(event.target.value)}
               >
-                <option value="first">First available</option>
+                <option value="first">Erster freier</option>
                 {barbers.map((barber) => (
                   <option key={barber.membershipId} value={barber.membershipId}>
                     {barber.displayName}
@@ -201,13 +201,13 @@ export function WalkInSheet({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Barber: {barbers.find((b) => b.membershipId === lockedBarberId)?.displayName ?? "You"}
+              Barber: {barbers.find((b) => b.membershipId === lockedBarberId)?.displayName ?? "Du"}
             </p>
           )}
 
           <div className="flex flex-wrap gap-[var(--space-2)]">
             <Button type="button" variant="outline" size="sm" onClick={pickNow}>
-              Now
+              Jetzt
             </Button>
             {slots.slice(0, 8).map((slot) => (
               <Button
@@ -233,7 +233,7 @@ export function WalkInSheet({
               <Input id="walk-in-name" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div>
-              <Label htmlFor="walk-in-phone">Phone (optional)</Label>
+              <Label htmlFor="walk-in-phone">Telefon (optional)</Label>
               <Input id="walk-in-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
           </div>
@@ -241,7 +241,7 @@ export function WalkInSheet({
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
           <Button type="button" disabled={isPending} onClick={handleCreate}>
-            Create walk-in
+            Laufkundschaft anlegen
           </Button>
         </div>
       </SheetContent>

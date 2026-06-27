@@ -79,7 +79,7 @@ export function AppointmentBlocks({
               {appointment.serviceName}
             </p>
             <p className="truncate text-xs text-muted-foreground">
-              {appointment.customerName ?? "Walk-in"}
+              {appointment.customerName ?? "Laufkundschaft"}
             </p>
             <StatusDot
               label={appointmentStatusLabel(appointment.status)}

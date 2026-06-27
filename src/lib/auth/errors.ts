@@ -13,22 +13,22 @@ export type AuthErrorCode =
   | "UNKNOWN";
 
 const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
-  INVALID_CREDENTIALS: "That email or password isn't right.",
+  INVALID_CREDENTIALS: "E-Mail oder Passwort ist falsch.",
   EMAIL_NOT_CONFIRMED:
-    "Confirm your email first — check your inbox, or ask your admin to disable email confirmation in Supabase.",
-  EMAIL_TAKEN: "That email is already registered. Try signing in instead.",
-  WEAK_PASSWORD: "Choose a password with at least 8 characters.",
-  RATE_LIMITED: "Too many tries. Give it a minute.",
-  OAUTH_FAILED: "Google sign-in didn't work. Try email instead.",
-  RESET_FAILED: "We couldn't send that reset link. Check the email and try again.",
-  UPDATE_PASSWORD_FAILED: "That link may have expired. Request a new reset.",
+    "Bitte bestätige zuerst deine E-Mail — prüfe dein Postfach oder deaktiviere die Bestätigung in Supabase.",
+  EMAIL_TAKEN: "Diese E-Mail ist bereits registriert. Melde dich stattdessen an.",
+  WEAK_PASSWORD: "Wähle ein Passwort mit mindestens 8 Zeichen.",
+  RATE_LIMITED: "Zu viele Versuche. Bitte kurz warten.",
+  OAUTH_FAILED: "Google-Anmeldung hat nicht funktioniert. Versuche es per E-Mail.",
+  RESET_FAILED: "Reset-Link konnte nicht gesendet werden. E-Mail prüfen und erneut versuchen.",
+  UPDATE_PASSWORD_FAILED: "Der Link ist möglicherweise abgelaufen. Fordere einen neuen Reset an.",
   NOT_PLATFORM_ADMIN:
     "Dieses Konto hat keinen Plattform-Zugang. Bitte in Supabase platform_admins eintragen.",
   SESSION_NOT_ESTABLISHED:
-    "Sign-in did not complete. Refresh the page and try again, or complete shop setup after registering.",
+    "Anmeldung nicht abgeschlossen. Seite neu laden oder nach der Registrierung den Salon einrichten.",
   PROFILE_SETUP_FAILED:
-    "Your account exists but profile setup failed. Try again or contact support.",
-  UNKNOWN: "Something went wrong. Try again.",
+    "Dein Konto existiert, aber das Profil konnte nicht angelegt werden. Erneut versuchen oder Support kontaktieren.",
+  UNKNOWN: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
 };
 
 export function authErrorMessage(code: AuthErrorCode): string {

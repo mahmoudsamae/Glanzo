@@ -74,7 +74,7 @@ describe("formatTodaySubline", () => {
       noShowCount: 1,
       appointments: [],
     });
-    expect(line).toBe("2 appointments · 1 no-show");
+    expect(line).toBe("2 Termine · 1 No-Show");
   });
 });
 

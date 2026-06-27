@@ -1,10 +1,10 @@
 type AppointmentStatus = "booked" | "completed" | "no_show" | "cancelled";
 
 const STATUS_LABELS: Record<AppointmentStatus, string> = {
-  booked: "Booked",
-  completed: "Completed",
-  no_show: "No-show",
-  cancelled: "Cancelled",
+  booked: "Gebucht",
+  completed: "Abgeschlossen",
+  no_show: "Nicht erschienen",
+  cancelled: "Storniert",
 };
 
 export function appointmentStatusLabel(status: AppointmentStatus): string {

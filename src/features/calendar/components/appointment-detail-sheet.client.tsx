@@ -6,7 +6,8 @@ import { ConfirmSheet } from "@/components/shared/confirm-sheet";
 import { StatusDot } from "@/components/shared/status-dot";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { formatAppointmentDateTime } from "@/lib/booking/format-appointment";
+import { appointmentStatusLabel } from "@/lib/appointments/status-label";
+import { canViewShopRevenue } from "@/lib/dashboard/nav-config";
 import type { AppointmentListItem, BarberColumn } from "@/server/modules/appointments/appointments.types";
 
 import { RescheduleSlotPicker } from "./reschedule-slot-picker.client";
@@ -34,6 +35,25 @@ type AppointmentDetailSheetProps = {
   }) => void;
   movePending?: boolean;
 };
+
+function formatAppointmentDateTimeDe(iso: string, timezone: string): string {
+  return new Intl.DateTimeFormat("de-DE", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: timezone,
+  }).format(new Date(iso));
+}
+
+function appointmentSourceLabel(source: AppointmentListItem["source"]): string {
+  if (source === "walk_in") {
+    return "Laufkundschaft";
+  }
+  return "Online";
+}
 
 export function AppointmentDetailSheet({
   appointment,
@@ -94,14 +114,19 @@ export function AppointmentDetailSheet({
       <Sheet open onOpenChange={(open) => !open && onClose()}>
         <SheetContent side="bottom" className="gap-[var(--space-4)]">
           <SheetHeader>
-            <SheetTitle>{active.customerName ?? "Walk-in"}</SheetTitle>
+            <SheetTitle>{active.customerName ?? "Laufkundschaft"}</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-[var(--space-3)] text-base">
             <p>{active.serviceName}</p>
-            <p className="text-data">{formatAppointmentDateTime(active.startsAt, timezone)}</p>
-            <p className="text-data">€{(active.priceCents / 100).toFixed(2)}</p>
-            <StatusDot label={active.status} tone={active.source === "walk_in" ? "barber" : "owner"} />
-            <p className="text-sm capitalize text-muted-foreground">{active.source.replace("_", " ")}</p>
+            <p className="text-data">{formatAppointmentDateTimeDe(active.startsAt, timezone)}</p>
+            {canViewShopRevenue(role) ? (
+              <p className="text-data">€{(active.priceCents / 100).toFixed(2)}</p>
+            ) : null}
+            <StatusDot
+              label={appointmentStatusLabel(active.status)}
+              tone={active.source === "walk_in" ? "barber" : "owner"}
+            />
+            <p className="text-sm text-muted-foreground">{appointmentSourceLabel(active.source)}</p>
           </div>
           {active.status === "booked" ? (
             <div className="flex flex-col gap-[var(--space-2)]">
@@ -112,7 +137,7 @@ export function AppointmentDetailSheet({
                   disabled={movePending || isPending}
                   onClick={() => setRescheduleOpen(true)}
                 >
-                  Reschedule
+                  Verschieben
                 </Button>
               ) : null}
               <Button
@@ -120,7 +145,7 @@ export function AppointmentDetailSheet({
                 disabled={!canComplete || isPending}
                 onClick={() => runStatus("completed")}
               >
-                Mark completed
+                Als abgeschlossen markieren
               </Button>
               <Button
                 type="button"
@@ -128,7 +153,7 @@ export function AppointmentDetailSheet({
                 disabled={!canNoShow || isPending}
                 onClick={() => runStatus("no_show")}
               >
-                Mark no-show
+                Als nicht erschienen markieren
               </Button>
               <Button
                 type="button"
@@ -136,7 +161,7 @@ export function AppointmentDetailSheet({
                 disabled={isPending}
                 onClick={() => setCancelOpen(true)}
               >
-                Cancel
+                Stornieren
               </Button>
             </div>
           ) : null}
@@ -158,9 +183,9 @@ export function AppointmentDetailSheet({
       <ConfirmSheet
         open={cancelOpen}
         onOpenChange={setCancelOpen}
-        title="Cancel appointment?"
-        description="The customer will need a new booking. Snapshot data is kept on the ledger."
-        confirmLabel="Cancel appointment"
+        title="Termin stornieren?"
+        description="Der Kunde muss neu buchen. Snapshot-Daten bleiben im Ledger erhalten."
+        confirmLabel="Termin stornieren"
         pending={isPending}
         onConfirm={() => runStatus("cancelled")}
       />

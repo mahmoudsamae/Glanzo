@@ -21,7 +21,8 @@ async function loadProfileWithMemberships(
             id,
             name,
             slug,
-            timezone
+            timezone,
+            dashboard_nav_keys
           )
         )
       `,
@@ -94,6 +95,7 @@ export async function getActor(): Promise<Actor | null> {
         shopName: shop.name,
         shopSlug: shop.slug,
         shopTimezone: shop.timezone,
+        dashboardNavKeys: shop.dashboard_nav_keys ?? null,
         createdAt: membership.created_at,
       };
     })

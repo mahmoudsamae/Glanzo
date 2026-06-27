@@ -10,9 +10,9 @@ export default function DashboardError({
 }) {
   return (
     <EmptyState
-      title="Something went wrong"
-      description="This view could not load."
-      actionLabel="Try again"
+      title="Etwas ist schiefgelaufen"
+      description="Diese Ansicht konnte nicht geladen werden."
+      actionLabel="Erneut versuchen"
       onAction={reset}
     />
   );

@@ -21,7 +21,7 @@ export function ToastBanner({ message, onDismiss }: ToastBannerProps) {
           type="button"
           className="shrink-0 text-muted-foreground"
           onClick={onDismiss}
-          aria-label="Dismiss"
+          aria-label="Schließen"
         >
           ×
         </button>

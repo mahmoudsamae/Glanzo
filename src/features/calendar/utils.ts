@@ -1,7 +1,7 @@
 export { appointmentStatusLabel } from "@/lib/appointments/status-label";
 
 export function formatGridTime(instantMs: number, timezone: string): string {
-  return new Intl.DateTimeFormat("en-GB", {
+  return new Intl.DateTimeFormat("de-DE", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,

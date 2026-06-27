@@ -11,8 +11,8 @@ export default async function OnboardingPage() {
 
   return (
     <AuthShell
-      title="Set up your shop"
-      subtitle="Three quick steps — no draft saves; refresh starts clean."
+      title="Salon einrichten"
+      subtitle="Drei kurze Schritte — ohne Entwurf; bei Reload startest du neu."
     >
       <OnboardingWizard
         checkSlugAction={checkShopSlugAvailability}

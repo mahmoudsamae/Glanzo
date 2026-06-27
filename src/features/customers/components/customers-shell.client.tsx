@@ -55,7 +55,7 @@ export function CustomersShell({
   if (isError) {
     return (
       <DashboardPage width="md">
-        <EmptyState title="Customers unavailable" actionLabel="Try again" onAction={onRefetch} />
+        <EmptyState title="Kunden nicht verfügbar" actionLabel="Erneut versuchen" onAction={onRefetch} />
       </DashboardPage>
     );
   }
@@ -63,26 +63,26 @@ export function CustomersShell({
   return (
     <DashboardPage width="lg">
       <DashboardPageHeader
-        kicker="Client ledger"
-        title="Customers"
-        subtitle="Regulars, walk-ins, and contact details — tap a card for the full profile."
+        kicker="Kundenkartei"
+        title="Kunden"
+        subtitle="Stammkunden, Laufkundschaft und Kontaktdaten — tippe auf eine Karte für das vollständige Profil."
         action={
           role === "owner" ? (
             <DashboardPrimaryButton type="button" size="sm" onClick={() => setAddOpen(true)}>
-              Add customer
+              Kunde hinzufügen
             </DashboardPrimaryButton>
           ) : null
         }
       />
 
-      <DashboardPanel title="Directory" description={`${customers.length} on file`} padding="md">
+      <DashboardPanel title="Verzeichnis" description={`${customers.length} im System`} padding="md">
         <CustomersList customers={customers} onSearch={onSearch} serverSearch={serverSearch} />
       </DashboardPanel>
 
       <Sheet open={addOpen} onOpenChange={setAddOpen}>
         <SheetContent side="bottom" className="salon-dash-panel border-t-0">
           <SheetHeader>
-            <SheetTitle>Add customer</SheetTitle>
+            <SheetTitle>Kunde hinzufügen</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-[var(--space-3)]">
             <div>
@@ -90,11 +90,11 @@ export function CustomersShell({
               <Input id="customer-name" className="salon-dash-search mt-[var(--space-2)]" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div>
-              <Label htmlFor="customer-phone">Phone</Label>
+              <Label htmlFor="customer-phone">Telefon</Label>
               <Input id="customer-phone" className="salon-dash-search mt-[var(--space-2)]" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div>
-              <Label htmlFor="customer-email">Email (optional)</Label>
+              <Label htmlFor="customer-email">E-Mail (optional)</Label>
               <Input id="customer-email" className="salon-dash-search mt-[var(--space-2)]" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
             <DashboardPrimaryButton
@@ -113,7 +113,7 @@ export function CustomersShell({
                 }
               }}
             >
-              Save
+              Speichern
             </DashboardPrimaryButton>
           </div>
         </SheetContent>

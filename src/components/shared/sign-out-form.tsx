@@ -7,7 +7,7 @@ type SignOutFormProps = {
 export function SignOutForm({
   signOutAction,
   className,
-  label = "Sign out",
+  label = "Abmelden",
 }: SignOutFormProps) {
   return (
     <form action={signOutAction} className={className}>

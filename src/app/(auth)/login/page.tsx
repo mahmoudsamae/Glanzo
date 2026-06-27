@@ -15,11 +15,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to your shop dashboard."
+      title="Willkommen zurück"
+      subtitle="Melde dich in deinem Salon-Dashboard an."
       footer={
         <>
-          New here? <AuthLink href="/register">Create an account</AuthLink>
+          Neu hier? <AuthLink href="/register">Konto erstellen</AuthLink>
         </>
       }
     >

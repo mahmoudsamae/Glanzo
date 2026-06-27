@@ -100,12 +100,12 @@ export function RescheduleSlotPicker({
     >
       <SheetContent side="bottom" className="gap-[var(--space-4)]">
         <SheetHeader>
-          <SheetTitle>Reschedule</SheetTitle>
+          <SheetTitle>Verschieben</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col gap-[var(--space-3)]">
           <div>
-            <Label htmlFor="reschedule-date">Date</Label>
+            <Label htmlFor="reschedule-date">Datum</Label>
             <Input
               id="reschedule-date"
               type="date"
@@ -115,7 +115,7 @@ export function RescheduleSlotPicker({
           </div>
 
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading slots…</p>
+            <p className="text-sm text-muted-foreground">Termine werden geladen…</p>
           ) : null}
 
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
@@ -143,7 +143,7 @@ export function RescheduleSlotPicker({
           </div>
 
           {!isLoading && visibleSlots.length === 0 && !error ? (
-            <p className="text-sm text-muted-foreground">No open slots this day.</p>
+            <p className="text-sm text-muted-foreground">Keine freien Termine an diesem Tag.</p>
           ) : null}
 
           <Button
@@ -159,7 +159,7 @@ export function RescheduleSlotPicker({
               });
             }}
           >
-            Confirm new time
+            Neue Uhrzeit bestätigen
           </Button>
         </div>
       </SheetContent>

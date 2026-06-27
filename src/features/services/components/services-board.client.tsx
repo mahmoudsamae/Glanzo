@@ -132,17 +132,17 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
 
   function submitForm() {
     if (!form.name.trim()) {
-      setError("Enter a service name.");
+      setError("Bitte einen Leistungsnamen eingeben.");
       return;
     }
 
     const priceCents = form.showPrice ? eurInputToCents(form.priceInput) : 0;
     if (form.showPrice && priceCents === null) {
-      setError("Enter a valid price or hide price and add a description.");
+      setError("Bitte einen gültigen Preis eingeben oder Preis ausblenden und Beschreibung hinzufügen.");
       return;
     }
     if (!form.showPrice && !form.description.trim()) {
-      setError("Add a short description when hiding the price.");
+      setError("Bitte eine kurze Beschreibung angeben, wenn der Preis ausgeblendet wird.");
       return;
     }
 
@@ -162,7 +162,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
         : await createServiceAction(payload);
 
       if (!result.ok) {
-        setError("Could not save service.");
+        setError("Leistung konnte nicht gespeichert werden.");
         return;
       }
 
@@ -176,7 +176,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
     startTransition(async () => {
       const result = await archiveServiceAction(archiveTarget.id);
       if (!result.ok) {
-        setError("Could not archive service.");
+        setError("Leistung konnte nicht archiviert werden.");
         return;
       }
       setArchiveTarget(null);
@@ -203,12 +203,12 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
     return (
       <DashboardPage width="md">
         <DashboardPageHeader
-          kicker="Price board"
-          title="What do you charge?"
-          subtitle="Add your cuts and prices — clients see these on your mini-site later."
+          kicker="Preisliste"
+          title="Was kostet was?"
+          subtitle="Leistungen und Preise hinzufügen — Kunden sehen diese später auf deiner Website."
           action={
             <DashboardPrimaryButton type="button" onClick={openCreate}>
-              Add your first service
+              Erste Leistung hinzufügen
             </DashboardPrimaryButton>
           }
         />
@@ -224,7 +224,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
           uploadingImage={uploadingImage}
           onImageUpload={handleImageUpload}
           onSubmit={submitForm}
-          title="New service"
+          title="Neue Leistung"
         />
       </DashboardPage>
     );
@@ -233,17 +233,17 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
   return (
     <DashboardPage width="lg">
       <DashboardPageHeader
-        kicker="Price board"
-        title="Services"
-        subtitle="Drag order, edit prices, and assign barbers — synced to booking."
+        kicker="Preisliste"
+        title="Leistungen"
+        subtitle="Reihenfolge, Preise und Barber zuweisen — synchron mit der Buchung."
         action={
           <DashboardPrimaryButton type="button" size="sm" onClick={openCreate}>
-            Add service
+            Leistung hinzufügen
           </DashboardPrimaryButton>
         }
       />
 
-      <DashboardPanel title="Menu" description={`${visible.length} active on your mini-site`}>
+      <DashboardPanel title="Menü" description={`${visible.length} aktiv auf deiner Website`}>
         <ServicesLedgerList
         services={visible}
         barbers={barbers}
@@ -258,7 +258,7 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
         className="mt-[var(--space-4)] text-sm text-[var(--brass)] underline-offset-4 hover:underline"
         onClick={() => setShowArchived((v) => !v)}
       >
-        {showArchived ? "Hide archived" : "Show archived"}
+        {showArchived ? "Archivierte ausblenden" : "Archivierte anzeigen"}
       </button>
 
       {error ? <p className="mt-[var(--space-4)] text-sm text-destructive">{error}</p> : null}
@@ -275,19 +275,19 @@ export function ServicesBoard({ shopId, initialServices, barbers }: ServicesBoar
         uploadingImage={uploadingImage}
         onImageUpload={handleImageUpload}
         onSubmit={submitForm}
-        title={form.id ? "Edit service" : "New service"}
+        title={form.id ? "Leistung bearbeiten" : "Neue Leistung"}
       />
 
       <ConfirmSheet
         open={archiveTarget !== null}
         onOpenChange={(open) => !open && setArchiveTarget(null)}
-        title="Archive service?"
+        title="Leistung archivieren?"
         description={
           archiveTarget
-            ? `"${archiveTarget.name}" will be hidden from booking. You can still view it under archived.`
+            ? `"${archiveTarget.name}" wird aus der Buchung ausgeblendet. Unter Archivierte ist sie weiterhin sichtbar.`
             : null
         }
-        confirmLabel="Archive"
+        confirmLabel="Archivieren"
         pending={isPending}
         onConfirm={confirmArchive}
       />
@@ -339,8 +339,8 @@ function ServiceFormSheet({
           </div>
 
           <div className="space-y-[var(--space-2)]">
-            <Label>Service image</Label>
-            <p className="text-xs text-[var(--text-2)]">Shown on your public minisite.</p>
+            <Label>Leistungsbild</Label>
+            <p className="text-xs text-[var(--text-2)]">Wird auf deiner öffentlichen Website angezeigt.</p>
             {form.imagePath ? (
               <div className="flex items-center gap-[var(--space-3)]">
                 <span className="relative block size-16 overflow-hidden rounded-md border border-border">
@@ -357,12 +357,12 @@ function ServiceFormSheet({
                   className="text-sm text-[var(--text-2)] underline-offset-4 hover:underline"
                   onClick={() => setForm({ ...form, imagePath: null })}
                 >
-                  Remove
+                  Entfernen
                 </button>
               </div>
             ) : null}
             <label className="inline-flex cursor-pointer text-sm font-medium text-[var(--brass)] underline-offset-4 hover:underline">
-              {uploadingImage ? "Uploading…" : "+ Upload image"}
+              {uploadingImage ? "Wird hochgeladen…" : "+ Bild hochladen"}
               <input
                 type="file"
                 accept="image/*"
@@ -377,20 +377,20 @@ function ServiceFormSheet({
           </div>
 
           <div className="space-y-[var(--space-2)]">
-            <Label htmlFor="service-description">Short description</Label>
+            <Label htmlFor="service-description">Kurzbeschreibung</Label>
             <textarea
               id="service-description"
               rows={3}
               maxLength={240}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="e.g. Includes wash, cut and styling"
+              placeholder="z. B. Waschen, Schneiden und Styling inklusive"
               className="flex min-h-[5rem] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
             />
           </div>
 
           <div className="space-y-[var(--space-2)]">
-            <Label>Duration (minutes)</Label>
+            <Label>Dauer (Minuten)</Label>
             <div className="flex items-center gap-[var(--space-2)]">
               <Button
                 type="button"
@@ -424,16 +424,16 @@ function ServiceFormSheet({
               onChange={(e) => setForm({ ...form, showPrice: e.target.checked })}
             />
             <span>
-              <span className="block text-sm font-medium">Show price on website</span>
+              <span className="block text-sm font-medium">Preis auf Website anzeigen</span>
               <span className="mt-0.5 block text-xs text-[var(--text-2)]">
-                Turn off to show only the description on your minisite.
+                Deaktivieren, um nur die Beschreibung auf deiner Website anzuzeigen.
               </span>
             </span>
           </label>
 
           {form.showPrice ? (
             <div className="space-y-[var(--space-2)]">
-              <Label htmlFor="service-price">Price (EUR)</Label>
+              <Label htmlFor="service-price">Preis (EUR)</Label>
               <Input
                 id="service-price"
                 inputMode="decimal"
@@ -444,7 +444,7 @@ function ServiceFormSheet({
           ) : null}
           {barbers.length > 0 ? (
             <fieldset className="space-y-[var(--space-2)]">
-              <legend className="text-sm font-medium">Barbers</legend>
+              <legend className="text-sm font-medium">Barber</legend>
               {barbers.map((barber) => (
                 <label key={barber.membershipId} className="flex items-center gap-[var(--space-2)] text-sm">
                   <input
@@ -464,7 +464,7 @@ function ServiceFormSheet({
           ) : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Button type="button" className="w-full" disabled={pending} onClick={onSubmit}>
-            Save service
+            Leistung speichern
           </Button>
         </div>
       </SheetContent>

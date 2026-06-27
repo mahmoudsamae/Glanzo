@@ -1,4 +1,5 @@
 import { getActiveMembership } from "@/lib/dashboard/active-shop";
+import { normalizeDashboardNavKeys } from "@/lib/dashboard/nav-config";
 import { getActor } from "@/server/modules/auth/get-actor";
 import { signOut } from "@/server/modules/auth/actions";
 import { requireDashboardAccess } from "@/server/modules/shops/create-shop.service";
@@ -15,14 +16,16 @@ export default async function DashboardLayout({
 
   const actor = await getActor();
   const activeMembership = getActiveMembership(actor?.memberships ?? []);
+  const allowedNavKeys = normalizeDashboardNavKeys(activeMembership?.dashboardNavKeys);
 
   return (
     <DashboardQueryProvider>
       <AppShell
-        shopName={activeMembership?.shopName ?? "Your shop"}
+        shopName={activeMembership?.shopName ?? "Dein Salon"}
         shopSlug={activeMembership?.shopSlug ?? ""}
         role={activeMembership?.role ?? "owner"}
-        displayName={actor?.profile.display_name.trim() || "Staff"}
+        allowedNavKeys={allowedNavKeys}
+        displayName={actor?.profile.display_name.trim() || "Teammitglied"}
         isPlatformAdmin={actor?.isPlatformAdmin ?? false}
         signOutAction={signOut}
       >

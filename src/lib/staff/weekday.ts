@@ -12,13 +12,13 @@ export const STAFF_WEEKDAY_ORDER = [
 export type StaffWeekdayKey = (typeof STAFF_WEEKDAY_ORDER)[number];
 
 export const STAFF_WEEKDAY_LABELS: Record<StaffWeekdayKey, string> = {
-  mon: "Monday",
-  tue: "Tuesday",
-  wed: "Wednesday",
-  thu: "Thursday",
-  fri: "Friday",
-  sat: "Saturday",
-  sun: "Sunday",
+  mon: "Montag",
+  tue: "Dienstag",
+  wed: "Mittwoch",
+  thu: "Donnerstag",
+  fri: "Freitag",
+  sat: "Samstag",
+  sun: "Sonntag",
 };
 
 export function staffWeekdayKeyToIndex(key: StaffWeekdayKey): number {

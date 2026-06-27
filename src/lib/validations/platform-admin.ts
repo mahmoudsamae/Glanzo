@@ -97,6 +97,7 @@ export const platformShopDetailSchema = z
     minisite_accent_hex: z.string(),
     minisite_managed: z.boolean().default(false),
     allowed_minisite_templates: z.array(minisiteTemplateSchema).default([]),
+    dashboard_nav_keys: z.array(z.string()).default([]),
     outbox_by_template: z.record(z.record(z.number())).optional(),
     audit_trail: z.array(z.record(z.unknown())).default([]),
   })

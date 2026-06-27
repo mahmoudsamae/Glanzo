@@ -21,12 +21,12 @@ import {
 } from "@/lib/validations/shop";
 
 const shopStepSchema = z.object({
-  name: z.string().trim().min(2, "Shop name is too short").max(80),
+  name: z.string().trim().min(2, "Salonname ist zu kurz").max(80),
   slug: shopSlugSchema,
 });
 
 const timezoneStepSchema = z.object({
-  timezone: z.string().min(1, "Choose a timezone"),
+  timezone: z.string().min(1, "Bitte Zeitzone wählen"),
 });
 
 const wizardSchema = z.object({
@@ -39,15 +39,15 @@ const wizardSchema = z.object({
 type WizardValues = z.infer<typeof wizardSchema>;
 
 const CREATE_SHOP_ERRORS: Record<CreateShopErrorCode, string> = {
-  NOT_AUTHENTICATED: "Sign in again to continue.",
-  VALIDATION: "Check your details and try again.",
-  SLUG_INVALID: "That slug isn't valid.",
-  SLUG_RESERVED: "That slug is reserved.",
-  SLUG_TAKEN: "Someone just took that slug — pick another.",
-  SLUG_OWNED: "You already own a shop with that slug.",
-  TIMEZONE_INVALID: "Choose a valid timezone.",
-  INVALID_NAME: "Shop name is required.",
-  UNKNOWN: "Something went wrong. Try again.",
+  NOT_AUTHENTICATED: "Bitte erneut anmelden.",
+  VALIDATION: "Bitte Angaben prüfen und erneut versuchen.",
+  SLUG_INVALID: "Dieser Slug ist ungültig.",
+  SLUG_RESERVED: "Dieser Slug ist reserviert.",
+  SLUG_TAKEN: "Dieser Slug ist vergeben — wähle einen anderen.",
+  SLUG_OWNED: "Du besitzt bereits einen Salon mit diesem Slug.",
+  TIMEZONE_INVALID: "Bitte eine gültige Zeitzone wählen.",
+  INVALID_NAME: "Salonname ist erforderlich.",
+  UNKNOWN: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
 };
 
 const TIMEZONE_OPTIONS =
@@ -167,30 +167,30 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-[var(--space-6)]">
-      <p className="text-center text-sm text-muted-foreground">Step {step + 1} of 3</p>
+      <p className="text-center text-sm text-muted-foreground">Schritt {step + 1} von 3</p>
 
       {step === 0 ? (
         <div className="space-y-[var(--space-4)]">
           <div className="space-y-[var(--space-2)]">
-            <Label htmlFor="name">Shop name</Label>
+            <Label htmlFor="name">Salonname</Label>
             <Input id="name" {...form.register("name")} />
           </div>
           <div className="space-y-[var(--space-2)]">
-            <Label htmlFor="slug">URL slug</Label>
+            <Label htmlFor="slug">URL-Slug</Label>
             <Input id="slug" {...form.register("slug")} />
             <p className="text-sm text-muted-foreground">{previewHost}</p>
             {slugStatus === "checking" ? (
-              <p className="text-sm text-muted-foreground">Checking availability…</p>
+              <p className="text-sm text-muted-foreground">Verfügbarkeit wird geprüft…</p>
             ) : null}
             {slugStatus === "available" ? (
-              <p className="text-sm text-[var(--signal-ok)]">Available</p>
+              <p className="text-sm text-[var(--signal-ok)]">Verfügbar</p>
             ) : null}
             {slugStatus === "taken" ? (
-              <p className="text-sm text-destructive">That slug is taken.</p>
+              <p className="text-sm text-destructive">Dieser Slug ist vergeben.</p>
             ) : null}
           </div>
           <Button type="button" className="w-full" onClick={() => goNext(0)}>
-            Continue
+            Weiter
           </Button>
         </div>
       ) : null}
@@ -198,7 +198,7 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
       {step === 1 ? (
         <div className="space-y-[var(--space-4)]">
           <div className="space-y-[var(--space-2)]">
-            <Label htmlFor="timezone">Timezone</Label>
+            <Label htmlFor="timezone">Zeitzone</Label>
             <Input id="timezone" list="timezone-options" {...form.register("timezone")} />
             <datalist id="timezone-options">
               {TIMEZONE_OPTIONS.map((tz) => (
@@ -206,13 +206,13 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
               ))}
             </datalist>
           </div>
-          <p className="text-sm text-muted-foreground">Currency: EUR (MVP)</p>
+          <p className="text-sm text-muted-foreground">Währung: EUR (MVP)</p>
           <div className="flex gap-[var(--space-2)]">
             <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(0)}>
-              Back
+              Zurück
             </Button>
             <Button type="button" className="flex-1" onClick={() => goNext(1)}>
-              Continue
+              Weiter
             </Button>
           </div>
         </div>
@@ -229,10 +229,10 @@ export function OnboardingWizard({ checkSlugAction, createShopAction }: Onboardi
 
           <div className="flex gap-[var(--space-2)]">
             <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(1)}>
-              Back
+              Zurück
             </Button>
             <div className="flex-1">
-              <SubmitButton pending={isPending}>Open my shop</SubmitButton>
+              <SubmitButton pending={isPending}>Salon eröffnen</SubmitButton>
             </div>
           </div>
         </div>

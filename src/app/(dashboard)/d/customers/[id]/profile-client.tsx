@@ -49,8 +49,8 @@ export function ProfileClient({ shopId, customerId, role }: ProfileClientProps) 
   if (isError || !data) {
     return (
       <EmptyState
-        title="Customer not found"
-        actionLabel="Back to list"
+        title="Kunde nicht gefunden"
+        actionLabel="Zurück zur Liste"
         onAction={() => router.push("/d/customers")}
       />
     );

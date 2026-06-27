@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { formatShopMinisiteHost } from "@/lib/dashboard/minisite-url";
+import type { DashboardNavKey } from "@/lib/dashboard/nav-config";
 import { cn } from "@/lib/utils";
 
 import { NAV_ICONS, NAV_ICON_CLASS } from "./nav-icons";
@@ -30,6 +31,7 @@ export type BottomTabsChromeProps = {
   minisiteUrl: string;
   displayName: string;
   role: NavRole;
+  allowedNavKeys: DashboardNavKey[] | null;
   isPlatformAdmin?: boolean;
   signOutAction: () => Promise<void>;
 };
@@ -61,7 +63,7 @@ function MobileNavSlot({
   if (item.isSheetTrigger) {
     return (
       <SheetTrigger asChild>
-        <button type="button" className={slotClass} aria-label="More options">
+        <button type="button" className={slotClass} aria-label="Weitere Optionen">
           {label}
         </button>
       </SheetTrigger>
@@ -73,7 +75,7 @@ function MobileNavSlot({
       <span
         role="link"
         aria-disabled="true"
-        aria-label={`${item.label} (coming soon)`}
+        aria-label={`${item.label} (demnächst)`}
         tabIndex={0}
         className={slotClass}
         onClick={(event) => event.preventDefault()}
@@ -102,13 +104,14 @@ export function BottomTabsChrome({
   minisiteUrl,
   displayName,
   role,
+  allowedNavKeys,
   isPlatformAdmin = false,
   signOutAction,
 }: BottomTabsChromeProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const items = navItemsForSurface("mobile", role);
-  const moreLinks = moreSheetNavItems(role);
+  const items = navItemsForSurface("mobile", role, allowedNavKeys);
+  const moreLinks = moreSheetNavItems(role, allowedNavKeys);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -144,7 +147,7 @@ export function BottomTabsChrome({
             onClick={() => setOpen(false)}
             className="flex min-h-11 items-center rounded-md px-[var(--space-3)] text-base text-[var(--text-1)] hover:bg-[var(--ink-2)]"
           >
-            Platform Admin
+            Plattform-Admin
           </Link>
         ) : null}
 

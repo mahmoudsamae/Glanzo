@@ -124,7 +124,7 @@ export function CalendarDayGrid({
   if (!window) {
     return (
       <p className="py-[var(--space-8)] text-center text-muted-foreground">
-        Shop closed this day.
+        Shop an diesem Tag geschlossen.
       </p>
     );
   }

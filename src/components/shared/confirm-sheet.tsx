@@ -42,7 +42,7 @@ export function ConfirmSheet({
             disabled={pending}
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            Abbrechen
           </Button>
           <Button type="button" className="flex-1" disabled={pending} onClick={onConfirm}>
             {confirmLabel}

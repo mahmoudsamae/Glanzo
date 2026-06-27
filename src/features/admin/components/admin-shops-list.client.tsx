@@ -76,7 +76,7 @@ export function AdminShopsList({
     <AdminFadeIn className="flex flex-col gap-[var(--space-8)]">
       <AdminPageHero
         kicker="Shop-Verzeichnis"
-        title="Shops"
+        title="Salons"
         subtitle="Status, Inhaber und Gesundheitssignale auf einen Blick — tippe eine Zeile für Details."
       />
 

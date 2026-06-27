@@ -16,12 +16,12 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
   if (!summary.ok) {
     return (
-      <AuthShell title="Invite unavailable" subtitle="This link may have expired or already been used.">
+      <AuthShell title="Einladung nicht verfügbar" subtitle="Der Link ist abgelaufen oder wurde bereits genutzt.">
         <p className="text-sm text-[var(--text-2)]">
-          Ask the shop owner for a new invite link.
+          Bitte den Salon-Inhaber um einen neuen Einladungslink bitten.
         </p>
         <p className="mt-[var(--space-4)] text-sm">
-          <AuthLink href="/login">Sign in</AuthLink>
+          <AuthLink href="/login">Anmelden</AuthLink>
         </p>
       </AuthShell>
     );
@@ -30,24 +30,24 @@ export default async function JoinPage({ params }: JoinPageProps) {
   if (!actor) {
     return (
       <AuthShell
-        title={`Join ${summary.data.shopName}`}
-        subtitle={`You've been invited as ${summary.data.role}.`}
+        title={`${summary.data.shopName} beitreten`}
+        subtitle={`Du wurdest als ${summary.data.role === "owner" ? "Inhaber" : "Barber"} eingeladen.`}
       >
         <p className="text-sm text-[var(--text-2)]">
-          Sign in or create an account to accept this invite.
+          Melde dich an oder erstelle ein Konto, um die Einladung anzunehmen.
         </p>
         <div className="mt-[var(--space-6)] flex flex-col gap-[var(--space-3)]">
           <Link
             href={`/login?next=${encodeURIComponent(next)}`}
             className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-[var(--space-4)] text-md font-medium text-primary-foreground"
           >
-            Sign in
+            Anmelden
           </Link>
           <Link
             href={`/register?next=${encodeURIComponent(next)}`}
             className="text-center text-sm text-[var(--brass)] underline-offset-4 hover:underline"
           >
-            Create account
+            Konto erstellen
           </Link>
         </div>
       </AuthShell>
@@ -56,8 +56,8 @@ export default async function JoinPage({ params }: JoinPageProps) {
 
   return (
     <AuthShell
-      title={`Join ${summary.data.shopName}`}
-      subtitle={`Accept invitation as ${summary.data.role}.`}
+      title={`${summary.data.shopName} beitreten`}
+      subtitle={`Einladung als ${summary.data.role === "owner" ? "Inhaber" : "Barber"} annehmen.`}
     >
       <JoinInvitePanel token={token} shopName={summary.data.shopName} />
     </AuthShell>

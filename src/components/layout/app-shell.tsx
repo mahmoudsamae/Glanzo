@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";
+import type { DashboardNavKey } from "@/lib/dashboard/nav-config";
 
 import { BottomTabsChrome } from "./bottom-tabs-chrome.client";
 import type { NavRole } from "./nav";
@@ -10,6 +11,7 @@ export type AppShellProps = {
   shopName: string;
   shopSlug: string;
   role: NavRole;
+  allowedNavKeys: DashboardNavKey[] | null;
   displayName: string;
   isPlatformAdmin?: boolean;
   signOutAction: () => Promise<void>;
@@ -20,6 +22,7 @@ export function AppShell({
   shopName,
   shopSlug,
   role,
+  allowedNavKeys,
   displayName,
   isPlatformAdmin = false,
   signOutAction,
@@ -33,6 +36,7 @@ export function AppShell({
         shopName={shopName}
         displayName={displayName}
         role={role}
+        allowedNavKeys={allowedNavKeys}
         isPlatformAdmin={isPlatformAdmin}
         signOutAction={signOutAction}
       />
@@ -54,6 +58,7 @@ export function AppShell({
         minisiteUrl={minisiteUrl}
         displayName={displayName}
         role={role}
+        allowedNavKeys={allowedNavKeys}
         isPlatformAdmin={isPlatformAdmin}
         signOutAction={signOutAction}
       />

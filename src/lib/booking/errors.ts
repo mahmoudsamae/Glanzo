@@ -11,13 +11,13 @@ export const BOOKING_ERROR_CODES = [
 export type BookingErrorCode = (typeof BOOKING_ERROR_CODES)[number];
 
 const BOOKING_ERROR_MESSAGES: Record<BookingErrorCode, string> = {
-  SHOP_SUSPENDED: "This shop is not accepting bookings right now.",
-  SLOT_TAKEN: "That time slot is no longer available.",
-  PHONE_LIMIT: "Too many upcoming bookings for this phone number.",
-  RATE_LIMITED: "Too many booking attempts. Try again later.",
-  TOO_LATE: "Cancellation window has passed for this appointment.",
-  INVALID_INPUT: "Check your booking details and try again.",
-  BOOKING_NOT_FOUND: "Booking not found.",
+  SHOP_SUSPENDED: "Dieser Salon nimmt derzeit keine Buchungen entgegen.",
+  SLOT_TAKEN: "Dieser Termin ist nicht mehr verfügbar.",
+  PHONE_LIMIT: "Zu viele anstehende Buchungen für diese Telefonnummer.",
+  RATE_LIMITED: "Zu viele Buchungsversuche. Bitte später erneut versuchen.",
+  TOO_LATE: "Das Stornierungsfenster für diesen Termin ist abgelaufen.",
+  INVALID_INPUT: "Bitte Buchungsdaten prüfen und erneut versuchen.",
+  BOOKING_NOT_FOUND: "Buchung nicht gefunden.",
 };
 
 export function bookingErrorMessage(code: BookingErrorCode): string {

@@ -264,6 +264,27 @@ export async function setPlatformMinisiteManaged(
   return { ok: true, data: { minisiteManaged: payload.minisite_managed } };
 }
 
+export async function setPlatformShopDashboardNav(
+  shopId: string,
+  navKeys: string[] | null,
+): Promise<PlatformResult<{ dashboardNavKeys: string[] }>> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("platform_set_shop_dashboard_nav", {
+    p_shop_id: shopId,
+    p_nav_keys: navKeys,
+  });
+
+  if (error) {
+    if (/NOT_FOUND|NAV_KEYS_REQUIRED/i.test(error.message)) {
+      return { ok: false, code: "VALIDATION" };
+    }
+    return { ok: false, code: "UNKNOWN" };
+  }
+
+  const payload = data as unknown as { dashboard_nav_keys: string[] };
+  return { ok: true, data: { dashboardNavKeys: payload.dashboard_nav_keys ?? [] } };
+}
+
 export async function createPlatformOwnerInvite(
   shopId: string,
   ownerEmail: string,

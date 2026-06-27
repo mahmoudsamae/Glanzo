@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import type { DashboardNavKey } from "@/lib/dashboard/nav-config";
 
 import { NAV_ICONS, NAV_ICON_CLASS } from "./nav-icons";
 import { isNavItemActive, navItemsForSurface, type NavItem, type NavRole } from "./nav";
@@ -22,6 +23,7 @@ export type RailNavChromeProps = {
   shopName: string;
   displayName: string;
   role: NavRole;
+  allowedNavKeys: DashboardNavKey[] | null;
   isPlatformAdmin?: boolean;
   signOutAction: () => Promise<void>;
 };
@@ -71,7 +73,7 @@ function NavLinkItem({
 
   if (!item.enabled) {
     return (
-      <span role="link" aria-disabled="true" aria-label={`${item.label} (coming soon)`} className={baseClass}>
+      <span role="link" aria-disabled="true" aria-label={`${item.label} (demnächst)`} className={baseClass}>
         {content}
       </span>
     );
@@ -98,6 +100,7 @@ export function RailNavChrome({
   shopName,
   displayName,
   role,
+  allowedNavKeys,
   isPlatformAdmin = false,
   signOutAction,
 }: RailNavChromeProps) {
@@ -108,7 +111,7 @@ export function RailNavChrome({
     }
     return window.localStorage.getItem(RAIL_COLLAPSE_KEY) === "true";
   });
-  const items = navItemsForSurface("desktop-rail", role);
+  const items = navItemsForSurface("desktop-rail", role, allowedNavKeys);
 
   function toggleCollapsed() {
     setCollapsed((current) => {
@@ -161,7 +164,7 @@ export function RailNavChrome({
                 {!collapsed ? (
                   <span className="min-w-0 truncate text-left">
                     <span className="block truncate text-sm font-medium text-[var(--text-0)]">{displayName}</span>
-                    <span className="block truncate text-xs text-[var(--text-2)]">Account</span>
+                    <span className="block truncate text-xs text-[var(--text-2)]">Konto</span>
                   </span>
                 ) : (
                   <span className="sr-only">{displayName}</span>
@@ -174,7 +177,7 @@ export function RailNavChrome({
                   href="/admin"
                   className="flex min-h-10 items-center rounded-md px-[var(--space-3)] text-sm text-[var(--text-1)] hover:bg-[var(--ink-2)]"
                 >
-                  Platform Admin
+                  Plattform-Admin
                 </Link>
               ) : null}
               <SignOutForm signOutAction={signOutAction} />
@@ -184,7 +187,7 @@ export function RailNavChrome({
           <button
             type="button"
             onClick={toggleCollapsed}
-            aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
+            aria-label={collapsed ? "Navigation erweitern" : "Navigation einklappen"}
             className="salon-dash-orbit__toggle"
           >
             {collapsed ? (

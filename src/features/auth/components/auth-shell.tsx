@@ -24,23 +24,22 @@ export function AuthShell({ title, subtitle, children, footer, className }: Auth
           <AuthBrandLine>
             <p className="salon-auth-kicker text-xs">Glanzo</p>
             <h2 className="salon-auth-brand-title mt-[var(--space-4)] font-display text-4xl leading-tight">
-              Run your chair.
+              Dein Stuhl.
               <br />
-              Own the day.
+              Dein Tag.
             </h2>
           </AuthBrandLine>
           <AuthBrandLine className="max-w-sm">
             <p className="text-base leading-relaxed text-[var(--text-2)]">
-              Bookings, team, and your mini-site — one calm dashboard built for barbers who care about
-              craft.
+              Termine, Team und Website — ein ruhiges Dashboard für Barbers, die Wert auf Handwerk legen.
             </p>
           </AuthBrandLine>
         </AuthBrandMotion>
         <AuthBrandLine>
           <ul className="flex flex-col gap-[var(--space-3)] text-sm text-[var(--text-2)]">
-            <li className="salon-auth-brand-pill">Live calendar & walk-ins</li>
-            <li className="salon-auth-brand-pill">Customer ledger in seconds</li>
-            <li className="salon-auth-brand-pill">Mini-site goes live on save</li>
+            <li className="salon-auth-brand-pill">Live-Kalender & Laufkundschaft</li>
+            <li className="salon-auth-brand-pill">Kundenkartei in Sekunden</li>
+            <li className="salon-auth-brand-pill">Website live nach dem Speichern</li>
           </ul>
         </AuthBrandLine>
       </aside>

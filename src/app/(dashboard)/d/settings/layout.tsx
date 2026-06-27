@@ -1,16 +1,16 @@
 import { SettingsNav } from "@/features/settings";
 import { DashboardPage, DashboardPageHeader } from "@/components/dashboard";
-import { requireOwnerDashboardAccess } from "@/server/modules/shops/create-shop.service";
+import { requireOwnerDashboardNavKey } from "@/server/modules/shops/create-shop.service";
 
 export default async function SettingsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  await requireOwnerDashboardAccess();
+  await requireOwnerDashboardNavKey("settings");
 
   return (
     <DashboardPage width="lg">
       <DashboardPageHeader
-        kicker="Shop setup"
+        kicker="Salon einrichten"
         title="Einstellungen"
         subtitle="Öffnungszeiten, Website-Bereiche, Buchungsregeln und Benachrichtigungen."
       />

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { CustomersSkeleton } from "@/features/customers";
 import { getActiveMembership } from "@/lib/dashboard/active-shop";
 import { getActor } from "@/server/modules/auth/get-actor";
-import { requireDashboardAccess } from "@/server/modules/shops/create-shop.service";
+import { requireDashboardNavKey } from "@/server/modules/shops/create-shop.service";
 
 import { ProfileClient } from "./profile-client";
 
@@ -12,7 +12,7 @@ type CustomerProfilePageProps = {
 };
 
 export default async function CustomerProfilePage({ params }: CustomerProfilePageProps) {
-  await requireDashboardAccess();
+  await requireDashboardNavKey("customers");
   const actor = await getActor();
   const membership = getActiveMembership(actor?.memberships ?? []);
   const { id } = await params;

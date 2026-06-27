@@ -153,7 +153,7 @@ export function CalendarWeekGrid({
                   style={{ width: COLUMN_WIDTH_PX, marginRight: COLUMN_GUTTER_PX }}
                 >
                   {formatWeekdayLabel(date, timezone)}
-                  <p>Closed</p>
+                  <p>Geschlossen</p>
                 </div>
               );
             }

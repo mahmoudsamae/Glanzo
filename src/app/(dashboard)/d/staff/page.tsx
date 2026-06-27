@@ -1,8 +1,13 @@
 import { StaffBoard } from "@/features/staff";
+import { getActiveMembership } from "@/lib/dashboard/active-shop";
+import {
+  isDashboardNavKeyAllowed,
+  normalizeDashboardNavKeys,
+} from "@/lib/dashboard/nav-config";
 import { getActor } from "@/server/modules/auth/get-actor";
 import { getStaffPageData } from "@/server/modules/staff/staff.service";
-import { getActiveMembership } from "@/lib/dashboard/active-shop";
 import { requireDashboardAccess } from "@/server/modules/shops/create-shop.service";
+import { redirect } from "next/navigation";
 
 export default async function StaffPage() {
   await requireDashboardAccess();
@@ -10,6 +15,13 @@ export default async function StaffPage() {
   const membership = getActiveMembership(actor?.memberships ?? []);
   if (!actor || !membership) {
     return null;
+  }
+
+  if (membership.role === "owner") {
+    const allowedNavKeys = normalizeDashboardNavKeys(membership.dashboardNavKeys);
+    if (!isDashboardNavKeyAllowed("staff", allowedNavKeys)) {
+      redirect("/d");
+    }
   }
 
   const result = await getStaffPageData(actor, membership.shopId);
