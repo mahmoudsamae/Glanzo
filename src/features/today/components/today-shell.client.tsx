@@ -6,7 +6,6 @@ import { RefreshCw } from "lucide-react";
 
 import { CutLine } from "@/components/shared/cut-line";
 import { EmptyState } from "@/components/shared/empty-state";
-import { MetricNumber } from "@/components/shared/metric-number.client";
 import { StatusDot } from "@/components/shared/status-dot";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +47,6 @@ type TodayShellProps = {
   isLoading: boolean;
   isError: boolean;
   isRefreshing?: boolean;
-  showRevenue?: boolean;
   onRefetch: () => void;
   onSelectAppointment: (appointment: AppointmentListItem) => void;
 };
@@ -70,7 +68,6 @@ export function TodayShell({
   isLoading,
   isError,
   isRefreshing = false,
-  showRevenue = true,
   onRefetch,
   onSelectAppointment,
 }: TodayShellProps) {
@@ -121,6 +118,9 @@ export function TodayShell({
               {weekday},{" "}
               <span className="text-data text-[var(--text-1)]">{day}</span> {month}
             </p>
+            {subline ? (
+              <p className="mt-[var(--space-2)] text-sm text-[var(--text-2)]">{subline}</p>
+            ) : null}
           </div>
           <Button
             type="button"
@@ -141,29 +141,6 @@ export function TodayShell({
       </header>
 
       <div className="mt-[var(--space-8)] grid max-w-3xl gap-[var(--space-3)] sm:grid-cols-2">
-        {showRevenue ? (
-          <div className="salon-dash-hero-metric sm:col-span-2">
-            <span className="dash-metric-settle inline-block">
-              <MetricNumber
-                value={data.expectedRevenueCents}
-                format={(cents) => `€${(cents / 100).toFixed(2)}`}
-                className="font-display text-[64px] leading-none text-data text-[var(--text-0)]"
-              />
-            </span>
-            {subline ? (
-              <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
-            ) : null}
-          </div>
-        ) : (
-          <div className="salon-dash-hero-metric sm:col-span-2">
-            <p className="font-display text-[2rem] leading-tight text-[var(--text-0)]">
-              {data.appointmentCount} Termin{data.appointmentCount === 1 ? "" : "e"}
-            </p>
-            {subline ? (
-              <p className="mt-[var(--space-2)] text-base text-[var(--text-2)]">{subline}</p>
-            ) : null}
-          </div>
-        )}
         <DashboardMetricTile label="Termine" value={data.appointmentCount} hint="Im heutigen Kalender" />
         <DashboardMetricTile label="Freie Lücken" value={data.gapCount} hint="Zwischen Terminen" />
         <DashboardMetricTile label="No-Shows" value={data.noShowCount} hint="Heute markiert" />

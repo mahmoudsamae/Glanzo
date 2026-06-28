@@ -13,7 +13,6 @@ import {
 } from "@/features/appointments";
 import type { AppointmentListItem } from "@/server/modules/appointments/appointments.types";
 import type { NavRole } from "@/components/layout/nav";
-import { canViewShopRevenue } from "@/lib/dashboard/nav-config";
 import { ToastBanner } from "@/components/shared/toast-banner.client";
 import { bookingErrorMessage, isBookingErrorCode } from "@/lib/booking/errors";
 import type { OpeningHours } from "@/lib/validations/shop";
@@ -76,7 +75,6 @@ export function TodayClient({
         isLoading={isLoading}
         isError={isError}
         isRefreshing={isFetching && !isLoading}
-        showRevenue={canViewShopRevenue(role)}
         onRefetch={() => void refetch()}
         onSelectAppointment={setSelected}
       />
