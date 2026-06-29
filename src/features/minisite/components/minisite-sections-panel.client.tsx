@@ -38,7 +38,8 @@ import {
   resolveNicolesHomeSectionOrder,
   type NicolesHomeSectionKey,
 } from "@/lib/minisite/nicoles-sections";
-import type { MinisiteSaveInput } from "@/lib/validations/minisite-editor";
+import { type VelvetHomeSectionKey } from "@/lib/minisite/velvet-sections";
+import type { MinisiteSaveInput, ShopMediaKind } from "@/lib/validations/minisite-editor";
 import {
   formatPriceRows,
   parsePriceRows,
@@ -56,6 +57,7 @@ import { MINISITE_TEMPLATES } from "../templates/registry";
 import { StarterKitPicker } from "./starter-kit-picker.client";
 import { MinisiteEditorSection } from "./minisite-editor-section.client";
 import { ForgeMinisitePanel } from "./forge/forge-minisite-panel.client";
+import { VelvetMinisitePanel } from "./velvet/velvet-minisite-panel.client";
 
 type SectionKey = keyof NonNullable<MinisiteContent["show"]>;
 
@@ -103,10 +105,10 @@ type MinisiteSectionsPanelProps = {
   onAccentChange: (hex: string) => void;
   onTemplateChange?: (template: MinisiteTemplate) => void;
   onContentChange: (content: MinisiteContent) => void;
-  onUpload: (kind: "logo" | "cover" | "gallery", file: File) => void;
+  onUpload: (kind: ShopMediaKind, file: File) => void;
   onSectionImageUpload?: (
     target: {
-      section: NicolesHomeSectionKey | "prices" | "contact" | "news";
+      section: NicolesHomeSectionKey | VelvetHomeSectionKey | "prices" | "contact" | "news";
       field: "image_path" | "image_paths";
       index?: number;
     },
@@ -840,8 +842,23 @@ export function MinisiteSectionsPanel({
         />
       ) : null}
 
+      {template === "velvet" ? (
+        <VelvetMinisitePanel
+          shopName={shopName}
+          content={content}
+          uploading={uploading}
+          onContentChange={onContentChange}
+          onUpload={onUpload}
+          onSectionImageUpload={onSectionImageUpload}
+          navLinks={navLinks}
+          saveNavLinks={saveNavLinks}
+          navHrefPresets={navHrefPresets}
+          defaultNavHref={defaultNavHref}
+        />
+      ) : null}
+
       {/* ── 3. Hero & Identität ── */}
-      {template !== "forge" ? (
+      {template !== "forge" && template !== "velvet" ? (
       <MinisiteEditorSection
         id="hero"
         title="Hero & Identität"
@@ -1034,7 +1051,7 @@ export function MinisiteSectionsPanel({
       ) : null}
 
       {/* ── 5. Über uns ── */}
-      {template !== "forge" ? (
+      {template !== "forge" && template !== "velvet" ? (
       <MinisiteEditorSection
         id="about"
         title="Über uns"
@@ -1180,6 +1197,7 @@ export function MinisiteSectionsPanel({
       ) : null}
 
       {/* ── 7. Galerie ── */}
+      {template !== "velvet" ? (
       <MinisiteEditorSection
         id="gallery"
         title="Galerie"
@@ -1230,8 +1248,10 @@ export function MinisiteSectionsPanel({
           )}
         </div>
       </MinisiteEditorSection>
+      ) : null}
 
       {/* ── 7. Standort & Kontakt ── */}
+      {template !== "velvet" ? (
       <MinisiteEditorSection
         id="contact"
         title="Standort & Kontakt"
@@ -1321,8 +1341,10 @@ export function MinisiteSectionsPanel({
           </div>
         </div>
       </MinisiteEditorSection>
+      ) : null}
 
       {/* ── 8. Hinweise ── */}
+      {template !== "velvet" ? (
       <MinisiteEditorSection
         id="guidelines"
         title="Hinweise für Gäste"
@@ -1356,8 +1378,10 @@ export function MinisiteSectionsPanel({
           </div>
         </div>
       </MinisiteEditorSection>
+      ) : null}
 
       {/* ── 9. Abschnitte ein-/ausblenden ── */}
+      {template !== "velvet" ? (
       <MinisiteEditorSection
         id="visibility"
         title="Abschnitte ein-/ausblenden"
@@ -1387,6 +1411,7 @@ export function MinisiteSectionsPanel({
           })}
         </ul>
       </MinisiteEditorSection>
+      ) : null}
     </div>
   );
 }
@@ -1404,7 +1429,7 @@ function AboutBlockFields({
   gallery: string[];
   uploading: string | null;
   onPatch: (patch: Partial<AboutBlock>) => void;
-  onUpload: (kind: "logo" | "cover" | "gallery", file: File) => void;
+  onUpload: (kind: ShopMediaKind, file: File) => void;
 }) {
   return (
     <div className="space-y-[var(--space-3)] border-t border-[var(--ink-3)] px-[var(--space-3)] py-[var(--space-3)]">

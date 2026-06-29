@@ -773,6 +773,10 @@ export type Database = {
         Args: { p_limit: number };
         Returns: Database["public"]["Tables"]["notification_outbox"]["Row"][];
       };
+      platform_attach_owner_membership: {
+        Args: { p_shop_id: string; p_user_id: string; p_email: string };
+        Returns: Json;
+      };
       platform_create_owner_invite: {
         Args: { p_owner_email: string; p_shop_id: string };
         Returns: Json;
@@ -798,6 +802,11 @@ export type Database = {
         Returns: Json;
       };
       platform_record_support_view: { Args: { p_shop_id: string }; Returns: undefined };
+      platform_lookup_user_id_by_email: { Args: { p_email: string }; Returns: string };
+      platform_set_pending_owner_email: {
+        Args: { p_shop_id: string; p_email: string };
+        Returns: Json;
+      };
       platform_set_shop_status: {
         Args: {
           p_reason: string;
@@ -846,7 +855,7 @@ export type Database = {
       appointment_source: "online" | "walk_in";
       appointment_status: "booked" | "completed" | "no_show" | "cancelled";
       membership_role: "owner" | "barber";
-      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles" | "mecca" | "forge";
+      minisite_template: "classic" | "midnight" | "bold" | "signature" | "flux" | "boutique" | "nicoles" | "mecca" | "forge" | "velvet";
       notification_channel: "email";
       notification_template:
         | "booking_confirmed"

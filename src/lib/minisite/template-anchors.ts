@@ -85,6 +85,14 @@ const ANCHORS: Record<MinisiteTemplate, MinisiteAnchors> = {
     gallery: "ms-nicoles-gallery",
     contact: "ms-nicoles-contact",
   },
+  velvet: {
+    top: "ms-velvet-top",
+    about: "ms-velvet-about",
+    services: "ms-velvet-services",
+    prices: "ms-velvet-services",
+    gallery: "ms-velvet-gallery",
+    contact: "ms-velvet-contact",
+  },
 };
 
 export function getMinisiteAnchors(template: MinisiteTemplate): MinisiteAnchors {

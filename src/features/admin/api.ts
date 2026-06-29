@@ -25,6 +25,7 @@ import {
   updateMinisiteForPlatformAdmin,
 } from "@/server/modules/minisite/minisite.service";
 import { uploadPlatformShopMediaAction } from "@/server/modules/minisite/upload-platform-media";
+import type { ShopMediaKind } from "@/lib/validations/minisite-editor";
 
 async function adminGate() {
   await requirePlatformAdmin();
@@ -88,9 +89,14 @@ export async function setPlatformOwnerEmailAction(shopId: string, email: string,
   return setPlatformOwnerEmail(shopId, email, reason);
 }
 
-export async function setPlatformOwnerPasswordAction(shopId: string, password: string, reason: string) {
+export async function setPlatformOwnerPasswordAction(
+  shopId: string,
+  password: string,
+  reason: string,
+  emailForProvision?: string,
+) {
   await adminGate();
-  return setPlatformOwnerPassword(shopId, password, reason);
+  return setPlatformOwnerPassword(shopId, password, reason, emailForProvision);
 }
 
 export async function setPlatformShopTemplateAction(shopId: string, template: string) {
@@ -138,7 +144,7 @@ export async function setPlatformShopDashboardNavAction(shopId: string, navKeys:
 
 export async function uploadPlatformMinisiteMediaAction(
   shopId: string,
-  kind: "logo" | "cover" | "gallery",
+  kind: ShopMediaKind,
   formData: FormData,
 ) {
   await adminGate();

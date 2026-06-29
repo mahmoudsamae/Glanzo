@@ -12,6 +12,7 @@ describe("minisite media path validation", () => {
     expect(isValidShopMediaPath(SHOP, `${SHOP}/logo/abc.webp`, "logo")).toBe(true);
     expect(isValidShopMediaPath(SHOP, `${SHOP}/cover/hero.webp`, "cover")).toBe(true);
     expect(isValidShopMediaPath(SHOP, `${SHOP}/gallery/1.webp`, "gallery")).toBe(true);
+    expect(isValidShopMediaPath(SHOP, `${SHOP}/hero_video/intro.mp4`, "hero_video")).toBe(true);
   });
 
   it("rejects wrong shop prefix or kind", () => {
@@ -25,6 +26,7 @@ describe("minisite media path validation", () => {
       validateMinisiteMediaPaths(SHOP, {
         logo_path: `${SHOP}/logo/a.webp`,
         cover_path: `${SHOP}/cover/b.webp`,
+        cover_video_path: `${SHOP}/hero_video/intro.mp4`,
         gallery: [`${SHOP}/gallery/c.webp`],
       }),
     ).toBe(true);

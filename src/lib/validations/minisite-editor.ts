@@ -16,7 +16,7 @@ export const minisiteSaveInputSchema = z.object({
 
 export type MinisiteSaveInput = z.infer<typeof minisiteSaveInputSchema>;
 
-const MEDIA_KINDS = ["logo", "cover", "gallery", "service"] as const;
+const MEDIA_KINDS = ["logo", "cover", "gallery", "service", "hero_video"] as const;
 export type ShopMediaKind = (typeof MEDIA_KINDS)[number];
 
 export function isValidShopMediaPath(
@@ -60,6 +60,7 @@ export function isValidShopMediaPath(
 type MediaContentFields = {
   logo_path?: string | null;
   cover_path?: string | null;
+  cover_video_path?: string | null;
   gallery?: string[] | null;
 };
 
@@ -71,6 +72,9 @@ export function validateMinisiteMediaPaths(
     return false;
   }
   if (content.cover_path && !isValidShopMediaPath(shopId, content.cover_path, "cover")) {
+    return false;
+  }
+  if (content.cover_video_path && !isValidShopMediaPath(shopId, content.cover_video_path, "hero_video")) {
     return false;
   }
   if (content.gallery) {

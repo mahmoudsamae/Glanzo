@@ -13,6 +13,8 @@ import {
 } from "@/lib/validations/platform-admin";
 import { minisiteTemplateSchema, type MinisiteTemplate } from "@/lib/validations/public-shop";
 
+import { provisionPlatformOwnerAccount } from "./platform-owner-credentials.service";
+
 export type PlatformResult<T> =
   | { ok: true; data: T }
   | { ok: false; code: string };
@@ -109,8 +111,18 @@ export async function createPlatformShop(
   });
 
   if (error) {
-    if (/SLUG_INVALID|INVALID_EMAIL|INVALID_NAME|TIMEZONE_INVALID/i.test(error.message)) {
+    const message = error.message ?? "";
+    if (/SLUG_INVALID|INVALID_EMAIL|INVALID_NAME|SLUG_RESERVED/i.test(message)) {
       return { ok: false, code: "VALIDATION" };
+    }
+    if (/TIMEZONE_INVALID/i.test(message)) {
+      return { ok: false, code: "TIMEZONE_INVALID" };
+    }
+    if (/TEMPLATE_NOT_ALLOWED|ALLOWED_REQUIRED/i.test(message)) {
+      return { ok: false, code: "TEMPLATE_MISMATCH" };
+    }
+    if (/require_platform_admin|NOT_PLATFORM_ADMIN|FORBIDDEN/i.test(message)) {
+      return { ok: false, code: "FORBIDDEN" };
     }
     return { ok: false, code: "UNKNOWN" };
   }
@@ -121,6 +133,18 @@ export async function createPlatformShop(
     invite_path: string;
     invite_token: string;
   };
+
+  if (parsed.data.ownerPassword) {
+    const provisioned = await provisionPlatformOwnerAccount(
+      payload.shop_id,
+      parsed.data.ownerEmail,
+      parsed.data.ownerPassword,
+      "Inhaber-Zugang beim Shop-Anlegen erstellt.",
+    );
+    if (!provisioned.ok) {
+      return { ok: false, code: provisioned.code };
+    }
+  }
 
   revalidateShopPublic(payload.shop_id);
   return {
@@ -200,8 +224,12 @@ export async function setPlatformShopMinisiteTemplates(
   });
 
   if (error) {
-    if (/ALLOWED_REQUIRED|ACTIVE_NOT_ALLOWED|NOT_FOUND/i.test(error.message)) {
+    const message = error.message ?? "";
+    if (/ALLOWED_REQUIRED|ACTIVE_NOT_ALLOWED|NOT_FOUND/i.test(message)) {
       return { ok: false, code: "VALIDATION" };
+    }
+    if (/invalid input value for enum|minisite_template/i.test(message)) {
+      return { ok: false, code: "DB_MIGRATION_REQUIRED" };
     }
     return { ok: false, code: "UNKNOWN" };
   }

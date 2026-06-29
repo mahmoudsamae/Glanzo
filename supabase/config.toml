@@ -120,8 +120,8 @@ file_size_limit = "50MiB"
 # Public mini-site media — path {shop_id}/{logo|cover|gallery}/...
 [storage.buckets.shop-media]
 public = true
-file_size_limit = "5MiB"
-allowed_mime_types = ["image/jpeg", "image/png", "image/webp"]
+file_size_limit = "25MiB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"]
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]

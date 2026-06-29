@@ -10,7 +10,7 @@ import {
 } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";
-import type { MinisiteSaveInput } from "@/lib/validations/minisite-editor";
+import type { MinisiteSaveInput, ShopMediaKind } from "@/lib/validations/minisite-editor";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
 import type { MinisiteEditorData } from "@/lib/minisite/editor-types";
 import { patchNicolesNewsItem } from "@/lib/minisite/nicoles-sections";
@@ -72,7 +72,7 @@ export function MinisiteEditor({
 
   const viewSiteUrl = buildShopMinisiteUrl(initial.shopSlug);
 
-  async function handleUpload(kind: "logo" | "cover" | "gallery", file: File) {
+  async function handleUpload(kind: ShopMediaKind, file: File) {
     setUploading(kind);
     setError(null);
 
@@ -126,13 +126,26 @@ export function MinisiteEditor({
     setToast("Bild hochgeladen — bitte speichern.");
   }
 
-  async function uploadMediaFile(kind: "logo" | "cover" | "gallery", file: File): Promise<string | null> {
+  async function uploadMediaFile(kind: ShopMediaKind, file: File): Promise<string | null> {
+    const { uploadShopMediaFile } = await import("../lib/upload-media.client");
+
+    // Hero videos upload directly to storage — server actions hit Next.js body size limits.
+    if (kind === "hero_video") {
+      const result = await uploadShopMediaFile(initial.shopId, kind, file);
+      setUploading(null);
+      if (!result.ok) {
+        setError(result.message);
+        return null;
+      }
+      return result.path;
+    }
+
     if (initial.editorMode === "admin") {
-      const { compressImageToWebp } = await import("@/lib/minisite/compress-image.client");
       const { uploadPlatformMinisiteMediaAction } = await import("@/features/admin/api");
       try {
-        const blob = await compressImageToWebp(file);
         const formData = new FormData();
+        const { compressImageToWebp } = await import("@/lib/minisite/compress-image.client");
+        const blob = await compressImageToWebp(file);
         formData.append("file", new File([blob], "upload.webp", { type: "image/webp" }));
         const result = await uploadPlatformMinisiteMediaAction(initial.shopId, kind, formData);
         setUploading(null);
@@ -141,14 +154,18 @@ export function MinisiteEditor({
           return null;
         }
         return result.path;
-      } catch {
+      } catch (error) {
         setUploading(null);
-        setError("Bild konnte nicht hochgeladen werden.");
+        const detail = error instanceof Error ? error.message : "";
+        setError(
+          detail
+            ? `Bild konnte nicht hochgeladen werden: ${detail}`
+            : "Bild konnte nicht hochgeladen werden.",
+        );
         return null;
       }
     }
 
-    const { uploadShopMediaFile } = await import("../lib/upload-media.client");
     const result = await uploadShopMediaFile(initial.shopId, kind, file);
     setUploading(null);
     if (!result.ok) {
@@ -158,18 +175,22 @@ export function MinisiteEditor({
     return result.path;
   }
 
-  function applyUploadedPath(kind: "logo" | "cover" | "gallery", path: string) {
+  function applyUploadedPath(kind: ShopMediaKind, path: string) {
     if (kind === "logo") {
       setContent((current) => ({ ...current, logo_path: path }));
     } else if (kind === "cover") {
       setContent((current) => ({ ...current, cover_path: path }));
+    } else if (kind === "hero_video") {
+      setContent((current) => ({ ...current, cover_video_path: path }));
     } else {
       setContent((current) => {
         const gallery = [...(current.gallery ?? []), path].slice(0, 8);
         return { ...current, gallery };
       });
     }
-    setToast("Bild hochgeladen — bitte speichern.");
+    setToast(
+      kind === "hero_video" ? "Video hochgeladen — bitte speichern." : "Bild hochgeladen — bitte speichern.",
+    );
   }
 
   function save() {

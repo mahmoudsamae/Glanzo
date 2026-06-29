@@ -38,6 +38,19 @@ import { AdminAuditTimeline, AdminFadeIn, AdminTabBar, AdminTableShell } from ".
 import { PlatformReasonSheet } from "./platform-reason-sheet.client";
 import { ShopStatusBadge } from "./shop-status-badge";
 
+function templateSettingsErrorMessage(code: string): string {
+  switch (code) {
+    case "VALIDATION":
+      return "Mindestens ein Template muss freigegeben sein; das aktive Template muss dabei sein.";
+    case "DB_MIGRATION_REQUIRED":
+      return "Velvet Atelier ist in Supabase noch nicht aktiviert. Bitte Migration „velvet“ im SQL Editor ausführen.";
+    case "FORBIDDEN":
+      return "Kein Plattform-Zugang für dieses Konto.";
+    default:
+      return "Template-Einstellungen konnten nicht gespeichert werden.";
+  }
+}
+
 type ShopDetail = z.infer<typeof platformShopDetailSchema>;
 
 type AdminShopDetailProps = {
@@ -50,7 +63,11 @@ type PendingAction = "suspend" | "reactivate" | "email" | "password";
 function credentialErrorMessage(code: string): string {
   switch (code) {
     case "NO_OWNER":
-      return "Noch kein Inhaber-Konto — zuerst Einladung annehmen lassen.";
+      return "Bitte E-Mail eingeben und Passwort setzen, um den Zugang anzulegen.";
+    case "NO_OWNER_EMAIL":
+      return "Bitte zuerst eine gültige E-Mail eingeben.";
+    case "OWNER_EXISTS":
+      return "Dieser Shop hat bereits einen anderen Inhaber.";
     case "EMAIL_TAKEN":
       return "Diese E-Mail ist bereits vergeben.";
     case "UNCHANGED":
@@ -103,6 +120,11 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
   const minisiteUrl = buildShopMinisiteUrl(shop.slug);
   const isSuspended = shop.status === "suspended";
   const hasOwnerAccount = Boolean(shop.owner_user_id);
+  const ownerAccessLabel = hasOwnerAccount
+    ? "Aktiv — Inhaber kann sich einloggen."
+    : shop.owner_invite_pending
+      ? "Einladung ausstehend — E-Mail unten anpassen oder Passwort setzen zum sofortigen Zugang."
+      : "Noch kein Zugang — E-Mail und Passwort unten setzen.";
 
   function openSuspend() {
     setPendingAction("suspend");
@@ -153,7 +175,7 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
         }
         setSheetOpen(false);
         setPendingAction(null);
-        setCredentialSuccess("E-Mail wurde aktualisiert.");
+        setCredentialSuccess(hasOwnerAccount ? "E-Mail wurde aktualisiert." : "Inhaber-E-Mail wurde gespeichert.");
         router.refresh();
       });
       return;
@@ -162,7 +184,12 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
     startTransition(async () => {
       setActionError(null);
       setCredentialSuccess(null);
-      const result = await setPlatformOwnerPasswordAction(shop.id, newPassword, reason);
+      const result = await setPlatformOwnerPasswordAction(
+        shop.id,
+        newPassword,
+        reason,
+        credentialEmail,
+      );
       if (!result.ok) {
         setActionError(credentialErrorMessage(result.code));
         return;
@@ -171,7 +198,7 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
       setConfirmPassword("");
       setSheetOpen(false);
       setPendingAction(null);
-      setCredentialSuccess("Passwort wurde gesetzt.");
+        setCredentialSuccess(hasOwnerAccount ? "Passwort wurde gesetzt." : "Inhaber-Zugang wurde angelegt.");
       router.refresh();
     });
   }
@@ -249,7 +276,7 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
         selectedTemplate,
       );
       if (!result.ok) {
-        setTemplateError("Template-Einstellungen konnten nicht gespeichert werden.");
+        setTemplateError(templateSettingsErrorMessage(result.code));
         return;
       }
       setTemplateSuccess("Freigegebene Templates und aktives Template wurden gespeichert.");
@@ -687,59 +714,65 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
             {credentialSuccess ? (
               <p className="mb-[var(--space-3)] text-sm text-[var(--signal-ok)]">{credentialSuccess}</p>
             ) : null}
-            {!hasOwnerAccount ? (
-              <AdminEmptyState>
-                Noch kein Inhaber-Konto aktiv. Nutze unten die Einladung, damit der Inhaber zuerst beitritt.
-              </AdminEmptyState>
-            ) : (
-              <div className="grid gap-[var(--space-6)] lg:grid-cols-2">
-                <div className="flex flex-col gap-[var(--space-3)] rounded-md border border-border/70 bg-[var(--ink-0)]/40 p-[var(--space-4)]">
-                  <div>
-                    <p className="text-sm font-medium text-[var(--text-1)]">E-Mail ändern</p>
-                    <p className="mt-[var(--space-1)] text-xs text-[var(--text-2)]">
-                      Setzt die Login-E-Mail sofort — ohne Bestätigungslink.
-                    </p>
-                  </div>
-                  <Input
-                    type="email"
-                    value={credentialEmail}
-                    onChange={(event) => setCredentialEmail(event.target.value)}
-                    className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
-                  />
-                  <Button type="button" variant="outline" disabled={isPending} onClick={openEmailChange}>
-                    E-Mail speichern
-                  </Button>
+            {actionError ? (
+              <p className="mb-[var(--space-3)] text-sm text-[var(--signal-bad)]">{actionError}</p>
+            ) : null}
+            <p className="mb-[var(--space-4)] text-xs text-[var(--text-2)]">{ownerAccessLabel}</p>
+            <div className="mb-[var(--space-4)] rounded-md border border-border/70 bg-[var(--ink-0)]/40 p-[var(--space-3)] text-sm">
+              <span className="text-[var(--text-2)]">Aktuelle E-Mail: </span>
+              <span className="font-medium text-[var(--text-0)]">{shop.owner_email ?? "—"}</span>
+            </div>
+            <div className="grid gap-[var(--space-6)] lg:grid-cols-2">
+              <div className="flex flex-col gap-[var(--space-3)] rounded-md border border-border/70 bg-[var(--ink-0)]/40 p-[var(--space-4)]">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-1)]">E-Mail</p>
+                  <p className="mt-[var(--space-1)] text-xs text-[var(--text-2)]">
+                    {hasOwnerAccount
+                      ? "Setzt die Login-E-Mail sofort — ohne Bestätigungslink."
+                      : "Speichert die Inhaber-E-Mail (auch vor dem ersten Login)."}
+                  </p>
                 </div>
-
-                <div className="flex flex-col gap-[var(--space-3)] rounded-md border border-border/70 bg-[var(--ink-0)]/40 p-[var(--space-4)]">
-                  <div>
-                    <p className="text-sm font-medium text-[var(--text-1)]">Passwort setzen</p>
-                    <p className="mt-[var(--space-1)] text-xs text-[var(--text-2)]">
-                      Neues Passwort vergeben — der Inhaber braucht das alte Passwort nicht.
-                    </p>
-                  </div>
-                  <Input
-                    type="password"
-                    value={newPassword}
-                    onChange={(event) => setNewPassword(event.target.value)}
-                    placeholder="Neues Passwort"
-                    autoComplete="new-password"
-                    className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
-                  />
-                  <Input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    placeholder="Passwort wiederholen"
-                    autoComplete="new-password"
-                    className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
-                  />
-                  <Button type="button" variant="outline" disabled={isPending} onClick={openPasswordChange}>
-                    Passwort setzen
-                  </Button>
-                </div>
+                <Input
+                  type="email"
+                  value={credentialEmail}
+                  onChange={(event) => setCredentialEmail(event.target.value)}
+                  className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
+                />
+                <Button type="button" variant="outline" disabled={isPending} onClick={openEmailChange}>
+                  E-Mail speichern
+                </Button>
               </div>
-            )}
+
+              <div className="flex flex-col gap-[var(--space-3)] rounded-md border border-border/70 bg-[var(--ink-0)]/40 p-[var(--space-4)]">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-1)]">Passwort</p>
+                  <p className="mt-[var(--space-1)] text-xs text-[var(--text-2)]">
+                    {hasOwnerAccount
+                      ? "Neues Passwort vergeben — der Inhaber braucht das alte Passwort nicht."
+                      : "Legt das Inhaber-Konto sofort an (E-Mail links muss ausgefüllt sein)."}
+                  </p>
+                </div>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  placeholder="Neues Passwort"
+                  autoComplete="new-password"
+                  className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
+                />
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Passwort wiederholen"
+                  autoComplete="new-password"
+                  className="border-[color-mix(in_oklch,var(--brass)_12%,var(--ink-3))] bg-[var(--ink-0)]/60 text-sm"
+                />
+                <Button type="button" variant="outline" disabled={isPending} onClick={openPasswordChange}>
+                  {hasOwnerAccount ? "Passwort setzen" : "Zugang anlegen"}
+                </Button>
+              </div>
+            </div>
           </AdminPanel>
 
           <AdminPanel title="Aktionen" description="Status ändern oder Owner-Einladung neu ausstellen.">
@@ -801,7 +834,9 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
                   : pendingAction === "email"
                     ? "Inhaber-E-Mail ändern"
                     : pendingAction === "password"
-                      ? "Inhaber-Passwort setzen"
+                      ? hasOwnerAccount
+                        ? "Inhaber-Passwort setzen"
+                        : "Inhaber-Zugang anlegen"
                       : "Bestätigen"
             }
             description={
@@ -812,7 +847,9 @@ export function AdminShopDetail({ shop }: AdminShopDetailProps) {
                   : pendingAction === "email"
                     ? "Die Login-E-Mail wird sofort ersetzt. Bitte kurz begründen."
                     : pendingAction === "password"
-                      ? "Das neue Passwort gilt sofort beim nächsten Login. Bitte kurz begründen."
+                      ? hasOwnerAccount
+                        ? "Das neue Passwort gilt sofort beim nächsten Login. Bitte kurz begründen."
+                        : "Legt Login-Konto mit E-Mail und Passwort sofort an. Bitte kurz begründen."
                       : ""
             }
             confirmLabel={

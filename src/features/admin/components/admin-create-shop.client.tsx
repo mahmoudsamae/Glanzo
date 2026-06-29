@@ -26,11 +26,32 @@ type SuccessPayload = {
   shopName: string;
 };
 
+function createShopErrorMessage(code: string): string {
+  switch (code) {
+    case "VALIDATION":
+      return "Slug ungültig, reserviert oder bereits vergeben.";
+    case "TIMEZONE_INVALID":
+      return "Ungültige Zeitzone — bitte eine gültige IANA-Zeitzone wählen.";
+    case "TEMPLATE_MISMATCH":
+      return "Website-Vorlage konnte nicht angelegt werden. Bitte Migration auf Supabase anwenden.";
+    case "FORBIDDEN":
+      return "Kein Plattform-Zugang für dieses Konto.";
+    case "EMAIL_TAKEN":
+      return "Diese E-Mail ist bereits vergeben.";
+    case "OWNER_EXISTS":
+      return "Inhaber-Konto konnte nicht angelegt werden.";
+    default:
+      return "Shop konnte nicht erstellt werden. Bitte erneut versuchen oder Support kontaktieren.";
+  }
+}
+
 export function AdminCreateShop() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerPassword, setOwnerPassword] = useState("");
+  const [ownerPasswordConfirm, setOwnerPasswordConfirm] = useState("");
   const [timezone, setTimezone] = useState("Europe/Berlin");
   const [slugAvailability, setSlugAvailability] = useState<"available" | "taken" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -92,21 +113,22 @@ export function AdminCreateShop() {
       name,
       slug,
       ownerEmail,
+      ownerPassword: ownerPassword.trim() ? ownerPassword : undefined,
       timezone,
     });
     if (!parsed.success || slugStatus === "taken" || slugStatus === "invalid") {
       setError("Bitte alle Felder prüfen.");
       return;
     }
+    if (ownerPassword && ownerPassword !== ownerPasswordConfirm) {
+      setError("Passwörter stimmen nicht überein.");
+      return;
+    }
 
     startTransition(async () => {
       const result = await createPlatformShopAction(parsed.data);
       if (!result.ok) {
-        setError(
-          result.code === "VALIDATION"
-            ? "Slug ungültig, reserviert oder bereits vergeben."
-            : "Shop konnte nicht erstellt werden.",
-        );
+        setError(createShopErrorMessage(result.code));
         return;
       }
       const inviteUrl = buildInviteAbsoluteUrl(result.data.invitePath);
@@ -199,6 +221,31 @@ export function AdminCreateShop() {
             required
             className="text-sm"
           />
+        </div>
+
+        <div className="flex flex-col gap-[var(--space-2)]">
+          <Label htmlFor="owner-password">Inhaber-Passwort (optional)</Label>
+          <Input
+            id="owner-password"
+            type="password"
+            value={ownerPassword}
+            onChange={(event) => setOwnerPassword(event.target.value)}
+            placeholder="Min. 8 Zeichen — sofortiger Login"
+            autoComplete="new-password"
+            className="text-sm"
+          />
+          <Input
+            id="owner-password-confirm"
+            type="password"
+            value={ownerPasswordConfirm}
+            onChange={(event) => setOwnerPasswordConfirm(event.target.value)}
+            placeholder="Passwort wiederholen"
+            autoComplete="new-password"
+            className="text-sm"
+          />
+          <p className="text-xs text-[var(--text-2)]">
+            Mit Passwort wird das Inhaber-Konto direkt angelegt. Ohne Passwort nur Einladungslink.
+          </p>
         </div>
 
         <div className="flex flex-col gap-[var(--space-2)]">

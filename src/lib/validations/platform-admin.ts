@@ -7,6 +7,12 @@ export const platformStatusReasonSchema = z
   .trim()
   .min(10, "Mindestens 10 Zeichen Begründung.");
 
+export const platformOwnerProvisionSchema = z.object({
+  email: z.string().trim().email("Gültige E-Mail eingeben"),
+  password: z.string().min(8, "Mindestens 8 Zeichen"),
+  reason: platformStatusReasonSchema,
+});
+
 export const platformOwnerEmailChangeSchema = z.object({
   email: z.string().trim().email("Gültige E-Mail eingeben"),
   reason: platformStatusReasonSchema,
@@ -90,6 +96,7 @@ export const platformShopDetailSchema = z
     owner_display_name: z.string().nullable().optional(),
     owner_email: z.string().nullable().optional(),
     owner_user_id: z.string().uuid().nullable().optional(),
+    owner_invite_pending: z.boolean().optional(),
     staff_count: z.number().int(),
     bookings_last_30d: z.number().int(),
     dead_outbox_count: z.number().int(),
@@ -111,6 +118,7 @@ export const platformCreateShopInputSchema = z.object({
     .max(40)
     .regex(/^[a-z0-9](-?[a-z0-9])*$/),
   ownerEmail: z.string().email(),
+  ownerPassword: z.string().min(8).optional(),
   timezone: z.string().min(1),
 });
 

@@ -34,6 +34,7 @@ export const minisiteSectionKeySchema = z.enum([
   "aktionstage",
   "news",
   "pre_footer",
+  "social",
 ]);
 
 export const minisiteSectionBlockSchema = z
@@ -103,6 +104,7 @@ export const minisiteSectionsConfigSchema = z
     booking: minisiteSectionBlockSchema.optional(),
     contact: minisiteSectionBlockSchema.optional(),
     reviews: minisiteSectionBlockSchema.optional(),
+    social: minisiteSectionBlockSchema.optional(),
   })
   .strict();
 
@@ -152,6 +154,7 @@ export const minisiteTemplateSchema = z.enum([
   "nicoles",
   "mecca",
   "forge",
+  "velvet",
 ]);
 
 export const minisiteContentSchema = z
@@ -195,6 +198,8 @@ export const minisiteContentSchema = z
       .optional(),
     logo_path: z.string().trim().min(1).optional(),
     cover_path: z.string().trim().min(1).optional(),
+    /** Velvet hero background video (shop-media hero_video/). */
+    cover_video_path: z.string().trim().min(1).optional(),
   })
   .strict();
 

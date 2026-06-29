@@ -62,6 +62,12 @@ export const MINISITE_TEMPLATES: Record<MinisiteTemplate, MinisiteTemplateConfig
     themeClass: "theme-forge",
     fontClass: "minisite-font minisite-forge-fonts",
   },
+  velvet: {
+    key: "velvet",
+    label: "Velvet Atelier",
+    themeClass: "theme-velvet",
+    fontClass: "minisite-font minisite-velvet-fonts",
+  },
 };
 
 export function getMinisiteTemplate(key: MinisiteTemplate): MinisiteTemplateConfig {

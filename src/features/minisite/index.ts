@@ -25,3 +25,5 @@ export { ForgeKontaktPage } from "./templates/forge/kontakt/forge-kontakt-page";
 export { ForgeSubpageChrome } from "./templates/forge/forge-subpage-chrome";
 export { ForgeAboutPage } from "./templates/forge/about/forge-about-page";
 export { ForgePricesPage } from "./templates/forge/prices/forge-prices-page";
+export { VelvetShell } from "./templates/velvet/velvet-shell";
+export { VelvetAmbient } from "./templates/velvet/velvet-ambient.client";

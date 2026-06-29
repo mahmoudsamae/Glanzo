@@ -22,6 +22,7 @@ const THEME_BACKGROUNDS: Record<MinisiteTemplate, string> = {
   flux: "oklch(0.13 0.035 265)",
   mecca: "oklch(0.12 0.015 75)",
   forge: "oklch(0.08 0.012 55)",
+  velvet: "oklch(0.97 0.006 75)",
 };
 
 type Rgb = { r: number; g: number; b: number };

@@ -15,6 +15,7 @@ import "@/styles/themes/nicoles.css";
 import "@/styles/themes/flux.css";
 import "@/styles/themes/mecca.css";
 import "@/styles/themes/forge.css";
+import "@/styles/themes/velvet.css";
 
 export const revalidate = 300;
 
