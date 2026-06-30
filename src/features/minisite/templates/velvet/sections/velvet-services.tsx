@@ -1,21 +1,24 @@
+import Link from "next/link";
 import Image from "next/image";
+import type { CSSProperties } from "react";
 
 import { formatPriceCents } from "@/lib/minisite/format-price";
 import { velvetReveal } from "@/lib/minisite/velvet-motion";
 import { VELVET_SECTION_META } from "@/lib/minisite/velvet-sections";
 import { TEMPLATE_STOCK } from "@/lib/minisite/template-stock-images";
 import { getMinisiteAnchors } from "@/lib/minisite/template-anchors";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../../lib/media-url";
 
 const PREVIEW_LIMIT = 9;
-const DEFAULT_CATEGORY = "Our Services";
 
 type VelvetServicesSectionProps = {
   data: ShopPublicData;
   shopSlug: string;
   preview?: boolean;
+  i18n: VelvetI18n;
 };
 
 type Service = ShopPublicData["services"][number];
@@ -27,32 +30,13 @@ function getField(content: MinisiteContent, field: "eyebrow" | "title" | "text" 
   return fallback;
 }
 
-function serviceDesc(service: Service): string {
-  if (service.description?.trim()) return service.description.trim();
-  return `${service.duration_min} min`;
+function resolveServiceImage(service: Service, index: number): string {
+  if (service.image_path?.trim()) return shopMediaPublicUrl(service.image_path.trim());
+  const stock = TEMPLATE_STOCK.services;
+  return stock[index % stock.length] ?? stock[0];
 }
 
-function resolveFeatureImage(services: Service[], content: MinisiteContent): string {
-  const withImage = services.find((s) => s.image_path?.trim());
-  if (withImage?.image_path) return shopMediaPublicUrl(withImage.image_path);
-  const blockPath = content.sections?.services?.image_path?.trim();
-  if (blockPath) return shopMediaPublicUrl(blockPath);
-  if (content.cover_path?.trim()) return shopMediaPublicUrl(content.cover_path);
-  return TEMPLATE_STOCK.services[0];
-}
-
-function groupByCategory(services: Service[]): Array<[string, Service[]]> {
-  const groups = new Map<string, Service[]>();
-  for (const service of services) {
-    const cat = DEFAULT_CATEGORY;
-    const existing = groups.get(cat) ?? [];
-    existing.push(service);
-    groups.set(cat, existing);
-  }
-  return Array.from(groups.entries());
-}
-
-export function VelvetServicesSection({ data, shopSlug, preview = false }: VelvetServicesSectionProps) {
+export function VelvetServicesSection({ data, shopSlug, preview = false, i18n }: VelvetServicesSectionProps) {
   const { minisite, services } = data;
   const content = minisite.content;
   const anchors = getMinisiteAnchors("velvet");
@@ -60,20 +44,16 @@ export function VelvetServicesSection({ data, shopSlug, preview = false }: Velve
   if (content.show?.prices === false || services.length === 0) return null;
 
   const meta = VELVET_SECTION_META.services;
-  const eyebrow = getField(content, "eyebrow", meta.defaults.eyebrow ?? "THE MENU");
-  const title = getField(content, "title", meta.defaults.title ?? "Curated Services.");
-  const featureText = getField(content, "text", "Precision, artistry, and care — in every appointment.");
-  const ctaLabel = getField(content, "cta_label", meta.defaults.cta_label ?? "View Full Menu →");
+  const eyebrow = getField(content, "eyebrow", meta.defaults.eyebrow ?? i18n.services.eyebrow);
+  const title = getField(content, "title", meta.defaults.title ?? i18n.services.title);
 
   const visible = services.slice(0, PREVIEW_LIMIT) as Service[];
-  const hasMore = services.length > PREVIEW_LIMIT;
-  const groups = groupByCategory(visible);
-  const featureImage = resolveFeatureImage(visible, content);
+  const bookBase = `/s/${shopSlug}?book=1`;
 
   return (
     <section id={anchors.services} className="ms-velvet-services" aria-label="Services">
       <div className="ms-velvet-services-inner">
-        <header className="ms-velvet-section-header" style={{ textAlign: "left", marginBottom: "clamp(2rem, 4vw, 3rem)" }}>
+        <header {...velvetReveal("fade", 0, "ms-velvet-section-header ms-velvet-services-header")}>
           <p className="ms-velvet-eyebrow">
             <span className="ms-velvet-eyebrow-ornament" aria-hidden />
             {eyebrow}
@@ -81,66 +61,63 @@ export function VelvetServicesSection({ data, shopSlug, preview = false }: Velve
           <h2 className="ms-velvet-section-title ms-velvet-display">{title}</h2>
         </header>
 
-        <div className="ms-velvet-services-layout">
-          {/* Feature image */}
-          <div {...velvetReveal("left", 0, "ms-velvet-services-feature")}>
-            <Image
-              src={featureImage}
-              alt=""
-              fill
-              sizes="(min-width: 1024px) 38vw, 100vw"
-              className="ms-velvet-photo"
-            />
-            <div className="ms-velvet-services-feature-overlay">
-              <p className="ms-velvet-services-feature-title ms-velvet-display">The Collection</p>
-              <p className="ms-velvet-services-feature-text">{featureText}</p>
-            </div>
-          </div>
+        <div className="ms-velvet-services-list">
+          {visible.map((service, i) => {
+            const imgSrc = resolveServiceImage(service, i);
+            const bookHref = preview ? "#" : `${bookBase}&service=${encodeURIComponent(service.id)}`;
+            const num = String(i + 1).padStart(2, "0");
 
-          {/* Service list */}
-          <div {...velvetReveal("right", 120)}>
-            <div className="ms-velvet-services-list-header">
-              <p className="ms-velvet-eyebrow" style={{ marginBottom: "0.75rem" }}>
-                <span className="ms-velvet-eyebrow-ornament" aria-hidden />
-                {groups.length > 0 ? groups[0]?.[0] : DEFAULT_CATEGORY}
-              </p>
-            </div>
-
-            <div data-velvet-stagger>
-              {groups.map(([category, items]) => (
-                <div key={category} className="ms-velvet-service-group">
-                  {groups.length > 1 ? (
-                    <h3 className="ms-velvet-service-group-name ms-velvet-display">{category}</h3>
-                  ) : null}
-                  <ul>
-                    {items.map((service) => (
-                      <li
-                        key={service.id}
-                        className="ms-velvet-service-row ms-velvet-reveal ms-velvet-reveal--up"
-                      >
-                        <div>
-                          <p className="ms-velvet-service-name">{service.name}</p>
-                          <p className="ms-velvet-service-desc">{serviceDesc(service)}</p>
-                        </div>
-                        {service.show_price !== false ? (
-                          <p className="ms-velvet-service-price ms-velvet-display">
-                            <small>from</small>
-                            {formatPriceCents(service.price_cents)}
-                          </p>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
+            return (
+              <article
+                key={service.id}
+                className="ms-velvet-service-row ms-velvet-reveal ms-velvet-reveal--up"
+                style={{ "--velvet-delay": `${i * 70}ms` } as CSSProperties}
+              >
+                {/* Thumbnail */}
+                <div className="ms-velvet-service-row-img" aria-hidden>
+                  <Image
+                    src={imgSrc}
+                    alt={service.name}
+                    fill
+                    sizes="(max-width: 639px) 72px, 96px"
+                    className="ms-velvet-photo"
+                  />
+                  <div className="ms-velvet-service-row-img-shine" />
                 </div>
-              ))}
-            </div>
 
-            {hasMore ? (
-              <div className="mt-6">
-                <span className="ms-velvet-services-cta">{ctaLabel}</span>
-              </div>
-            ) : null}
-          </div>
+                {/* Main info */}
+                <div className="ms-velvet-service-row-body">
+                  <div className="ms-velvet-service-row-header">
+                    <span className="ms-velvet-service-row-num">{num}</span>
+                    <h3 className="ms-velvet-service-row-name ms-velvet-display">{service.name}</h3>
+                  </div>
+                  {service.description?.trim() ? (
+                    <p className="ms-velvet-service-row-desc">{service.description.trim()}</p>
+                  ) : null}
+                  <span className="ms-velvet-service-row-chip">{service.duration_min} min</span>
+                </div>
+
+                {/* Price + CTA */}
+                <div className="ms-velvet-service-row-end">
+                  {service.show_price !== false && (
+                    <span className="ms-velvet-service-row-price">
+                      <span className="ms-velvet-service-row-price-from">{i18n.services.from}</span>
+                      {formatPriceCents(service.price_cents, content.currency)}
+                    </span>
+                  )}
+                  {preview ? (
+                    <span className="ms-velvet-service-row-cta" aria-hidden>
+                      {i18n.nav.bookNow}
+                    </span>
+                  ) : (
+                    <Link href={bookHref} scroll={false} className="ms-velvet-service-row-cta">
+                      {i18n.nav.bookNow}
+                    </Link>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

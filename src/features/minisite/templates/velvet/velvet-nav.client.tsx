@@ -1,12 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { navHrefTarget, type NavLink } from "@/lib/minisite/about-blocks";
+import { scrollToMinisiteAnchor } from "@/lib/minisite/scroll-to-anchor.client";
 import { defaultNavLinksForTemplate, getMinisiteAnchors } from "@/lib/minisite/template-anchors";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
+
+import { shopMediaPublicUrl } from "../../lib/media-url";
+
+const PREVIEW_SCROLL_SELECTOR = ".salon-dash-minisite-preview-scroll";
 
 type VelvetNavProps = {
   shopName: string;
@@ -14,11 +21,13 @@ type VelvetNavProps = {
   bookHref: string;
   preview?: boolean;
   basePath?: string;
+  i18n: VelvetI18n;
 };
 
-function scrollToAnchor(href: string) {
-  const id = href.startsWith("#") ? href.slice(1) : href;
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+function scrollNavTo(href: string, topAnchor: string) {
+  scrollToMinisiteAnchor(href, {
+    offsetPx: href === `#${topAnchor}` || href === topAnchor ? 0 : undefined,
+  });
 }
 
 function resolvePageHref(href: string | undefined, basePath: string): string | null {
@@ -61,6 +70,7 @@ export function VelvetNav({
   bookHref,
   preview = false,
   basePath,
+  i18n,
 }: VelvetNavProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -75,6 +85,7 @@ export function VelvetNav({
   }, [content]);
 
   const navLinks = useMemo(() => links.filter((l) => !isBookNavLink(l)), [links]);
+  const logoUrl = content?.logo_path?.trim() ? shopMediaPublicUrl(content.logo_path.trim()) : null;
 
   const scrollLinks = useMemo(
     () =>
@@ -86,14 +97,39 @@ export function VelvetNav({
   );
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 72);
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const id = hash.slice(1);
+    if (!document.getElementById(id)) return;
+
+    const frame = requestAnimationFrame(() => {
+      scrollNavTo(hash, anchors.top);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [anchors.top]);
+
+  useEffect(() => {
+    const previewScroll = document.querySelector<HTMLElement>(PREVIEW_SCROLL_SELECTOR);
+    const scrollRoot: HTMLElement | Window = previewScroll ?? window;
+
+    const onScroll = () => {
+      const y =
+        scrollRoot === window
+          ? window.scrollY
+          : (scrollRoot as HTMLElement).scrollTop;
+      setScrolled(y > 72);
+    };
+
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    scrollRoot.addEventListener("scroll", onScroll, { passive: true });
+    return () => scrollRoot.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    if (basePath) return;
+    const scrollRoot =
+      document.querySelector<HTMLElement>(PREVIEW_SCROLL_SELECTOR) ?? null;
+
     const sections = scrollLinks
       .map((l) => document.getElementById(l.targetId))
       .filter(Boolean);
@@ -106,12 +142,16 @@ export function VelvetNav({
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible?.target.id) setActive(visible.target.id);
       },
-      { rootMargin: "-30% 0px -55% 0px", threshold: [0, 0.2, 0.5] },
+      {
+        root: scrollRoot,
+        rootMargin: "-30% 0px -55% 0px",
+        threshold: [0, 0.2, 0.5],
+      },
     );
 
     sections.forEach((s) => io.observe(s!));
     return () => io.disconnect();
-  }, [scrollLinks, basePath]);
+  }, [scrollLinks]);
 
   useEffect(() => {
     if (!open) return;
@@ -121,6 +161,11 @@ export function VelvetNav({
   }, [open]);
 
   function isLinkActive(link: NavLink): boolean {
+    const href = link.href ?? "";
+    if (href.startsWith("#")) {
+      return active === navHrefTarget(href, anchors.about);
+    }
+
     if (basePath) {
       const pageHref = resolvePageHref(link.href, basePath);
       if (!pageHref) return false;
@@ -133,14 +178,23 @@ export function VelvetNav({
 
   function onNav(link: NavLink) {
     setOpen(false);
-    if (!basePath) scrollToAnchor(link.href ?? `#${anchors.about}`);
+    scrollNavTo(link.href ?? `#${anchors.about}`, anchors.top);
   }
 
   function renderLink(link: NavLink, className: string) {
     const activeClass = isLinkActive(link) ? `${className}--active` : "";
+    const href = link.href ?? `#${anchors.about}`;
+
+    if (href.startsWith("#")) {
+      return (
+        <button type="button" className={`${className} ${activeClass}`} onClick={() => onNav(link)}>
+          {link.label}
+        </button>
+      );
+    }
 
     if (basePath && !preview) {
-      const pageHref = resolvePageHref(link.href, basePath);
+      const pageHref = resolvePageHref(href, basePath);
       if (pageHref) {
         return (
           <Link href={pageHref} className={`${className} ${activeClass}`} onClick={() => setOpen(false)}>
@@ -164,7 +218,13 @@ export function VelvetNav({
 
   const brandContent = (
     <>
-      <VelvetGemIcon />
+      {logoUrl ? (
+        <span className="ms-velvet-nav-logo-mark">
+          <Image src={logoUrl} alt="" width={180} height={64} className="ms-velvet-nav-logo-img" />
+        </span>
+      ) : (
+        <VelvetGemIcon />
+      )}
       <span className="ms-velvet-nav-logo truncate">{shopName}</span>
     </>
   );
@@ -173,14 +233,27 @@ export function VelvetNav({
     <header className={navClass}>
       <div className="ms-velvet-nav-inner">
         {basePath && !preview ? (
-          <Link href={basePath} className="ms-velvet-nav-brand" onClick={() => setOpen(false)}>
+          <Link
+            href={basePath}
+            className="ms-velvet-nav-brand"
+            onClick={(event) => {
+              setOpen(false);
+              if (pathname === basePath) {
+                event.preventDefault();
+                scrollNavTo(`#${anchors.top}`, anchors.top);
+              }
+            }}
+          >
             {brandContent}
           </Link>
         ) : (
           <button
             type="button"
             className="ms-velvet-nav-brand"
-            onClick={() => { setOpen(false); scrollToAnchor(`#${anchors.top}`); }}
+            onClick={() => {
+              setOpen(false);
+              scrollNavTo(`#${anchors.top}`, anchors.top);
+            }}
           >
             {brandContent}
           </button>
@@ -195,7 +268,7 @@ export function VelvetNav({
         <div className="ms-velvet-nav-actions">
           {preview ? null : (
             <Link href={bookHref} scroll={false} className="ms-velvet-nav-cta">
-              Book Now
+              {i18n.nav.bookNow}
             </Link>
           )}
         </div>
@@ -204,7 +277,7 @@ export function VelvetNav({
           type="button"
           className={`ms-velvet-nav-menu-btn ${open ? "ms-velvet-nav-menu-btn--open" : ""}`}
           aria-expanded={open}
-          aria-label={open ? "Menü schließen" : "Menü öffnen"}
+          aria-label={open ? i18n.nav.menuClose : i18n.nav.menuOpen}
           onClick={() => setOpen((v) => !v)}
         >
           <span />

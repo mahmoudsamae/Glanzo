@@ -1,11 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { getMinisiteAnchors } from "@/lib/minisite/template-anchors";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
+
+import { shopMediaPublicUrl } from "../../lib/media-url";
+import { VelvetAnchorLink } from "./velvet-anchor-link.client";
 
 type VelvetFooterProps = {
   data: ShopPublicData;
   shopSlug: string;
+  i18n: VelvetI18n;
 };
 
 function InstagramIcon() {
@@ -31,7 +37,19 @@ function WhatsAppIcon() {
   );
 }
 
-export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
+function extractInstagramHandle(raw: string): string {
+  const trimmed = raw.trim();
+  try {
+    const url = new URL(trimmed);
+    if (url.hostname.includes("instagram.com")) {
+      const handle = url.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
+      return handle ? `@${handle}` : "";
+    }
+  } catch { /* not a URL */ }
+  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
+}
+
+export function VelvetFooter({ data, shopSlug, i18n }: VelvetFooterProps) {
   const { shop, minisite } = data;
   const content = minisite.content;
   const anchors = getMinisiteAnchors("velvet");
@@ -43,6 +61,7 @@ export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
   const address = content.address;
 
   const year = new Date().getFullYear();
+  const logoUrl = content.logo_path?.trim() ? shopMediaPublicUrl(content.logo_path.trim()) : null;
 
   return (
     <footer className="ms-velvet-footer">
@@ -50,11 +69,16 @@ export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
         <div className="ms-velvet-footer-grid">
           {/* Brand column */}
           <div>
+            {logoUrl ? (
+              <div className="ms-velvet-footer-logo">
+                <Image src={logoUrl} alt="" width={180} height={72} className="ms-velvet-footer-logo-img" />
+              </div>
+            ) : null}
             <p className="ms-velvet-footer-brand">{shop.name}</p>
             <p className="ms-velvet-footer-tagline">
               {content.about?.trim()
                 ? content.about.slice(0, 100)
-                : "Handcrafted nail art. Every set is a work of art."}
+                : i18n.footer.tagline}
             </p>
 
             {(instagram || whatsapp) ? (
@@ -62,13 +86,13 @@ export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
                 {instagram ? (
                   <li>
                     <a
-                      href={`https://instagram.com/${instagram.replace("@", "")}`}
+                      href={`https://instagram.com/${extractInstagramHandle(instagram).replace("@", "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ms-velvet-footer-social-pill"
                     >
                       <InstagramIcon />
-                      {instagram.startsWith("@") ? instagram : `@${instagram}`}
+                      {extractInstagramHandle(instagram)}
                     </a>
                   </li>
                 ) : null}
@@ -91,17 +115,27 @@ export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
 
           {/* Navigation column */}
           <div>
-            <p className="ms-velvet-footer-heading">Navigation</p>
-            <a href={`#${anchors.top}`} className="ms-velvet-footer-link">Home</a>
-            <a href={`#${anchors.about}`} className="ms-velvet-footer-link">About</a>
-            <a href={`#${anchors.services}`} className="ms-velvet-footer-link">Services</a>
-            <a href={`#${anchors.gallery}`} className="ms-velvet-footer-link">Gallery</a>
-            <a href={`#${anchors.contact}`} className="ms-velvet-footer-link">Contact</a>
+            <p className="ms-velvet-footer-heading">{i18n.footer.navHeading}</p>
+            <VelvetAnchorLink href={`#${anchors.top}`} className="ms-velvet-footer-link">
+              {i18n.footer.links.home}
+            </VelvetAnchorLink>
+            <VelvetAnchorLink href={`#${anchors.about}`} className="ms-velvet-footer-link">
+              {i18n.footer.links.about}
+            </VelvetAnchorLink>
+            <VelvetAnchorLink href={`#${anchors.services}`} className="ms-velvet-footer-link">
+              {i18n.footer.links.services}
+            </VelvetAnchorLink>
+            <VelvetAnchorLink href={`#${anchors.gallery}`} className="ms-velvet-footer-link">
+              {i18n.footer.links.gallery}
+            </VelvetAnchorLink>
+            <VelvetAnchorLink href={`#${anchors.contact}`} className="ms-velvet-footer-link">
+              {i18n.footer.links.contact}
+            </VelvetAnchorLink>
           </div>
 
           {/* Contact column */}
           <div>
-            <p className="ms-velvet-footer-heading">Contact</p>
+            <p className="ms-velvet-footer-heading">{i18n.footer.contactHeading}</p>
             {address ? <p className="ms-velvet-footer-link" style={{ cursor: "default" }}>{address}</p> : null}
             {phone ? (
               <a href={`tel:${phone}`} className="ms-velvet-footer-link">{phone}</a>
@@ -113,7 +147,7 @@ export function VelvetFooter({ data, shopSlug }: VelvetFooterProps) {
         </div>
 
         <div className="ms-velvet-footer-bottom">
-          <span>© {year} {shop.name}. All rights reserved.</span>
+          <span>© {year} {shop.name}. {i18n.footer.rights}</span>
           <span>Powered by BarbarOS</span>
         </div>
       </div>

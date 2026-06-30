@@ -7,10 +7,11 @@ import { BookCta } from "./book-cta";
 type BookBarProps = {
   bookHref: string;
   suspended: boolean;
+  label?: string;
 };
 
 /** Fixed bottom book bar — glass overlay, reveals after hero scrolls past. */
-export function BookBarSection({ bookHref, suspended }: BookBarProps) {
+export function BookBarSection({ bookHref, suspended, label = "Jetzt buchen" }: BookBarProps) {
   useEffect(() => {
     const bar = document.querySelector("[data-cinema-book-bar]");
     const onInteract = () => bar?.classList.add("ms-cinema-book-bar--interacted");
@@ -25,7 +26,7 @@ export function BookBarSection({ bookHref, suspended }: BookBarProps) {
       aria-label="Buchen"
     >
       <div className="pointer-events-auto mx-auto flex w-full max-w-lg justify-center">
-        <BookCta href={bookHref} label="Jetzt buchen" suspended={suspended} cinema className="w-full" />
+        <BookCta href={bookHref} label={label} suspended={suspended} cinema className="w-full" />
       </div>
     </div>
   );

@@ -200,6 +200,10 @@ export const minisiteContentSchema = z
     cover_path: z.string().trim().min(1).optional(),
     /** Velvet hero background video (shop-media hero_video/). */
     cover_video_path: z.string().trim().min(1).optional(),
+    /** Per-shop display language for the Velvet template. */
+    locale: z.enum(["en", "de"]).optional(),
+    /** ISO 4217 currency code for the Velvet template (e.g. "EUR", "USD", "GBP"). Defaults to EUR. */
+    currency: z.string().trim().max(3).optional(),
   })
   .strict();
 

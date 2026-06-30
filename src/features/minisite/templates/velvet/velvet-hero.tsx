@@ -3,9 +3,11 @@ import Link from "next/link";
 
 import { velvetHeroEnter } from "@/lib/minisite/velvet-motion";
 import { VELVET_SECTION_META } from "@/lib/minisite/velvet-sections";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../lib/media-url";
+import { VelvetAnchorLink } from "./velvet-anchor-link.client";
 
 const VELVET_TOP_ID = "ms-velvet-top";
 const VELVET_ABOUT_ID = "ms-velvet-about";
@@ -14,6 +16,7 @@ type VelvetHeroSectionProps = {
   data: ShopPublicData;
   bookHref: string;
   preview?: boolean;
+  i18n: VelvetI18n;
 };
 
 type HeroField = "eyebrow" | "title" | "subtitle" | "text" | "cta_label" | "badge_tiny";
@@ -90,7 +93,7 @@ const PARTICLES = [
   { l: 55, b: 62 }, { l: 88, b: 50 }, { l: 22, b: 70 }, { l: 64, b: 66 },
 ] as const;
 
-export function VelvetHeroSection({ data, bookHref, preview = false }: VelvetHeroSectionProps) {
+export function VelvetHeroSection({ data, bookHref, preview = false, i18n }: VelvetHeroSectionProps) {
   const { shop, minisite } = data;
   const content = minisite.content;
   const meta = VELVET_SECTION_META.hero;
@@ -109,21 +112,19 @@ export function VelvetHeroSection({ data, bookHref, preview = false }: VelvetHer
   const galleryImages = resolveGalleryImages(content);
   const slideImages = galleryImages.length > 0 ? galleryImages : coverUrl ? [coverUrl] : [];
 
-  const eyebrow = getHeroField(content, "eyebrow", meta.defaults.eyebrow ?? "NAIL ATELIER");
-  const title = getHeroField(content, "title", meta.defaults.title ?? "Nails as Art.");
+  const eyebrow = getHeroField(content, "eyebrow", meta.defaults.eyebrow ?? i18n.hero.eyebrow);
+  const title = getHeroField(content, "title", meta.defaults.title ?? i18n.hero.title);
   const subtitle = content.sections?.hero?.subtitle?.trim();
-  const bodyText = getHeroField(
-    content,
-    "text",
-    "Handcrafted nail art. Every set is a collaboration between artist and client.",
-  );
+  const bodyText = getHeroField(content, "text", i18n.hero.body);
   const { line1, line2, line3 } = splitHeadline(title, subtitle);
 
   const bookLabel =
     getHeroField(content, "cta_label", "") ||
-    getHeroField(content, "badge_tiny", meta.defaults.badge_tiny ?? "Book Now");
+    getHeroField(content, "badge_tiny", meta.defaults.badge_tiny ?? i18n.hero.bookNow);
 
   const aboutHref = `#${VELVET_ABOUT_ID}`;
+  const logoPath = content.logo_path?.trim();
+  const logoUrl = logoPath ? shopMediaPublicUrl(logoPath) : null;
 
   return (
     <section
@@ -194,6 +195,28 @@ export function VelvetHeroSection({ data, bookHref, preview = false }: VelvetHer
       {/* ── Dark gradient overlay ── */}
       <div className="ms-velvet-hero-overlay" aria-hidden />
 
+      {logoUrl ? (
+        <div className="ms-velvet-hero-logo-floats" aria-hidden>
+          {(
+            [
+              ["ms-velvet-hero-logo-float--br", 160, 96],
+              ["ms-velvet-hero-logo-float--tr", 112, 64],
+              ["ms-velvet-hero-logo-float--bl", 96, 56],
+            ] as const
+          ).map(([variant, width, height]) => (
+            <div key={variant} className={`ms-velvet-hero-logo-float ${variant}`}>
+              <Image
+                src={logoUrl}
+                alt=""
+                width={width}
+                height={height}
+                className="ms-velvet-hero-logo-float-img"
+              />
+            </div>
+          ))}
+        </div>
+      ) : null}
+
       {/* ── Main content ── */}
       <div className="ms-velvet-hero-inner">
         <p {...velvetHeroEnter(0, "ms-velvet-hero-eyebrow")}>
@@ -234,17 +257,17 @@ export function VelvetHeroSection({ data, bookHref, preview = false }: VelvetHer
             </Link>
           )}
 
-          <a href={aboutHref} className="ms-velvet-hero-cta-ghost">
-            Our Work ↓
-          </a>
+          <VelvetAnchorLink href={aboutHref} className="ms-velvet-hero-cta-ghost">
+            {i18n.hero.ourWork}
+          </VelvetAnchorLink>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <a href={aboutHref} className="ms-velvet-hero-scroll" aria-label="Scroll down">
+      <VelvetAnchorLink href={aboutHref} className="ms-velvet-hero-scroll" aria-label="Scroll down">
         <span className="ms-velvet-hero-scroll-label">Scroll</span>
         <span className="ms-velvet-hero-scroll-line" />
-      </a>
+      </VelvetAnchorLink>
 
       {/* Slide dots */}
       {!videoUrl && slideImages.length > 1 ? (

@@ -4,6 +4,7 @@ import {
   resolveVelvetHomeSectionOrder,
   type VelvetHomeSectionKey,
 } from "@/lib/minisite/velvet-sections";
+import { getVelvetI18n } from "@/lib/minisite/velvet-i18n";
 
 import { BookBarSection } from "../../sections/book-bar";
 import { VelvetAmbient } from "./velvet-ambient.client";
@@ -28,6 +29,7 @@ export function VelvetShell({ data, shopSlug, preview = false }: VelvetShellProp
   const isSuspended = data.shop.status === "suspended";
   const content = data.minisite.content;
   const sectionOrder = resolveVelvetHomeSectionOrder(content);
+  const i18n = getVelvetI18n(content.locale);
 
   function renderSection(key: VelvetHomeSectionKey) {
     if (!isVelvetSectionVisible(key, content)) return null;
@@ -35,27 +37,27 @@ export function VelvetShell({ data, shopSlug, preview = false }: VelvetShellProp
     switch (key) {
       case "hero":
         return (
-          <VelvetHeroSection key="hero" data={data} bookHref={bookHref} preview={preview} />
+          <VelvetHeroSection key="hero" data={data} bookHref={bookHref} preview={preview} i18n={i18n} />
         );
       case "about":
         return (
-          <VelvetAboutSection key="about" data={data} shopSlug={shopSlug} preview={preview} />
+          <VelvetAboutSection key="about" data={data} shopSlug={shopSlug} preview={preview} i18n={i18n} />
         );
       case "services":
         return (
-          <VelvetServicesSection key="services" data={data} shopSlug={shopSlug} preview={preview} />
+          <VelvetServicesSection key="services" data={data} shopSlug={shopSlug} preview={preview} i18n={i18n} />
         );
       case "gallery":
         return (
-          <VelvetGallerySection key="gallery" data={data} preview={preview} />
+          <VelvetGallerySection key="gallery" data={data} preview={preview} i18n={i18n} />
         );
       case "social":
         return (
-          <VelvetSocialSection key="social" data={data} preview={preview} />
+          <VelvetSocialSection key="social" data={data} preview={preview} i18n={i18n} />
         );
       case "contact":
         return (
-          <VelvetContactSection key="contact" data={data} shopSlug={shopSlug} preview={preview} />
+          <VelvetContactSection key="contact" data={data} shopSlug={shopSlug} preview={preview} i18n={i18n} />
         );
       default:
         return null;
@@ -63,7 +65,10 @@ export function VelvetShell({ data, shopSlug, preview = false }: VelvetShellProp
   }
 
   return (
-    <div className="ms-velvet-root relative flex min-h-full flex-1 flex-col">
+    <div
+      className="ms-velvet-root relative flex min-h-full flex-1 flex-col"
+      lang={content.locale ?? "de"}
+    >
       <VelvetAmbient />
       <VelvetNav
         shopName={data.shop.name}
@@ -71,6 +76,7 @@ export function VelvetShell({ data, shopSlug, preview = false }: VelvetShellProp
         bookHref={bookHref}
         preview={preview}
         basePath={preview ? undefined : `/s/${shopSlug}`}
+        i18n={i18n}
       />
       <main
         className={`relative z-[1] flex w-full flex-1 flex-col ${
@@ -82,12 +88,12 @@ export function VelvetShell({ data, shopSlug, preview = false }: VelvetShellProp
         {sectionOrder.map((key) => renderSection(key))}
 
         {!isSuspended && !preview && (
-          <VelvetBookingCta bookHref={bookHref} content={content} />
+          <VelvetBookingCta bookHref={bookHref} content={content} i18n={i18n} />
         )}
 
-        <VelvetFooter data={data} shopSlug={shopSlug} />
+        <VelvetFooter data={data} shopSlug={shopSlug} i18n={i18n} />
       </main>
-      {preview ? null : <BookBarSection bookHref={bookHref} suspended={isSuspended} />}
+      {preview ? null : <BookBarSection bookHref={bookHref} suspended={isSuspended} label={i18n.nav.bookNow} />}
     </div>
   );
 }

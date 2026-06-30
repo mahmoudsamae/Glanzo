@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { velvetReveal } from "@/lib/minisite/velvet-motion";
 import { VELVET_SECTION_META } from "@/lib/minisite/velvet-sections";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../../lib/media-url";
@@ -9,6 +10,7 @@ import { shopMediaPublicUrl } from "../../../lib/media-url";
 type VelvetSocialSectionProps = {
   data: ShopPublicData;
   preview?: boolean;
+  i18n: VelvetI18n;
 };
 
 function resolveStripImages(content: MinisiteContent): string[] {
@@ -30,23 +32,30 @@ function InstagramIcon() {
   );
 }
 
-export function VelvetSocialSection({ data, preview = false }: VelvetSocialSectionProps) {
+function extractInstagramHandle(raw: string): string {
+  const trimmed = raw.trim();
+  try {
+    const url = new URL(trimmed);
+    if (url.hostname.includes("instagram.com")) {
+      const handle = url.pathname.replace(/^\/+|\/+$/g, "").split("/")[0];
+      return handle ? `@${handle}` : "@nailatelier";
+    }
+  } catch { /* not a URL */ }
+  return trimmed.startsWith("@") ? trimmed : `@${trimmed}`;
+}
+
+export function VelvetSocialSection({ data, preview = false, i18n }: VelvetSocialSectionProps) {
   const content = data.minisite.content;
   if (content.show?.social === false) return null;
 
-  const meta = VELVET_SECTION_META.social;
-  const ctaLabel = meta.defaults.cta_label || "Follow on Instagram →";
+  const ctaLabel = content.sections?.social?.cta_label?.trim() || i18n.social.ctaLabel;
 
   const instagram = content.links?.instagram || content.instagram;
-  const instagramHandle = instagram
-    ? instagram.startsWith("@")
-      ? instagram
-      : `@${instagram}`
-    : "@nailatelier";
+  const instagramHandle = instagram ? extractInstagramHandle(instagram) : "@nailatelier";
 
   const instagramUrl =
     instagram && !preview
-      ? `https://instagram.com/${instagram.replace("@", "")}`
+      ? `https://instagram.com/${instagramHandle.replace("@", "")}`
       : null;
 
   const images = resolveStripImages(content);
@@ -56,7 +65,7 @@ export function VelvetSocialSection({ data, preview = false }: VelvetSocialSecti
       <div className="ms-velvet-social-inner">
         <div {...velvetReveal("fade", 0)}>
           {/* Subtitle above handle */}
-          <p className="ms-velvet-social-subtitle">Follow our work</p>
+          <p className="ms-velvet-social-subtitle">{i18n.social.subtitle}</p>
 
           {/* Large editorial Instagram handle */}
           <p className="ms-velvet-social-handle ms-velvet-display">{instagramHandle}</p>

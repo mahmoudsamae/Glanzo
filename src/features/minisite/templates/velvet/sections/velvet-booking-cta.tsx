@@ -1,11 +1,13 @@
 import Link from "next/link";
 
 import { velvetReveal } from "@/lib/minisite/velvet-motion";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
 
 type VelvetBookingCtaProps = {
   bookHref: string;
   content: MinisiteContent;
+  i18n: VelvetI18n;
 };
 
 function SparkleIcon() {
@@ -21,11 +23,11 @@ function SparkleIcon() {
   );
 }
 
-export function VelvetBookingCta({ bookHref, content }: VelvetBookingCtaProps) {
-  const notice = content.booking_notice?.trim() || "Book online — confirmation within seconds.";
+export function VelvetBookingCta({ bookHref, content, i18n }: VelvetBookingCtaProps) {
+  const notice = content.booking_notice?.trim() || i18n.booking.notice;
 
   return (
-    <section className="ms-velvet-booking-cta" aria-label="Book an appointment">
+    <section className="ms-velvet-booking-cta" aria-label={i18n.booking.cta}>
       {/* Aurora + animated rays */}
       <div className="ms-velvet-booking-cta-bg" aria-hidden>
         <div className="ms-velvet-booking-cta-ray" />
@@ -35,32 +37,26 @@ export function VelvetBookingCta({ bookHref, content }: VelvetBookingCtaProps) {
 
       <div className="ms-velvet-booking-cta-inner">
         <div {...velvetReveal("fade", 0)}>
-          {/* Eyebrow label */}
-          <p className="ms-velvet-booking-cta-label">Ready to book?</p>
+          <p className="ms-velvet-booking-cta-label">{i18n.booking.label}</p>
 
-          {/* Decorative ornament line */}
           <div className="ms-velvet-booking-cta-ornament" aria-hidden>
             <div className="ms-velvet-booking-cta-ornament-gem" />
           </div>
 
-          {/* Main headline — large editorial serif */}
           <h2 className="ms-velvet-booking-cta-title ms-velvet-display">
-            Book your
+            {i18n.booking.title}
             <br />
-            <em>perfect set.</em>
+            <em>{i18n.booking.titleEm}</em>
           </h2>
 
           <p className="ms-velvet-booking-cta-sub">{notice}</p>
 
           <Link href={bookHref} scroll={false} className="ms-velvet-booking-cta-btn">
             <SparkleIcon />
-            Book Now
+            {i18n.booking.cta}
           </Link>
 
-          {/* Subtle hint */}
-          <p className="ms-velvet-booking-cta-hint">
-            by appointment · online booking available 24/7
-          </p>
+          <p className="ms-velvet-booking-cta-hint">{i18n.booking.hint}</p>
         </div>
       </div>
     </section>

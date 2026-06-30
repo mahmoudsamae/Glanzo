@@ -87,12 +87,12 @@ const BOOKING_SURFACES: Record<MinisiteTemplate, BookingSurface> = {
     overlay: "rgb(7 6 5 / 0.94)",
   },
   velvet: {
-    bg: "#faf8f5",
-    elevated: "#f3ede7",
-    text: "#1a1512",
-    textMuted: "#8a7870",
-    border: "#ddd0c8",
-    overlay: "rgb(26 21 18 / 0.88)",
+    bg: "#faf7f5",
+    elevated: "#f3ede9",
+    text: "#1a1215",
+    textMuted: "#8a7075",
+    border: "#e0cdd2",
+    overlay: "rgb(28 10 18 / 0.86)",
   },
 };
 

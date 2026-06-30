@@ -24,15 +24,14 @@ export function VelvetAmbient() {
 
     /* ——— Scroll reveals ——— */
     if (!reducedMotion) {
+      // Bidirectional: add is-inview on enter, remove on exit
       const revealIo = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            entry.target.classList.add("is-inview");
-            revealIo.unobserve(entry.target);
+            entry.target.classList.toggle("is-inview", entry.isIntersecting);
           }
         },
-        { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
+        { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
       );
 
       root.querySelectorAll(REVEAL_SELECTOR).forEach((el) => revealIo.observe(el));
@@ -42,15 +41,13 @@ export function VelvetAmbient() {
       const staggerIo = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
             entry.target.querySelectorAll(REVEAL_SELECTOR).forEach((child, i) => {
               const node = child as HTMLElement;
               if (!node.style.getPropertyValue("--velvet-delay")) {
                 node.style.setProperty("--velvet-delay", `${i * 100}ms`);
               }
-              node.classList.add("is-inview");
+              node.classList.toggle("is-inview", entry.isIntersecting);
             });
-            staggerIo.unobserve(entry.target);
           }
         },
         { threshold: 0.06, rootMargin: "0px 0px -6% 0px" },

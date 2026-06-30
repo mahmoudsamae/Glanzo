@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { velvetReveal } from "@/lib/minisite/velvet-motion";
 import { VELVET_SECTION_META } from "@/lib/minisite/velvet-sections";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../../lib/media-url";
@@ -12,6 +13,7 @@ type VelvetAboutSectionProps = {
   data: ShopPublicData;
   shopSlug: string;
   preview?: boolean;
+  i18n: VelvetI18n;
 };
 
 type AboutField = "eyebrow" | "title" | "subtitle" | "text" | "cta_label" | "badge_tiny" | "badge_medium" | "badge_large";
@@ -32,14 +34,14 @@ function resolveAboutImage(content: MinisiteContent): string | null {
   return null;
 }
 
-function resolveStats(content: MinisiteContent): { value: string; label: string }[] {
+function resolveStats(content: MinisiteContent, i18n: VelvetI18n): { value: string; label: string }[] {
   const defaults = VELVET_SECTION_META.about.defaults;
   const block = content.sections?.about;
 
   const raw = [
-    { value: block?.badge_tiny?.trim() || defaults.badge_tiny || "5+", label: "Years" },
-    { value: block?.badge_medium?.trim() || defaults.badge_medium || "1000+", label: "Sets" },
-    { value: block?.badge_large?.trim() || defaults.badge_large || "5★", label: "Rated" },
+    { value: block?.badge_tiny?.trim() || defaults.badge_tiny || "5+", label: i18n.about.statLabels.years },
+    { value: block?.badge_medium?.trim() || defaults.badge_medium || "1000+", label: i18n.about.statLabels.sets },
+    { value: block?.badge_large?.trim() || defaults.badge_large || "5★", label: i18n.about.statLabels.rated },
   ];
 
   return raw.filter((s) => s.value);
@@ -58,19 +60,19 @@ function splitHeadline(title: string, subtitle?: string): { line1: string; line2
   return { line1: title, line2: "" };
 }
 
-export function VelvetAboutSection({ data, shopSlug, preview = false }: VelvetAboutSectionProps) {
+export function VelvetAboutSection({ data, shopSlug, preview = false, i18n }: VelvetAboutSectionProps) {
   const content = data.minisite.content;
   if (content.show?.about === false) return null;
 
   const meta = VELVET_SECTION_META.about;
-  const eyebrow = getField(content, "eyebrow", meta.defaults.eyebrow ?? "THE ARTIST");
-  const title = getField(content, "title", meta.defaults.title ?? "Crafted with intention.");
+  const eyebrow = getField(content, "eyebrow", meta.defaults.eyebrow ?? i18n.about.eyebrow);
+  const title = getField(content, "title", meta.defaults.title ?? i18n.about.title);
   const subtitle = content.sections?.about?.subtitle?.trim();
-  const body = getField(content, "text", meta.defaults.text ?? "Every set is handcrafted — a collaboration between artist and client.");
-  const ctaLabel = getField(content, "cta_label", meta.defaults.cta_label ?? "Meet the Artist →");
+  const body = getField(content, "text", meta.defaults.text ?? i18n.about.text);
+  const ctaLabel = getField(content, "cta_label", meta.defaults.cta_label ?? i18n.about.ctaLabel);
   const { line1, line2 } = splitHeadline(title, subtitle);
   const imageUrl = resolveAboutImage(content);
-  const stats = resolveStats(content);
+  const stats = resolveStats(content, i18n);
   const firstStat = stats[0];
 
   return (
@@ -125,7 +127,7 @@ export function VelvetAboutSection({ data, shopSlug, preview = false }: VelvetAb
               {/* Floating glass tag */}
               <div className="ms-velvet-about-glass-tag" aria-hidden>
                 <span className="ms-velvet-about-glass-tag-dot" />
-                Handcrafted Quality
+                {i18n.about.glassTag}
               </div>
 
               <div className="ms-velvet-about-image">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { moveNavLink } from "@/lib/minisite/about-blocks";
+import { VELVET_LOCALE_LABELS, type VelvetLocale } from "@/lib/minisite/velvet-i18n";
 import {
   VELVET_SECTION_META,
   collectVelvetMediaPool,
@@ -154,8 +155,72 @@ export function VelvetMinisitePanel({
     onContentChange({ ...content, sections });
   }
 
+  const currentLocale = (content.locale ?? "de") as VelvetLocale;
+
+  function setLocale(locale: VelvetLocale) {
+    onContentChange({ ...content, locale });
+  }
+
   return (
     <>
+      {/* ── Language / Sprache ── */}
+      <MinisiteEditorSection
+        id="velvet-language"
+        title="Sprache der Website"
+        description="Legt die Anzeigesprache der öffentlichen Seite fest."
+        defaultOpen
+      >
+        <div className="flex flex-wrap gap-[var(--space-2)]">
+          {(["de", "en"] as VelvetLocale[]).map((loc) => (
+            <button
+              key={loc}
+              type="button"
+              onClick={() => setLocale(loc)}
+              className={`flex items-center gap-[var(--space-1)] rounded-full border px-[var(--space-3)] py-[var(--space-1)] text-sm font-medium transition-colors ${
+                currentLocale === loc
+                  ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)]"
+                  : "border-[var(--ink-3)] bg-[var(--ink-1)] text-[var(--text-2)] hover:border-[var(--accent)] hover:text-[var(--text-1)]"
+              }`}
+            >
+              <span className="text-base leading-none">
+                {loc === "de" ? "🇩🇪" : "🇬🇧"}
+              </span>
+              {VELVET_LOCALE_LABELS[loc]}
+            </button>
+          ))}
+        </div>
+        <p className="mt-[var(--space-2)] text-xs text-[var(--text-3)]">
+          {currentLocale === "en"
+            ? "English: All default texts switch to English."
+            : "Deutsch: Alle Standardtexte erscheinen auf Deutsch."}
+        </p>
+      </MinisiteEditorSection>
+
+      {/* ── Currency / Währung ── */}
+      <MinisiteEditorSection
+        id="velvet-currency"
+        title="Währung"
+        description="ISO 4217 Währungscode für Preisanzeige (z.B. EUR, USD, GBP, CHF)."
+        defaultOpen
+      >
+        <div className="flex items-center gap-[var(--space-2)]">
+          <Input
+            className="salon-dash-search w-28 font-mono uppercase"
+            placeholder="EUR"
+            maxLength={3}
+            value={content.currency ?? ""}
+            onChange={(e) => {
+              const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3);
+              onContentChange({ ...content, currency: val || undefined });
+            }}
+          />
+          <span className="text-sm text-[var(--text-2)]">ISO 4217 — z.B. EUR, USD, EGP, SYP, DKK</span>
+        </div>
+        <p className="mt-[var(--space-2)] text-xs text-[var(--text-3)]">
+          Leer lassen für Standard-EUR. Wird für alle Preisanzeigen auf der Seite verwendet.
+        </p>
+      </MinisiteEditorSection>
+
       <MinisiteEditorSection
         id="velvet-sections"
         title="Velvet — Abschnitte"

@@ -52,6 +52,113 @@ import { isBookingErrorCode } from "@/lib/booking/errors";
 import { bookingContactFallback, resolveMinisiteLinks } from "@/lib/validations/minisite-links";
 import { cn } from "@/lib/utils";
 
+type BookingLocale = "de" | "en";
+
+const BOOKING_STRINGS = {
+  de: {
+    back: "Zurück",
+    stepService: "Service wählen",
+    stepBarber: "Barber wählen",
+    stepSlot: "Termin wählen",
+    stepDetails: "Deine Daten",
+    serviceSubtitle: "Wähle eine Leistung — danach siehst du sofort freie Termine.",
+    firstAvailable: "Erstverfügbar",
+    chosen: "Gewählt",
+    dayLabel: "Tag",
+    autoAssign: "Nächster freier Termin",
+    noSlots: "Keine freien Termine",
+    noSlotsDesc: "An diesem Tag ist nichts frei. Wähle einen anderen Tag oder kontaktiere uns direkt.",
+    nextDay: (label: string) => `Nächster Tag mit Terminen: ${label}`,
+    nameLabel: "Name",
+    phoneLabel: "Telefon",
+    emailLabel: "E-Mail (optional)",
+    emailPlaceholder: "für deine Bestätigung",
+    submitBtn: "Termin bestätigen",
+    submitting: "Wird gebucht…",
+    suspended: "Online-Buchung pausiert",
+    suspendedDesc: (shopName: string) => `${shopName} nimmt gerade keine Online-Termine an.`,
+    validationError: "Bitte Name und gültige Telefonnummer angeben.",
+    slotError: "Bitte wähle einen Termin erneut.",
+    networkError: "Verbindung fehlgeschlagen.",
+    retry: "Erneut versuchen",
+    duplicateWarning: (time: string, svcName: string) =>
+      `Du hast heute schon einen Termin um ${time} Uhr (${svcName}). Noch einen buchen?`,
+    cancel: "Abbrechen",
+    bookAnyway: "Trotzdem buchen",
+    durMin: "Min.",
+    clock: " Uhr",
+    icsFilename: "termin.ics",
+    icsServiceFallback: "Termin",
+    periodLabels: { morning: "Vormittag", afternoon: "Nachmittag", evening: "Abend" } as Record<string, string>,
+    confirm: {
+      title: "Gebucht.",
+      when: "Wann",
+      service: "Service",
+      barber: "Barber",
+      price: "Preis",
+      salon: "Salon",
+      address: "Adresse",
+      saveIcs: "In Kalender speichern (.ics)",
+      manage: "Termin verwalten",
+      copy: "Link kopieren",
+      copied: "Link kopiert",
+      done: "Fertig",
+      hint: "Nach «Fertig» findest du deinen Termin jederzeit über «Dein Termin» auf der Seite.",
+    },
+  },
+  en: {
+    back: "Back",
+    stepService: "Choose a Service",
+    stepBarber: "Choose a Team Member",
+    stepSlot: "Pick a Time",
+    stepDetails: "Your Details",
+    serviceSubtitle: "Pick a service — available times appear right away.",
+    firstAvailable: "First available",
+    chosen: "Selected",
+    dayLabel: "Day",
+    autoAssign: "First available",
+    noSlots: "No available times",
+    noSlotsDesc: "Nothing free today. Choose another day or contact us directly.",
+    nextDay: (label: string) => `Next day with availability: ${label}`,
+    nameLabel: "Name",
+    phoneLabel: "Phone",
+    emailLabel: "Email (optional)",
+    emailPlaceholder: "for your confirmation",
+    submitBtn: "Confirm Booking",
+    submitting: "Booking…",
+    suspended: "Online booking paused",
+    suspendedDesc: (shopName: string) => `${shopName} is not accepting online bookings right now.`,
+    validationError: "Please enter your name and a valid phone number.",
+    slotError: "Please select a time again.",
+    networkError: "Connection failed.",
+    retry: "Try again",
+    duplicateWarning: (time: string, svcName: string) =>
+      `You already have an appointment today at ${time} (${svcName}). Book another?`,
+    cancel: "Cancel",
+    bookAnyway: "Book anyway",
+    durMin: "min",
+    clock: "",
+    icsFilename: "booking.ics",
+    icsServiceFallback: "Appointment",
+    periodLabels: { morning: "Morning", afternoon: "Afternoon", evening: "Evening" } as Record<string, string>,
+    confirm: {
+      title: "Booked.",
+      when: "When",
+      service: "Service",
+      barber: "Artist",
+      price: "Price",
+      salon: "Salon",
+      address: "Address",
+      saveIcs: "Save to calendar (.ics)",
+      manage: "Manage booking",
+      copy: "Copy link",
+      copied: "Copied",
+      done: "Done",
+      hint: "You can always find your booking via 'My Booking' on the page.",
+    },
+  },
+} satisfies Record<BookingLocale, unknown>;
+
 type AvailabilitySlot = PublicApiAlternativeSlot;
 
 type ConfirmationState = {
@@ -88,6 +195,24 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
   const timezone = data.shop.timezone;
   const isSuspended = data.shop.status === "suspended";
+  const locale = ((data.minisite.content.locale ?? "de") as BookingLocale);
+  const s = BOOKING_STRINGS[locale];
+  const currency = data.minisite.content.currency;
+
+  function getBookingError(code: string): string {
+    if (locale === "en") {
+      const map: Record<string, string> = {
+        SLOT_TAKEN: "This time was just taken. Please choose another slot.",
+        SHOP_SUSPENDED: "This salon isn't accepting bookings right now.",
+        INVALID_INPUT: "Please check your details and try again.",
+        DUPLICATE_BOOKING: "You already have a booking at this time.",
+        SERVICE_NOT_FOUND: "This service is no longer available.",
+        MEMBERSHIP_NOT_FOUND: "This team member is currently unavailable.",
+      };
+      return map[code] ?? "Something went wrong. Please try again.";
+    }
+    return bookingErrorMessageDe(isBookingErrorCode(code) ? code : "INVALID_INPUT");
+  }
   const today = useMemo(() => todayInTimezone(timezone), [timezone]);
   const dayOptions = useMemo(() => nextDaysInTimezone(timezone, 7), [timezone]);
 
@@ -193,7 +318,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
       const body = (await response.json()) as PublicApiEnvelope<{ slots: AvailabilitySlot[] }>;
       if ("error" in body) {
         if (body.error.code === "SHOP_SUSPENDED") {
-          setError(bookingErrorMessageDe("SHOP_SUSPENDED"));
+          setError(getBookingError("SHOP_SUSPENDED"));
         } else {
           setError(body.error.message);
         }
@@ -340,7 +465,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
     const phoneRaw = germanPhoneRawFromDigits(phoneDigits);
     const phone = normalizePhoneToE164(phoneRaw);
     if (!name.trim() || name.trim().length < 2 || !phone) {
-      setError("Bitte Name und gültige Telefonnummer angeben.");
+      setError(s.validationError);
       return;
     }
 
@@ -352,7 +477,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
         : effectiveBarberId;
 
     if (!membershipId) {
-      setError("Bitte wähle einen Termin erneut.");
+      setError(s.slotError);
       return;
     }
 
@@ -415,7 +540,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
 
         if ("error" in body) {
           const code = isBookingErrorCode(body.error.code) ? body.error.code : "INVALID_INPUT";
-          setError(bookingErrorMessageDe(code));
+          setError(getBookingError(code));
           if (code === "SLOT_TAKEN" && body.error.alternatives?.length) {
             setAlternatives(body.error.alternatives);
           }
@@ -490,7 +615,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
               className="-ml-2 text-[color:var(--ms-text-muted)] hover:bg-[color-mix(in_oklch,var(--ms-accent)_12%,transparent)] hover:text-[color:var(--ms-text)]"
               onClick={goBack}
             >
-              Zurück
+              {s.back}
             </Button>
           ) : (
             <span className="w-14" />
@@ -508,10 +633,13 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
             serviceName={selectedService?.name ?? ""}
             barberName={barberNameForSlot}
             priceCents={selectedService?.price_cents}
+            currency={currency}
             timezone={timezone}
             confirmation={confirmation}
             address={data.minisite.content.address}
             copyDone={copyDone}
+            strings={s.confirm}
+            clock={s.clock}
             onCopy={() => {
               const url = `${window.location.origin}${confirmation.manageUrl}`;
               void navigator.clipboard.writeText(url).then(() => setCopyDone(true));
@@ -519,22 +647,22 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
             onDownloadIcs={() => {
               const ics = generateBookingIcs({
                 shopName: data.shop.name,
-                serviceName: selectedService?.name ?? "Termin",
+                serviceName: selectedService?.name ?? s.icsServiceFallback,
                 startsAt: confirmation.startsAt,
                 endsAt: confirmation.endsAt,
                 location: data.minisite.content.address,
               });
-              downloadBookingIcs("termin.ics", ics);
+              downloadBookingIcs(s.icsFilename, ics);
             }}
             onClose={closeSheet}
           />
         ) : isSuspended ? (
           <div className="flex flex-col gap-[var(--space-4)] pt-[var(--space-4)]">
             <SheetHeader>
-              <SheetTitle>Online-Buchung pausiert</SheetTitle>
+              <SheetTitle>{s.suspended}</SheetTitle>
             </SheetHeader>
             <p className="text-md text-[color:var(--ms-text-muted)]">
-              {data.shop.name} nimmt gerade keine Online-Termine an.
+              {s.suspendedDesc(data.shop.name)}
             </p>
             {contactFallback.href ? (
               <p className="text-sm text-[color:var(--ms-text-muted)]">
@@ -553,14 +681,14 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
           <div key={urlState.step} className="ms-booking-step">
             <SheetHeader className="pt-[var(--space-2)]">
               <SheetTitle className="ms-booking-sheet__title">
-                {urlState.step === "service" && "Service wählen"}
-                {urlState.step === "barber" && "Barber wählen"}
-                {urlState.step === "slot" && "Termin wählen"}
-                {urlState.step === "details" && "Deine Daten"}
+                {urlState.step === "service" && s.stepService}
+                {urlState.step === "barber" && s.stepBarber}
+                {urlState.step === "slot" && s.stepSlot}
+                {urlState.step === "details" && s.stepDetails}
               </SheetTitle>
               {urlState.step === "service" ? (
                 <p className="ms-booking-sheet__subtitle">
-                  Wähle eine Leistung — danach siehst du sofort freie Termine.
+                  {s.serviceSubtitle}
                 </p>
               ) : null}
             </SheetHeader>
@@ -577,11 +705,11 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                       <span className="flex min-w-0 flex-1 flex-col gap-[var(--space-1)]">
                         <span className="font-display text-base leading-snug">{service.name}</span>
                         <span className="text-sm text-[color:var(--ms-text-muted)]">
-                          {service.duration_min} Min.
+                          {service.duration_min} {s.durMin}
                         </span>
                       </span>
                       <span className="ms-booking-service-card__price">
-                        {formatPriceCents(service.price_cents)}
+                        {formatPriceCents(service.price_cents, currency)}
                       </span>
                     </button>
                   </li>
@@ -597,7 +725,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                     className="ms-booking-service-card font-display text-md"
                     onClick={() => selectBarber(BARBER_FIRST)}
                   >
-                    Erstverfügbar
+                    {s.firstAvailable}
                   </button>
                 </li>
                 {data.team.map((member) => (
@@ -619,19 +747,19 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 {selectedService ? (
                   <div className="ms-booking-summary">
                     <p className="text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
-                      Gewählt
+                      {s.chosen}
                     </p>
                     <p className="mt-[var(--space-1)] font-display text-base">{selectedService.name}</p>
                     <p className="text-sm text-[color:var(--ms-text-muted)]">
-                      {selectedService.duration_min} Min. · {formatPriceCents(selectedService.price_cents)}
-                      {autoAssignBarber ? " · Nächster freier Termin" : null}
+                      {selectedService.duration_min} {s.durMin} · {formatPriceCents(selectedService.price_cents, currency)}
+                      {autoAssignBarber ? ` · ${s.autoAssign}` : null}
                     </p>
                   </div>
                 ) : null}
 
                 <div>
                   <p className="mb-[var(--space-2)] text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
-                    Tag
+                    {s.dayLabel}
                   </p>
                   <div className="flex gap-[var(--space-2)] overflow-x-auto pb-1">
                     {dayOptions.map((date) => (
@@ -660,7 +788,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                     {groupedSlots.map((group) => (
                       <div key={group.period}>
                         <p className="mb-[var(--space-3)] text-xs uppercase tracking-[0.12em] text-[color:var(--ms-text-muted)]">
-                          {group.label}
+                          {s.periodLabels[group.period] ?? group.label}
                         </p>
                         <div className="grid grid-cols-3 gap-[var(--space-2)] sm:grid-cols-4">
                           {group.slots.map((slot, slotIndex) => (
@@ -683,9 +811,9 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   </div>
                 ) : (
                   <div className="ms-booking-empty">
-                    <p className="font-display text-base">Keine freien Termine</p>
+                    <p className="font-display text-base">{s.noSlots}</p>
                     <p className="mt-[var(--space-2)] text-sm text-[color:var(--ms-text-muted)]">
-                      An diesem Tag ist nichts frei. Wähle einen anderen Tag oder kontaktiere uns direkt.
+                      {s.noSlotsDesc}
                     </p>
                   </div>
                 )}
@@ -696,7 +824,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                     variant="outline"
                     onClick={() => setSelectedDate(suggestedDate)}
                   >
-                    Nächster Tag mit Terminen: {formatDayChipLabel(suggestedDate, timezone, today)}
+                    {s.nextDay(formatDayChipLabel(suggestedDate, timezone, today))}
                   </Button>
                 ) : null}
               </div>
@@ -708,17 +836,17 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                   <p className="font-display text-md">{selectedService.name}</p>
                   <p className="text-[color:var(--ms-text-muted)]">
                     {urlState.slotStartsAt
-                      ? `${formatBookingSummaryDate(urlState.slotStartsAt, timezone)}, ${formatSlotTime(urlState.slotStartsAt, timezone)} Uhr`
+                      ? `${formatBookingSummaryDate(urlState.slotStartsAt, timezone)}, ${formatSlotTime(urlState.slotStartsAt, timezone)}${s.clock}`
                       : null}
-                    {selectedBarber ? ` · ${selectedBarber.display_name}` : " · Erstverfügbar"}
+                    {selectedBarber ? ` · ${selectedBarber.display_name}` : ` · ${s.firstAvailable}`}
                   </p>
                   <p className="text-data tabular-nums text-[color:var(--ms-accent-on-bg)]">
-                    {formatPriceCents(selectedService.price_cents)}
+                    {formatPriceCents(selectedService.price_cents, currency)}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <Label htmlFor="booking-name">Name</Label>
+                  <Label htmlFor="booking-name">{s.nameLabel}</Label>
                   <Input
                     id="booking-name"
                     value={name}
@@ -729,7 +857,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <Label htmlFor="booking-phone">Telefon</Label>
+                  <Label htmlFor="booking-phone">{s.phoneLabel}</Label>
                   <div className="flex items-center gap-[var(--space-2)] rounded-md border border-input bg-transparent px-[var(--space-3)] py-[var(--space-2)] focus-within:ring-1 focus-within:ring-ring">
                     <span className="text-sm text-[color:var(--ms-text-muted)]">+49</span>
                     <Input
@@ -746,12 +874,12 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <Label htmlFor="booking-email">E-Mail (optional)</Label>
+                  <Label htmlFor="booking-email">{s.emailLabel}</Label>
                   <Input
                     id="booking-email"
                     type="email"
                     autoComplete="email"
-                    placeholder="für deine Bestätigung"
+                    placeholder={s.emailPlaceholder}
                     value={email}
                     disabled={isPending}
                     onChange={(e) => setEmail(e.target.value)}
@@ -783,11 +911,10 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 {duplicatePrompt ? (
                   <div className="ms-booking-summary flex flex-col gap-[var(--space-3)] border-[color:var(--ms-accent)]">
                     <p className="text-sm text-[color:var(--ms-text)]">
-                      Du hast heute schon einen Termin um{" "}
-                      <span className="text-[color:var(--ms-accent-on-bg)]">
-                        {formatSlotTime(duplicatePrompt.startsAt, timezone)} Uhr
-                      </span>{" "}
-                      ({duplicatePrompt.serviceName}). Noch einen buchen?
+                      {s.duplicateWarning(
+                        `${formatSlotTime(duplicatePrompt.startsAt, timezone)}${s.clock}`,
+                        duplicatePrompt.serviceName,
+                      )}
                     </p>
                     <div className="flex flex-col gap-[var(--space-2)] sm:flex-row">
                       <Button
@@ -797,7 +924,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                         disabled={isPending}
                         onClick={() => setDuplicatePrompt(null)}
                       >
-                        Abbrechen
+                        {s.cancel}
                       </Button>
                       <Button
                         type="button"
@@ -805,7 +932,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                         disabled={isPending}
                         onClick={() => void submitBooking(true)}
                       >
-                        Trotzdem buchen
+                        {s.bookAnyway}
                       </Button>
                     </div>
                   </div>
@@ -814,7 +941,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                 {networkError ? (
                   <div className="flex flex-col gap-[var(--space-2)]">
                     <p className="text-sm text-[color:var(--ms-text-muted)]">
-                      Verbindung fehlgeschlagen.{" "}
+                      {s.networkError}{" "}
                       {contactFallback.href ? (
                         <a
                           href={contactFallback.href}
@@ -829,7 +956,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                       )}
                     </p>
                     <Button type="button" variant="outline" onClick={() => confirmBooking()}>
-                      Erneut versuchen
+                      {s.retry}
                     </Button>
                   </div>
                 ) : (
@@ -839,7 +966,7 @@ export function BookingSheetClient({ shopSlug, data }: BookingSheetClientProps) 
                     disabled={isPending || Boolean(duplicatePrompt)}
                     onClick={confirmBooking}
                   >
-                    {isPending ? "Wird gebucht…" : "Termin bestätigen"}
+                    {isPending ? s.submitting : s.submitBtn}
                   </Button>
                 )}
               </div>
@@ -873,10 +1000,13 @@ type ConfirmationViewProps = {
   serviceName: string;
   barberName: string;
   priceCents?: number;
+  currency?: string | null;
   timezone: string;
   confirmation: ConfirmationState;
   address?: string;
   copyDone: boolean;
+  strings: typeof BOOKING_STRINGS.de.confirm;
+  clock: string;
   onCopy: () => void;
   onDownloadIcs: () => void;
   onClose: () => void;
@@ -887,10 +1017,13 @@ function ConfirmationView({
   serviceName,
   barberName,
   priceCents,
+  currency,
   timezone,
   confirmation,
   address,
   copyDone,
+  strings: cs,
+  clock,
   onCopy,
   onDownloadIcs,
   onClose,
@@ -898,40 +1031,40 @@ function ConfirmationView({
   return (
     <div className="ms-booking-celebrate ms-booking-confirmation flex flex-col gap-[var(--space-6)] pt-[var(--space-4)]">
       <header className="text-center">
-        <h2 className="font-display text-2xl text-[color:var(--ms-text)]">Gebucht.</h2>
+        <h2 className="font-display text-2xl text-[color:var(--ms-text)]">{cs.title}</h2>
         <div className="ms-booking-celebrate__shimmer mx-auto mt-[var(--space-3)] h-px w-24 bg-[color:var(--ms-accent-on-bg)]" aria-hidden />
       </header>
 
       <dl className="flex flex-col gap-[var(--space-3)] rounded-md border border-[color:var(--ms-border-subtle)] bg-[color:var(--ms-bg-elevated)] px-[var(--space-4)] py-[var(--space-4)] text-sm">
         <div className="flex justify-between gap-[var(--space-4)]">
-          <dt className="text-[color:var(--ms-text-muted)]">Wann</dt>
+          <dt className="text-[color:var(--ms-text-muted)]">{cs.when}</dt>
           <dd className="text-right text-data tabular-nums ms-booking-confirmation__accent">
             {formatBookingSummaryDate(confirmation.startsAt, timezone)}
             <br />
-            {formatSlotTime(confirmation.startsAt, timezone)} Uhr
+            {formatSlotTime(confirmation.startsAt, timezone)}{clock}
           </dd>
         </div>
         <div className="flex justify-between gap-[var(--space-4)]">
-          <dt className="text-[color:var(--ms-text-muted)]">Service</dt>
+          <dt className="text-[color:var(--ms-text-muted)]">{cs.service}</dt>
           <dd>{serviceName}</dd>
         </div>
         <div className="flex justify-between gap-[var(--space-4)]">
-          <dt className="text-[color:var(--ms-text-muted)]">Barber</dt>
+          <dt className="text-[color:var(--ms-text-muted)]">{cs.barber}</dt>
           <dd>{barberName}</dd>
         </div>
         {priceCents !== undefined ? (
           <div className="flex justify-between gap-[var(--space-4)]">
-            <dt className="text-[color:var(--ms-text-muted)]">Preis</dt>
-            <dd className="text-data tabular-nums ms-booking-confirmation__accent">{formatPriceCents(priceCents)}</dd>
+            <dt className="text-[color:var(--ms-text-muted)]">{cs.price}</dt>
+            <dd className="text-data tabular-nums ms-booking-confirmation__accent">{formatPriceCents(priceCents, currency)}</dd>
           </div>
         ) : null}
         <div className="flex justify-between gap-[var(--space-4)]">
-          <dt className="text-[color:var(--ms-text-muted)]">Salon</dt>
+          <dt className="text-[color:var(--ms-text-muted)]">{cs.salon}</dt>
           <dd>{shopName}</dd>
         </div>
         {address ? (
           <div className="flex justify-between gap-[var(--space-4)]">
-            <dt className="text-[color:var(--ms-text-muted)]">Adresse</dt>
+            <dt className="text-[color:var(--ms-text-muted)]">{cs.address}</dt>
             <dd className="text-right">{address}</dd>
           </div>
         ) : null}
@@ -939,19 +1072,19 @@ function ConfirmationView({
 
       <div className="flex flex-col gap-[var(--space-2)]">
         <Button type="button" variant="outline" onClick={onDownloadIcs}>
-          In Kalender speichern (.ics)
+          {cs.saveIcs}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <a href={confirmation.manageUrl}>Termin verwalten</a>
+          <a href={confirmation.manageUrl}>{cs.manage}</a>
         </Button>
         <Button type="button" variant="secondary" onClick={onCopy}>
-          {copyDone ? "Link kopiert" : "Link kopieren"}
+          {copyDone ? cs.copied : cs.copy}
         </Button>
         <p className="text-center text-xs text-[color:var(--ms-text-muted)]">
-          Nach «Fertig» findest du deinen Termin jederzeit über «Dein Termin» auf der Seite.
+          {cs.hint}
         </p>
         <Button type="button" onClick={onClose}>
-          Fertig
+          {cs.done}
         </Button>
       </div>
     </div>

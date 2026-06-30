@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 
 import { velvetReveal, type VelvetRevealVariant } from "@/lib/minisite/velvet-motion";
 import { VELVET_SECTION_META } from "@/lib/minisite/velvet-sections";
+import type { VelvetI18n } from "@/lib/minisite/velvet-i18n";
 import type { MinisiteContent, ShopPublicData } from "@/lib/validations/public-shop";
 
 import { shopMediaPublicUrl } from "../../../lib/media-url";
@@ -12,6 +13,7 @@ const VELVET_GALLERY_ID = "ms-velvet-gallery";
 type VelvetGallerySectionProps = {
   data: ShopPublicData;
   preview?: boolean;
+  i18n: VelvetI18n;
 };
 
 function resolveGalleryImages(content: MinisiteContent): string[] {
@@ -26,14 +28,7 @@ function resolveGalleryImages(content: MinisiteContent): string[] {
   return coverPath ? [shopMediaPublicUrl(coverPath)] : [];
 }
 
-const GALLERY_CAPTIONS = [
-  "The Statement Set",
-  "Minimalist Edit",
-  "Floral Art",
-  "Chrome Dreams",
-  "French Elevated",
-  "Pearl Finish",
-] as const;
+// Captions now come from i18n — removed static const
 
 /* Editorial floating-card composition — overlapping, asymmetric, alive */
 type CardLayout = {
@@ -67,15 +62,16 @@ function tileNumber(i: number): string {
   return String(i + 1).padStart(2, "0");
 }
 
-export function VelvetGallerySection({ data, preview = false }: VelvetGallerySectionProps) {
+export function VelvetGallerySection({ data, preview = false, i18n }: VelvetGallerySectionProps) {
   const content = data.minisite.content;
   if (content.show?.gallery === false) return null;
 
   const meta = VELVET_SECTION_META.gallery;
   const eyebrow =
-    content.sections?.gallery?.eyebrow?.trim() || meta.defaults.eyebrow || "THE WORK";
+    content.sections?.gallery?.eyebrow?.trim() || meta.defaults.eyebrow || i18n.gallery.eyebrow;
   const title =
-    content.sections?.gallery?.title?.trim() || meta.defaults.title || "Every nail, a canvas.";
+    content.sections?.gallery?.title?.trim() || meta.defaults.title || i18n.gallery.title;
+  const captions = i18n.gallery.captions;
 
   const images = resolveGalleryImages(content);
   const tiles = images.length > 0 ? images : (Array(6).fill(null) as null[]);
@@ -130,7 +126,7 @@ export function VelvetGallerySection({ data, preview = false }: VelvetGallerySec
                 {src ? (
                   <Image
                     src={src}
-                    alt={GALLERY_CAPTIONS[i] ?? `Nail art ${i + 1}`}
+                    alt={captions[i] ?? `Nail art ${i + 1}`}
                     fill
                     sizes="(max-width: 767px) 90vw, 40vw"
                     className="ms-velvet-photo"
@@ -144,7 +140,7 @@ export function VelvetGallerySection({ data, preview = false }: VelvetGallerySec
 
                 <div className="ms-velvet-gallery-tile-caption">
                   <p className="ms-velvet-gallery-tile-label ms-velvet-display">
-                    {GALLERY_CAPTIONS[i] ?? `Set ${i + 1}`}
+                    {captions[i] ?? `Set ${i + 1}`}
                   </p>
                   <span className="ms-velvet-gallery-number" aria-hidden>
                     {tileNumber(i)}
