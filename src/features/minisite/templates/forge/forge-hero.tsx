@@ -68,7 +68,7 @@ export function ForgeHeroSection({ data }: ForgeHeroSectionProps) {
     <section
       id={anchors.top}
       data-forge-hero
-      className="ms-forge-hero"
+      className={videoUrl ? "ms-forge-hero ms-forge-hero--video" : "ms-forge-hero"}
       aria-label="Hero"
     >
       <div className="ms-forge-hero-shell">
