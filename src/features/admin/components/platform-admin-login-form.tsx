@@ -51,7 +51,9 @@ export function PlatformAdminLoginForm({ loginAction }: PlatformAdminLoginFormPr
         router.push(result.redirectTo ?? "/admin");
       } catch (error) {
         if (isNextRedirectError(error)) {
-          throw error;
+          router.refresh();
+          router.push("/admin");
+          return;
         }
         setErrorMessage("Etwas ist schiefgelaufen. Bitte erneut versuchen.");
       }

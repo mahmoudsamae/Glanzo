@@ -30,6 +30,7 @@ import {
 } from "@/lib/minisite/nicoles-prices-page";
 import { DEFAULT_KONTAKT_MAP_DIRECTIONS } from "@/lib/minisite/nicoles-kontakt-page";
 import type { MinisiteContent } from "@/lib/validations/public-shop";
+import type { ShopMediaKind } from "@/lib/validations/minisite-editor";
 
 import { shopMediaPublicUrl } from "../../lib/media-url";
 import { MinisiteEditorSection } from "../minisite-editor-section.client";
@@ -41,7 +42,7 @@ type ForgeMinisitePanelProps = {
   gallery: string[];
   uploading: string | null;
   onContentChange: (content: MinisiteContent) => void;
-  onUpload: (kind: "logo" | "cover" | "gallery", file: File) => void;
+  onUpload: (kind: ShopMediaKind, file: File) => void;
   onSectionImageUpload?: (
     target: {
       section: NicolesHomeSectionKey | "prices" | "contact" | "news";
@@ -346,7 +347,7 @@ export function ForgeMinisitePanel({
       >
         <div className="flex flex-col gap-[var(--space-2)]">
           {/* Hero */}
-          <MinisiteEditorSection id="forge-home-hero" title="Hero" description="Logo, Überschrift, Foto rechts und Deal-Badge.">
+          <MinisiteEditorSection id="forge-home-hero" title="Hero" description="Logo, Überschrift, Foto/Video rechts und Deal-Badge.">
             <div className="space-y-[var(--space-4)]">
               <ForgeFieldInput
                 label="Überschrift"
@@ -355,6 +356,46 @@ export function ForgeMinisitePanel({
                 value={content.hero_headline ?? ""}
                 onChange={(v) => onContentChange({ ...content, hero_headline: v || undefined })}
               />
+              <div className="rounded-lg border border-dashed border-[var(--ink-3)] bg-[var(--ink-1)]/40 p-[var(--space-4)] space-y-[var(--space-2)]">
+                <Label className="text-sm font-semibold">Hero-Video (Hintergrund)</Label>
+                <p className="text-xs text-[var(--text-3)]">
+                  MP4 oder WebM, max. 20 MB. Ersetzt das Hero-Foto. Titelbild dient als Poster beim Laden.
+                </p>
+                {content.cover_video_path ? (
+                  <div className="space-y-[var(--space-2)]">
+                    <video
+                      src={shopMediaPublicUrl(content.cover_video_path)}
+                      className="h-28 w-full rounded object-cover"
+                      muted
+                      playsInline
+                      controls
+                      preload="metadata"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onContentChange({ ...content, cover_video_path: undefined })}
+                    >
+                      Video entfernen
+                    </Button>
+                  </div>
+                ) : null}
+                <label className="inline-flex cursor-pointer items-center rounded-md border border-[var(--brass)]/40 bg-[var(--brass)]/10 px-[var(--space-3)] py-[var(--space-2)] text-sm font-medium text-[var(--brass)]">
+                  {uploading === "hero_video" ? "Lädt…" : "+ Hero-Video hochladen"}
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm"
+                    className="sr-only"
+                    disabled={uploading === "hero_video"}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) onUpload("hero_video", file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
               <div className="grid grid-cols-1 gap-[var(--space-4)] sm:grid-cols-2">
                 <div className="space-y-[var(--space-2)]">
                   <Label>Logo</Label>
@@ -373,7 +414,7 @@ export function ForgeMinisitePanel({
                   </label>
                 </div>
                 <SingleImagePicker
-                  label="Foto rechts (Titelbild)"
+                  label="Foto rechts (Titelbild / Video-Poster)"
                   path={content.cover_path}
                   gallery={gallery}
                   uploading={uploading === "cover"}

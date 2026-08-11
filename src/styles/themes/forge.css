@@ -533,6 +533,16 @@ html:has(.ms-forge-root) {
   animation: ms-forge-ken-burns 22s ease-in-out infinite alternate;
 }
 
+.ms-forge-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  pointer-events: none;
+}
+
 .ms-forge-hero-shell .ms-forge-scroll-cue {
   z-index: 4;
 }

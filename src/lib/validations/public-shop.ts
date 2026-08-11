@@ -198,7 +198,7 @@ export const minisiteContentSchema = z
       .optional(),
     logo_path: z.string().trim().min(1).optional(),
     cover_path: z.string().trim().min(1).optional(),
-    /** Velvet hero background video (shop-media hero_video/). */
+    /** Hero background video for Velvet / Forge (shop-media hero_video/). */
     cover_video_path: z.string().trim().min(1).optional(),
     /** Per-shop display language for the Velvet template. */
     locale: z.enum(["en", "de"]).optional(),

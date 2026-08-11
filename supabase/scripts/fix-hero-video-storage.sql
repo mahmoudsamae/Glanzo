@@ -1,5 +1,5 @@
--- Velvet hero video uploads: bucket MIME types + hero_video/ storage folder.
--- Safe to re-run in Supabase SQL Editor.
+-- Forge / Velvet hero video uploads: bucket MIME types + hero_video/ storage folder.
+-- Safe to re-run in Supabase SQL Editor (Dashboard → SQL → New query → Run).
 
 UPDATE storage.buckets
 SET

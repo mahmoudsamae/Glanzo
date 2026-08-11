@@ -305,7 +305,9 @@ export async function loginPlatformAdmin(formData: FormData): Promise<AuthAction
     }
 
     revalidateAuthShell();
-    redirect("/admin");
+    // Return redirect for the client — do not call redirect() here.
+    // Client try/catch often misreads NEXT_REDIRECT as a generic failure.
+    return { ok: true, redirectTo: "/admin" };
   } catch (error) {
     if (isSupabaseTransportError(error)) {
       return supabaseTransportErrorResult();

@@ -1,4 +1,6 @@
--- Velvet / Forge hero background videos: allow MP4/WebM in shop-media (hero_video/ prefix).
+-- Forge (and Velvet) hero background videos in shop-media.
+-- Allows MP4/WebM under {shop_id}/hero_video/ and raises the bucket limit to 25 MB.
+-- Idempotent: safe if 20250629110000_hero_video_storage.sql was already applied.
 
 UPDATE storage.buckets
 SET
