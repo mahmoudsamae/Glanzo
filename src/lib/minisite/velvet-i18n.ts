@@ -32,6 +32,8 @@ export type VelvetI18n = {
     featureText: string;
     ctaLabel: string;
     from: string;
+    signatureBadge: string;
+    popularBadge: string;
   };
   gallery: {
     eyebrow: string;
@@ -94,6 +96,8 @@ const EN: VelvetI18n = {
     featureText: "Precision, artistry, and care — in every appointment.",
     ctaLabel: "View Full Menu →",
     from: "from",
+    signatureBadge: "Signature",
+    popularBadge: "Most Popular",
   },
   gallery: {
     eyebrow: "THE WORK",
@@ -153,6 +157,8 @@ const DE: VelvetI18n = {
     featureText: "Präzision, Kunstfertigkeit und Sorgfalt — bei jedem Termin.",
     ctaLabel: "Vollständiges Menü ansehen →",
     from: "ab",
+    signatureBadge: "Signature",
+    popularBadge: "Beliebteste Wahl",
   },
   gallery: {
     eyebrow: "DIE ARBEIT",

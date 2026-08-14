@@ -148,6 +148,12 @@
   to   { opacity: 1; transform: none; }
 }
 
+/* Hero enter — editorial blur dissolve */
+@keyframes ms-velvet-hero-blur-dissolve {
+  from { opacity: 0; transform: translateY(32px); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0px); }
+}
+
 /* Gallery shimmer on hover */
 @keyframes ms-velvet-gallery-sheen {
   from { transform: translateX(-120%) skewX(-18deg); }
@@ -234,6 +240,16 @@ html:has(.ms-velvet-root) {
   will-change: opacity, transform;
 }
 
+/* Hero enter: slower, blur-dissolve for editorial luxury feel */
+.ms-velvet-hero-enter {
+  transform: translate3d(0, 32px, 0);
+  filter: blur(5px);
+  transition:
+    opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Entrance: apply stagger delay */
 .ms-velvet-reveal.is-inview {
   transition-delay: var(--velvet-delay, 0ms);
@@ -254,6 +270,7 @@ html:has(.ms-velvet-root) {
 .ms-velvet-root.ms-velvet-ready .ms-velvet-hero-enter {
   opacity: 1;
   transform: none;
+  filter: none;
 }
 
 
@@ -371,7 +388,7 @@ html:has(.ms-velvet-root) {
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 @media (min-width: 1024px) { .ms-velvet-nav-desktop { display: flex; } }
 
@@ -402,23 +419,26 @@ html:has(.ms-velvet-root) {
 
 .ms-velvet-nav-cta {
   display: inline-flex;
-  min-height: 2.375rem;
+  min-height: 2.5rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 0;
-  background: linear-gradient(135deg, #d4899a 0%, #c4726f 100%);
-  color: #faf7f2;
+  border: 1px solid rgb(255 210 220 / 0.22);
+  background: linear-gradient(135deg, #e0a0b5 0%, #d4849a 30%, #c4726f 100%);
+  color: #fdf9f6;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  padding: 0.55rem 1.25rem;
+  padding: 0.55rem 1.35rem;
   text-decoration: none;
   position: relative;
   overflow: hidden;
-  transition: transform 0.25s ease, background-color 0.25s ease;
+  box-shadow:
+    0 2px 12px rgb(196 114 111 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .ms-velvet-nav-cta::after {
   content: "";
@@ -612,20 +632,21 @@ html:has(.ms-velvet-root) {
 
 .ms-velvet-hero-aurora-mid {
   position: absolute;
-  width: 50%;
-  height: 60%;
-  top: 15%;
-  right: 15%;
+  width: 55%;
+  height: 65%;
+  top: 8%;
+  right: 10%;
   border-radius: 50%;
   background: radial-gradient(
-    ellipse at center,
-    rgb(240 180 195 / 0.32) 0%,
-    rgb(234 197 181 / 0.18) 50%,
-    transparent 65%
+    ellipse at 35% 25%,
+    rgb(252 240 228 / 0.22) 0%,    /* ivory highlight top-right */
+    rgb(240 190 205 / 0.20) 35%,   /* soft rose-blush mid */
+    rgb(234 197 181 / 0.12) 60%,
+    transparent 75%
   );
-  filter: blur(30px);
+  filter: blur(32px);
   pointer-events: none;
-  animation: ms-velvet-aurora-c 18s ease-in-out infinite;
+  animation: ms-velvet-aurora-c 22s ease-in-out infinite;
   animation-delay: -4s;
 }
 
@@ -645,8 +666,8 @@ html:has(.ms-velvet-root) {
     transparent
   );
   transform: skewX(-12deg);
-  animation: ms-velvet-light-sweep 10s ease-in-out infinite;
-  animation-delay: 1s;
+  animation: ms-velvet-light-sweep 16s ease-in-out infinite;
+  animation-delay: 3s;
 }
 
 /* ─── Particles ─── */
@@ -673,23 +694,23 @@ html:has(.ms-velvet-root) {
   will-change: opacity, transform;
 }
 
-/* Particle positions — sized 8-14px so they're actually visible */
-.ms-velvet-particle:nth-child(1)  { width:10px; height:10px; left:12%; bottom:14%; --p-dur:14s; --p-delay:0s;    --p-opacity:.62; }
-.ms-velvet-particle:nth-child(2)  { width:7px;  height:7px;  left:24%; bottom:22%; --p-dur:11s; --p-delay:-2.5s; --p-opacity:.70; }
-.ms-velvet-particle:nth-child(3)  { width:13px; height:13px; left:38%; bottom:8%;  --p-dur:16s; --p-delay:-5s;   --p-opacity:.52; }
-.ms-velvet-particle:nth-child(4)  { width:8px;  height:8px;  left:50%; bottom:30%; --p-dur:12s; --p-delay:-1.5s; --p-opacity:.72; }
-.ms-velvet-particle:nth-child(5)  { width:9px;  height:9px;  left:66%; bottom:12%; --p-dur:18s; --p-delay:-4s;   --p-opacity:.48; }
-.ms-velvet-particle:nth-child(6)  { width:11px; height:11px; left:78%; bottom:26%; --p-dur:13s; --p-delay:-0.8s; --p-opacity:.65; }
-.ms-velvet-particle:nth-child(7)  { width:7px;  height:7px;  left:84%; bottom:18%; --p-dur:15s; --p-delay:-3.2s; --p-opacity:.58; }
-.ms-velvet-particle:nth-child(8)  { width:9px;  height:9px;  left:18%; bottom:42%; --p-dur:10s; --p-delay:-6s;   --p-opacity:.68; }
-.ms-velvet-particle:nth-child(9)  { width:12px; height:12px; left:42%; bottom:52%; --p-dur:17s; --p-delay:-1s;   --p-opacity:.54; }
-.ms-velvet-particle:nth-child(10) { width:7px;  height:7px;  left:60%; bottom:36%; --p-dur:14s; --p-delay:-3.8s; --p-opacity:.64; }
-.ms-velvet-particle:nth-child(11) { width:10px; height:10px; left:72%; bottom:44%; --p-dur:12s; --p-delay:-2s;   --p-opacity:.72; }
-.ms-velvet-particle:nth-child(12) { width:8px;  height:8px;  left:32%; bottom:58%; --p-dur:16s; --p-delay:-4.5s; --p-opacity:.55; }
-.ms-velvet-particle:nth-child(13) { width:11px; height:11px; left:55%; bottom:62%; --p-dur:11s; --p-delay:-0.5s; --p-opacity:.68; }
-.ms-velvet-particle:nth-child(14) { width:9px;  height:9px;  left:88%; bottom:50%; --p-dur:15s; --p-delay:-2.8s; --p-opacity:.58; }
-.ms-velvet-particle:nth-child(15) { width:7px;  height:7px;  left:22%; bottom:70%; --p-dur:13s; --p-delay:-5.5s; --p-opacity:.62; }
-.ms-velvet-particle:nth-child(16) { width:12px; height:12px; left:64%; bottom:66%; --p-dur:18s; --p-delay:-1.8s; --p-opacity:.46; }
+/* Particle positions — slowed down, quieter: luxury organic drift */
+.ms-velvet-particle:nth-child(1)  { width:8px;  height:8px;  left:12%; bottom:14%; --p-dur:22s; --p-delay:0s;    --p-opacity:.28; }
+.ms-velvet-particle:nth-child(2)  { width:6px;  height:6px;  left:24%; bottom:22%; --p-dur:18s; --p-delay:-3s;   --p-opacity:.32; }
+.ms-velvet-particle:nth-child(3)  { width:10px; height:10px; left:38%; bottom:8%;  --p-dur:26s; --p-delay:-6s;   --p-opacity:.22; }
+.ms-velvet-particle:nth-child(4)  { width:7px;  height:7px;  left:50%; bottom:30%; --p-dur:20s; --p-delay:-2s;   --p-opacity:.30; }
+.ms-velvet-particle:nth-child(5)  { width:8px;  height:8px;  left:66%; bottom:12%; --p-dur:28s; --p-delay:-5s;   --p-opacity:.20; }
+.ms-velvet-particle:nth-child(6)  { width:9px;  height:9px;  left:78%; bottom:26%; --p-dur:21s; --p-delay:-1.2s; --p-opacity:.28; }
+.ms-velvet-particle:nth-child(7)  { width:6px;  height:6px;  left:84%; bottom:18%; --p-dur:24s; --p-delay:-4s;   --p-opacity:.24; }
+.ms-velvet-particle:nth-child(8)  { width:8px;  height:8px;  left:18%; bottom:42%; --p-dur:17s; --p-delay:-7s;   --p-opacity:.30; }
+.ms-velvet-particle:nth-child(9)  { width:10px; height:10px; left:42%; bottom:52%; --p-dur:27s; --p-delay:-1.5s; --p-opacity:.22; }
+.ms-velvet-particle:nth-child(10) { width:6px;  height:6px;  left:60%; bottom:36%; --p-dur:22s; --p-delay:-4.5s; --p-opacity:.26; }
+.ms-velvet-particle:nth-child(11) { width:8px;  height:8px;  left:72%; bottom:44%; --p-dur:19s; --p-delay:-2.5s; --p-opacity:.30; }
+.ms-velvet-particle:nth-child(12) { width:7px;  height:7px;  left:32%; bottom:58%; --p-dur:25s; --p-delay:-5.5s; --p-opacity:.22; }
+.ms-velvet-particle:nth-child(13) { width:9px;  height:9px;  left:55%; bottom:62%; --p-dur:18s; --p-delay:-0.8s; --p-opacity:.28; }
+.ms-velvet-particle:nth-child(14) { width:7px;  height:7px;  left:88%; bottom:50%; --p-dur:23s; --p-delay:-3.5s; --p-opacity:.24; }
+.ms-velvet-particle:nth-child(15) { width:6px;  height:6px;  left:22%; bottom:70%; --p-dur:21s; --p-delay:-6.5s; --p-opacity:.26; }
+.ms-velvet-particle:nth-child(16) { width:10px; height:10px; left:64%; bottom:66%; --p-dur:28s; --p-delay:-2.2s; --p-opacity:.18; }
 
 /* ─── Pearl orb — primary ─── */
 .ms-velvet-hero-orb {
@@ -775,6 +796,16 @@ html:has(.ms-velvet-root) {
   filter: blur(32px);
 }
 
+/* ─── Soft edge vignette — barely visible, frames the scene ─── */
+.ms-velvet-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: radial-gradient(ellipse at center, transparent 40%, rgb(8 2 6 / 0.28) 100%);
+  pointer-events: none;
+}
+
 /* ─── Gradient overlays ─── */
 .ms-velvet-hero-logo-floats {
   position: absolute;
@@ -836,24 +867,26 @@ html:has(.ms-velvet-root) {
   inset: 0;
   z-index: 8;
   background:
+    /* Left: pure deep rose-black — no brown, no coffee */
     linear-gradient(
-      90deg,
-      rgb(100 20 50 / 0.82) 0%,
-      rgb(80 15 40 / 0.45) 28%,
-      transparent 58%
+      95deg,
+      rgb(16 4 10 / 0.72) 0%,
+      rgb(10 3 7 / 0.30) 28%,
+      transparent 55%
     ),
+    /* Vertical: subtle top darkening, gentle bottom deepening */
     linear-gradient(
       180deg,
-      rgb(30 8 18 / 0.25) 0%,
-      transparent 22%,
-      rgb(120 40 70 / 0.12) 48%,
-      rgb(140 50 80 / 0.50) 72%,
-      rgb(160 60 90 / 0.72) 100%
+      rgb(8 2 6 / 0.14) 0%,
+      transparent 20%,
+      transparent 55%,
+      rgb(50 10 25 / 0.28) 72%,
+      rgb(70 15 35 / 0.50) 100%
     );
   pointer-events: none;
 }
 
-/* Hero-to-section transition — saturated blush/rose, visibly pink */
+/* Hero-to-section transition — soft rose haze fading to warm ivory */
 .ms-velvet-hero::after {
   content: "";
   position: absolute;
@@ -862,16 +895,16 @@ html:has(.ms-velvet-root) {
   right: 0;
   height: 22rem;
   background:
-    radial-gradient(ellipse at 50% 100%, rgb(210 100 130 / 0.60) 0%, transparent 55%),
-    radial-gradient(ellipse at 20% 100%, rgb(196 80 110 / 0.35) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgb(212 130 155 / 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgb(196 164 104 / 0.18) 0%, transparent 50%),
     linear-gradient(
       to bottom,
       transparent 0%,
-      rgb(180 80 110 / 0.20) 20%,
-      rgb(210 110 140 / 0.55) 42%,
-      rgb(220 150 165 / 0.82) 60%,
-      #e8bcc8 78%,
-      #edc8d4 100%
+      rgb(160 70 95 / 0.14) 22%,
+      rgb(200 115 140 / 0.42) 44%,
+      rgb(220 160 175 / 0.72) 62%,
+      #EDD8D0 80%,   /* soft blush-rose */
+      #F2EAE1 100%   /* warm ivory — matches next section bg */
     );
   pointer-events: none;
   z-index: 10;
@@ -892,14 +925,15 @@ html:has(.ms-velvet-root) {
 .ms-velvet-hero-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  gap: 0.875rem;
+  margin-bottom: 1.75rem;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.30em;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: var(--ms-velvet-rose-light);
+  color: rgb(234 197 181 / 0.90);
+  text-shadow: 0 1px 10px rgb(8 2 6 / 0.45);
 }
 .ms-velvet-hero-eyebrow-line {
   display: block;
@@ -911,12 +945,15 @@ html:has(.ms-velvet-root) {
 
 .ms-velvet-hero-headline {
   font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
-  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-size: clamp(3.75rem, 9.5vw, 8.5rem);
   font-weight: 300;
-  line-height: 0.88;
-  letter-spacing: -0.015em;
-  color: #faf7f2;
+  line-height: 0.90;
+  letter-spacing: -0.02em;
+  color: #fdf9f5;
   margin: 0;
+  text-shadow:
+    0 2px 24px rgb(8 2 6 / 0.28),
+    0 1px 4px rgb(0 0 0 / 0.12);
 }
 .ms-velvet-hero-headline-line   { display: block; }
 .ms-velvet-hero-headline-italic {
@@ -926,14 +963,15 @@ html:has(.ms-velvet-root) {
 }
 
 .ms-velvet-hero-subtitle {
-  margin-top: 1.875rem;
-  max-width: 36ch;
+  margin-top: 2rem;
+  max-width: 38ch;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
   font-size: 0.9375rem;
   font-weight: 300;
-  line-height: 1.7;
-  color: rgb(250 247 242 / 0.60);
-  letter-spacing: 0.01em;
+  line-height: 1.78;
+  color: rgb(253 249 245 / 0.72);
+  letter-spacing: 0.015em;
+  text-shadow: 0 1px 8px rgb(8 2 6 / 0.30);
 }
 
 .ms-velvet-hero-cta-row {
@@ -944,35 +982,36 @@ html:has(.ms-velvet-root) {
   margin-top: 2.5rem;
 }
 
-/* Premium CTA — rose-gold pill */
+/* Premium CTA — rose-gold glassy pill */
 .ms-velvet-hero-cta-primary {
   display: inline-flex;
-  min-height: 3.125rem;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: 9999px;
-  border: 0;
-  background: linear-gradient(135deg, #d4899a 0%, #c4726f 60%, #b06060 100%);
-  color: #faf7f2;
+  border: 1px solid rgb(255 210 220 / 0.28);
+  background: linear-gradient(135deg, #e0a0b5 0%, #d4849a 22%, #c4726f 62%, #b06060 100%);
+  color: #fdf9f6;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
-  padding: 0.875rem 2rem;
+  padding: 0.875rem 2.25rem;
   text-decoration: none;
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 4px 20px rgb(196 114 111 / 0.45),
-    0 1px 4px rgb(196 114 111 / 0.25),
-    inset 0 1px 0 rgb(255 255 255 / 0.18);
+    0 6px 28px rgb(196 114 111 / 0.48),
+    0 2px 6px rgb(196 114 111 / 0.22),
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 -1px 0 rgb(0 0 0 / 0.06);
   transition:
     transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.35s ease,
     opacity 0.25s ease;
-  animation: ms-velvet-btn-breathe 4.5s ease-in-out infinite;
+  animation: ms-velvet-btn-breathe 5s ease-in-out infinite;
 }
 .ms-velvet-hero-cta-primary:hover { animation-play-state: paused; }
 @keyframes ms-velvet-btn-breathe {
@@ -999,28 +1038,30 @@ html:has(.ms-velvet-root) {
 
 .ms-velvet-hero-cta-ghost {
   display: inline-flex;
-  min-height: 3.125rem;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  border: 1px solid rgb(237 200 210 / 0.45);
-  background: rgb(237 200 210 / 0.08);
-  color: #faf7f2;
+  border: 1px solid rgb(255 225 235 / 0.48);
+  background: rgb(255 235 242 / 0.07);
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  color: rgb(253 249 245 / 0.90);
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
   font-size: 0.8125rem;
   font-weight: 400;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  padding: 0.875rem 1.75rem;
+  padding: 0.875rem 1.875rem;
   text-decoration: none;
   transition:
-    border-color 0.3s ease,
+    border-color 0.35s ease,
     transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-    background-color 0.3s ease;
+    background-color 0.35s ease;
 }
 .ms-velvet-hero-cta-ghost:hover {
-  border-color: rgb(237 200 210 / 0.85);
-  background: rgb(237 200 210 / 0.14);
+  border-color: rgb(255 225 235 / 0.80);
+  background: rgb(255 235 242 / 0.13);
   transform: translateY(-3px);
 }
 
@@ -1427,7 +1468,10 @@ html:has(.ms-velvet-root) {
    ══════════════════════════════════════════════════════════════ */
 
 .ms-velvet-services {
-  background: var(--ms-velvet-cream);
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 0%, rgb(232 197 184 / 0.30), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 88% 100%, rgb(212 137 154 / 0.20), transparent 65%),
+    linear-gradient(165deg, var(--ms-velvet-ivory) 0%, var(--ms-velvet-cream) 55%, var(--ms-velvet-blush-light) 100%);
   padding-block: clamp(6rem, 11vw, 10rem);
   position: relative;
   overflow: hidden;
@@ -1456,6 +1500,18 @@ html:has(.ms-velvet-root) {
   filter: blur(48px);
   pointer-events: none;
 }
+.ms-velvet-services-ambient {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(196 164 104 / 0.16), transparent 70%);
+  filter: blur(64px);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
 
 .ms-velvet-services-inner {
   width: 100%;
@@ -1470,329 +1526,352 @@ html:has(.ms-velvet-root) {
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
-/* Spinning gradient border on the menu container */
-@property --velvet-list-spin {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@keyframes velvet-list-border-spin {
-  to { --velvet-list-spin: 360deg; }
-}
 @keyframes velvet-cta-pulse {
-  0%, 100% { box-shadow: 0 3px 12px rgb(196 114 111 / 0.30); }
+  0%, 100% { box-shadow: 0 3px 14px rgb(196 114 111 / 0.32); }
   50% {
     box-shadow:
-      0 4px 22px rgb(196 114 111 / 0.65),
-      0 0 0 4px rgb(212 137 154 / 0.18);
-  }
-}
-@keyframes velvet-row-enter {
-  from {
-    opacity: 0;
-    transform: translateX(-28px) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0) translateY(0);
+      0 4px 22px rgb(196 114 111 / 0.62),
+      0 0 0 4px rgb(212 137 154 / 0.16);
   }
 }
 
-/* ── Atelier menu list ── */
-.ms-velvet-services-list {
-  border: 2px solid transparent;
-  border-radius: 1.5rem;
-  overflow: hidden;
-  background:
-    #fff padding-box,
-    conic-gradient(
-      from var(--velvet-list-spin),
-      #ead5d0 0%, #d4899a 18%, #e87490 30%,
-      #f2c8d0 46%, #c8a468 58%, #e8c4b8 70%,
-      #c4726f 83%, #d4899a 92%, #ead5d0 100%
-    ) border-box;
-  box-shadow:
-    0 4px 32px rgb(26 12 20 / 0.08),
-    0 1px 8px rgb(212 137 154 / 0.12);
-  animation: velvet-list-border-spin 14s linear infinite;
+/* ── Editorial grid ── */
+.ms-velvet-services-editorial {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-flow: dense;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+@media (min-width: 1024px) {
+  .ms-velvet-services-editorial { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 767px) {
+  .ms-velvet-services-editorial { grid-template-columns: 1fr; }
 }
 
-/* ── Row ── */
-.ms-velvet-service-row {
+.ms-velvet-service-card.is-featured {
+  grid-column: span 2;
+}
+/* At tablet: featured is same width as other cards so 4 cards fill 2×2 */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .ms-velvet-service-card.is-featured {
+    grid-column: span 1;
+    grid-row: auto;
+  }
+  .ms-velvet-service-card.is-featured .ms-velvet-service-card-img {
+    aspect-ratio: 3 / 4;
+  }
+}
+@media (max-width: 639px) {
+  .ms-velvet-service-card.is-featured { grid-column: span 1; }
+}
+
+/* ── Card ── */
+.ms-velvet-service-card {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1.125rem 1.5rem;
-  position: relative;
+  flex-direction: column;
+  border-radius: 1.75rem;
+  overflow: hidden;
   background: #fff;
-  border-bottom: 1px solid var(--ms-velvet-border-subtle);
-  transition: background 0.3s ease;
+  box-shadow:
+    0 2px 8px rgb(26 12 20 / 0.05),
+    0 16px 40px rgb(26 12 20 / 0.07);
+  transition:
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ms-velvet-service-row:last-child { border-bottom: none; }
+.ms-velvet-service-card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 10px 28px rgb(26 12 20 / 0.10),
+    0 30px 70px rgb(212 137 154 / 0.24);
+}
 
-/* Left accent bar */
-.ms-velvet-service-row::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 12%;
-  bottom: 12%;
-  width: 3px;
-  background: var(--ms-velvet-rose);
-  border-radius: 0 2px 2px 0;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.ms-velvet-service-row:hover {
-  background: linear-gradient(to right, #f5ede8 0%, #faf7f2 50%, #fff 100%);
-}
-.ms-velvet-service-row:hover::before { transform: scaleY(1); }
-
-/* ── Thumbnail ── */
-.ms-velvet-service-row-img {
+/* ── Image ── */
+.ms-velvet-service-card-img {
   position: relative;
-  width: 88px;
-  height: 88px;
-  flex-shrink: 0;
-  border-radius: 12px;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--ms-velvet-blush);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ms-velvet-service-row-img .ms-velvet-photo {
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+.ms-velvet-service-card.is-featured .ms-velvet-service-card-img {
+  aspect-ratio: 16 / 11;
 }
-.ms-velvet-service-row:hover .ms-velvet-service-row-img .ms-velvet-photo {
-  transform: scale(1.07);
+.ms-velvet-service-card:hover .ms-velvet-service-card-img {
+  transform: rotate(-0.5deg) scale(1.008);
 }
-.ms-velvet-service-row-img-shine {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.20) 50%, transparent 70%);
-  transform: translateX(-100%);
-  pointer-events: none;
+.ms-velvet-service-card-img .ms-velvet-photo {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ms-velvet-service-row:hover .ms-velvet-service-row-img-shine {
-  animation: ms-velvet-btn-sweep 0.6s ease both;
+.ms-velvet-service-card:hover .ms-velvet-service-card-img .ms-velvet-photo {
+  transform: scale(1.09);
 }
 
-/* ── Body (middle) ── */
-.ms-velvet-service-row-body {
-  flex: 1;
-  min-width: 0;
+/* Rose-gold glow ring on hover */
+.ms-velvet-service-card-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-shadow: inset 0 0 0 0 rgb(212 137 154 / 0);
+  transition: box-shadow 0.5s ease;
+  pointer-events: none;
 }
-.ms-velvet-service-row-header {
-  display: flex;
-  align-items: baseline;
-  gap: 0.55rem;
-  margin-bottom: 0.2rem;
+.ms-velvet-service-card:hover .ms-velvet-service-card-img::after {
+  box-shadow:
+    inset 0 0 0 2px rgb(212 137 154 / 0.55),
+    inset 0 0 36px rgb(212 137 154 / 0.20);
 }
-.ms-velvet-service-row-num {
+
+/* Sweeping sheen */
+.ms-velvet-service-card-sheen {
+  position: absolute;
+  inset-block: 0;
+  left: -80%;
+  width: 45%;
+  z-index: 2;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.45) 50%, transparent);
+  transform: skewX(-10deg);
+  pointer-events: none;
+}
+.ms-velvet-service-card:hover .ms-velvet-service-card-sheen {
+  animation: ms-velvet-btn-sweep 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Top scrim for badge/number legibility */
+.ms-velvet-service-card-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgb(26 12 20 / 0.32) 0%,
+    transparent 32%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.ms-velvet-service-card-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 3;
+  background: linear-gradient(135deg, #d4899a, #c4726f);
+  color: #faf7f2;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
   font-size: 0.625rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--ms-velvet-muted-light);
-  flex-shrink: 0;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgb(196 114 111 / 0.40);
 }
-.ms-velvet-service-row-name {
+
+.ms-velvet-service-card-num {
+  position: absolute;
+  top: 1rem;
+  right: 1.1rem;
+  z-index: 3;
   font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+  opacity: 0.9;
+}
+
+/* ── Body ── */
+.ms-velvet-service-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.5rem 1.5rem 1.75rem;
+  gap: 0.85rem;
+}
+
+.ms-velvet-service-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ms-velvet-service-card-name {
+  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
+  font-size: 1.45rem;
   font-weight: 400;
   font-style: italic;
   color: var(--ms-velvet-espresso);
   line-height: 1.2;
   margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  transition: color 0.35s ease;
 }
-.ms-velvet-service-row-desc {
-  font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.78rem;
-  color: var(--ms-velvet-muted-light);
-  line-height: 1.45;
-  margin: 0.15rem 0 0.4rem;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+.ms-velvet-service-card.is-featured .ms-velvet-service-card-name {
+  font-size: 1.9rem;
 }
-.ms-velvet-service-row-chip {
-  display: inline-flex;
-  align-items: center;
-  font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--ms-velvet-muted-light);
-  padding: 0.18rem 0.55rem;
-  border: 1px solid var(--ms-velvet-border-subtle);
-  border-radius: 9999px;
-  line-height: 1;
+.ms-velvet-service-card:hover .ms-velvet-service-card-name {
+  color: var(--ms-velvet-rose);
 }
 
-/* ── End (price + CTA) ── */
-.ms-velvet-service-row-end {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+.ms-velvet-service-card-duration {
   flex-shrink: 0;
+  font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ms-velvet-rose);
+  border: 1px solid rgb(212 137 154 / 0.35);
+  background: rgb(212 137 154 / 0.08);
+  padding: 0.28rem 0.7rem;
+  border-radius: 9999px;
+  white-space: nowrap;
 }
-.ms-velvet-service-row-price {
+
+.ms-velvet-service-card-desc {
+  font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ms-velvet-muted-light);
+  flex: 1;
+}
+
+/* ── Footer: price + CTA ── */
+.ms-velvet-service-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--ms-velvet-border-subtle);
+}
+
+.ms-velvet-service-card-price {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
-  font-size: 1.15rem;
-  font-weight: 500;
-  color: var(--ms-velvet-rose);
-  line-height: 1.2;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.ms-velvet-service-row-price-from {
+.ms-velvet-service-card:hover .ms-velvet-service-card-price {
+  transform: scale(1.05);
+}
+.ms-velvet-service-card-price-from {
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.575rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ms-velvet-muted-light);
   line-height: 1;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.15rem;
 }
-.ms-velvet-service-row-cta {
+.ms-velvet-service-card-price-value {
+  font-family: "Cormorant Garamond", var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--ms-velvet-rose);
+  line-height: 1.15;
+}
+.ms-velvet-service-card.is-featured .ms-velvet-service-card-price-value {
+  font-size: 1.9rem;
+}
+
+.ms-velvet-service-card-cta {
   display: inline-flex;
   align-items: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
   font-family: "DM Sans", var(--font-sans), system-ui, sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #faf7f2;
   background: linear-gradient(135deg, #d4899a 0%, #c4726f 60%, #b06060 100%);
-  padding: 0.45rem 1.1rem;
+  padding-inline: 1.2rem;
   border-radius: 9999px;
   text-decoration: none;
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 3px 14px rgb(196 114 111 / 0.32);
   transition:
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.25s ease;
-  box-shadow: 0 3px 12px rgb(196 114 111 / 0.30);
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
 }
-.ms-velvet-service-row-cta::after {
+.ms-velvet-service-card-cta::after {
   content: "";
   position: absolute;
   inset-block: 0;
   left: -80%;
   width: 50%;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.28), transparent);
   transform: skewX(-12deg);
   pointer-events: none;
 }
-.ms-velvet-service-row-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgb(196 114 111 / 0.45);
+.ms-velvet-service-card-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgb(196 114 111 / 0.50);
 }
-.ms-velvet-service-row-cta:hover::after {
+.ms-velvet-service-card-cta:hover::after {
   animation: ms-velvet-btn-sweep 0.55s ease both;
 }
-
-/* ── Rich hover interactions ── */
-
-/* Full-row shimmer sweep on hover */
-.ms-velvet-service-row::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    transparent 28%,
-    rgb(255 220 210 / 0.22) 48%,
-    rgb(255 255 255 / 0.18) 52%,
-    transparent 72%,
-    transparent 100%
-  );
-  transform: translateX(-120%);
-  pointer-events: none;
-  z-index: 1;
+.ms-velvet-service-card-cta-arrow {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ms-velvet-service-row:hover::after {
-  animation: ms-velvet-btn-sweep 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+.ms-velvet-service-card-cta:hover .ms-velvet-service-card-cta-arrow {
+  transform: translateX(3px);
+}
+.ms-velvet-service-card:hover .ms-velvet-service-card-cta {
+  animation: velvet-cta-pulse 1.8s ease infinite;
 }
 
-/* Number → rose on hover */
-.ms-velvet-service-row-num {
-  transition: color 0.35s ease, letter-spacing 0.35s ease;
-}
-.ms-velvet-service-row:hover .ms-velvet-service-row-num {
-  color: var(--ms-velvet-rose);
-  letter-spacing: 0.28em;
-}
-
-/* Name: gentle letter-spacing + rose tint */
-.ms-velvet-service-row-name {
-  transition:
-    letter-spacing 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.35s ease;
-}
-.ms-velvet-service-row:hover .ms-velvet-service-row-name {
-  letter-spacing: 0.015em;
-  color: var(--ms-velvet-rose);
-}
-
-/* Duration chip brightens */
-.ms-velvet-service-row-chip {
-  transition: border-color 0.3s ease, color 0.3s ease;
-}
-.ms-velvet-service-row:hover .ms-velvet-service-row-chip {
-  border-color: rgb(212 137 154 / 0.45);
-  color: var(--ms-velvet-rose);
-}
-
-/* Price scales up with a pop */
-.ms-velvet-service-row-price {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.ms-velvet-service-row:hover .ms-velvet-service-row-price {
-  transform: scale(1.07);
-}
-
-/* CTA pulses with rose glow when row is hovered */
-.ms-velvet-service-row:hover .ms-velvet-service-row-cta {
-  animation: velvet-cta-pulse 1.6s ease infinite;
-}
-
-/* Row slide-in entrance (override generic reveal--up for rows) */
-.ms-velvet-service-row.ms-velvet-reveal--up {
+/* ── Reveal entrance ── */
+.ms-velvet-service-card.ms-velvet-reveal--up {
   opacity: 0;
-  transform: translateX(-32px) translateY(12px);
+  transform: translateY(48px) scale(0.98);
   transition:
-    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.3s ease;
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--velvet-delay, 0ms);
 }
-.ms-velvet-service-row.ms-velvet-reveal--up.is-inview {
+.ms-velvet-service-card.ms-velvet-reveal--up.is-inview {
   opacity: 1;
-  transform: translateX(0) translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-velvet-service-card.ms-velvet-reveal--up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ms-velvet-service-card,
+  .ms-velvet-service-card-img,
+  .ms-velvet-service-card-img .ms-velvet-photo,
+  .ms-velvet-service-card-cta,
+  .ms-velvet-service-card-sheen,
+  .ms-velvet-service-card-price {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* ── Mobile ── */
-@media (max-width: 639px) {
-  .ms-velvet-service-row {
-    padding: 0.875rem 1rem;
-    gap: 0.875rem;
+@media (max-width: 767px) {
+  .ms-velvet-services-editorial { gap: 1.5rem; }
+  .ms-velvet-service-card-img { aspect-ratio: 4 / 3; }
+  .ms-velvet-service-card.is-featured .ms-velvet-service-card-img { aspect-ratio: 4 / 3; }
+  .ms-velvet-service-card-body { padding: 1.25rem 1.25rem 1.5rem; gap: 0.65rem; }
+  .ms-velvet-service-card.is-featured .ms-velvet-service-card-name,
+  .ms-velvet-service-card.is-featured .ms-velvet-service-card-price-value {
+    font-size: 1.5rem;
   }
-  .ms-velvet-service-row-img {
-    width: 68px;
-    height: 68px;
-    border-radius: 10px;
-  }
-  .ms-velvet-service-row-name { font-size: 1.1rem; }
-  .ms-velvet-service-row-desc { display: none; }
+  .ms-velvet-service-card-footer { flex-wrap: wrap; }
+  .ms-velvet-service-card-cta { flex: 1; justify-content: center; }
 }
 
 

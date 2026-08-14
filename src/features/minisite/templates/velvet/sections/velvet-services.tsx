@@ -49,9 +49,11 @@ export function VelvetServicesSection({ data, shopSlug, preview = false, i18n }:
 
   const visible = services.slice(0, PREVIEW_LIMIT) as Service[];
   const bookBase = `/s/${shopSlug}?book=1`;
+  const popularIndex = visible.length >= 3 ? 1 : -1;
 
   return (
     <section id={anchors.services} className="ms-velvet-services" aria-label="Services">
+      <div className="ms-velvet-services-ambient" aria-hidden />
       <div className="ms-velvet-services-inner">
         <header {...velvetReveal("fade", 0, "ms-velvet-section-header ms-velvet-services-header")}>
           <p className="ms-velvet-eyebrow">
@@ -61,59 +63,76 @@ export function VelvetServicesSection({ data, shopSlug, preview = false, i18n }:
           <h2 className="ms-velvet-section-title ms-velvet-display">{title}</h2>
         </header>
 
-        <div className="ms-velvet-services-list">
+        <div className="ms-velvet-services-editorial">
           {visible.map((service, i) => {
             const imgSrc = resolveServiceImage(service, i);
             const bookHref = preview ? "#" : `${bookBase}&service=${encodeURIComponent(service.id)}`;
             const num = String(i + 1).padStart(2, "0");
+            const isFeatured = i === 0 && visible.length > 1;
+            const badge = isFeatured
+              ? i18n.services.signatureBadge
+              : i === popularIndex
+                ? i18n.services.popularBadge
+                : null;
 
             return (
               <article
                 key={service.id}
-                className="ms-velvet-service-row ms-velvet-reveal ms-velvet-reveal--up"
-                style={{ "--velvet-delay": `${i * 70}ms` } as CSSProperties}
+                className={`ms-velvet-service-card ms-velvet-reveal ms-velvet-reveal--up${isFeatured ? " is-featured" : ""}`}
+                style={{ "--velvet-delay": `${i * 110}ms` } as CSSProperties}
               >
-                {/* Thumbnail */}
-                <div className="ms-velvet-service-row-img" aria-hidden>
+                {/* Image */}
+                <div className="ms-velvet-service-card-img">
                   <Image
                     src={imgSrc}
                     alt={service.name}
                     fill
-                    sizes="(max-width: 639px) 72px, 96px"
+                    sizes={isFeatured ? "(max-width: 767px) 100vw, 56vw" : "(max-width: 639px) 100vw, (max-width: 1023px) 46vw, 30vw"}
                     className="ms-velvet-photo"
                   />
-                  <div className="ms-velvet-service-row-img-shine" />
+                  <div className="ms-velvet-service-card-sheen" aria-hidden />
+                  <div className="ms-velvet-service-card-scrim" aria-hidden />
+                  {badge ? <span className="ms-velvet-service-card-badge">{badge}</span> : null}
+                  <span className="ms-velvet-service-card-num">{num}</span>
                 </div>
 
-                {/* Main info */}
-                <div className="ms-velvet-service-row-body">
-                  <div className="ms-velvet-service-row-header">
-                    <span className="ms-velvet-service-row-num">{num}</span>
-                    <h3 className="ms-velvet-service-row-name ms-velvet-display">{service.name}</h3>
+                {/* Body */}
+                <div className="ms-velvet-service-card-body">
+                  <div className="ms-velvet-service-card-head">
+                    <h3 className="ms-velvet-service-card-name ms-velvet-display">{service.name}</h3>
+                    <span className="ms-velvet-service-card-duration">{service.duration_min} min</span>
                   </div>
-                  {service.description?.trim() ? (
-                    <p className="ms-velvet-service-row-desc">{service.description.trim()}</p>
-                  ) : null}
-                  <span className="ms-velvet-service-row-chip">{service.duration_min} min</span>
-                </div>
 
-                {/* Price + CTA */}
-                <div className="ms-velvet-service-row-end">
-                  {service.show_price !== false && (
-                    <span className="ms-velvet-service-row-price">
-                      <span className="ms-velvet-service-row-price-from">{i18n.services.from}</span>
-                      {formatPriceCents(service.price_cents, content.currency)}
-                    </span>
-                  )}
-                  {preview ? (
-                    <span className="ms-velvet-service-row-cta" aria-hidden>
-                      {i18n.nav.bookNow}
-                    </span>
-                  ) : (
-                    <Link href={bookHref} scroll={false} className="ms-velvet-service-row-cta">
-                      {i18n.nav.bookNow}
-                    </Link>
-                  )}
+                  {service.description?.trim() ? (
+                    <p className="ms-velvet-service-card-desc">{service.description.trim()}</p>
+                  ) : null}
+
+                  <div className="ms-velvet-service-card-footer">
+                    {service.show_price !== false && (
+                      <span className="ms-velvet-service-card-price">
+                        <span className="ms-velvet-service-card-price-from">{i18n.services.from}</span>
+                        <span className="ms-velvet-service-card-price-value">
+                          {formatPriceCents(service.price_cents, content.currency)}
+                        </span>
+                      </span>
+                    )}
+
+                    {preview ? (
+                      <span className="ms-velvet-service-card-cta" aria-hidden>
+                        {i18n.nav.bookNow}
+                        <svg className="ms-velvet-service-card-cta-arrow" width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden>
+                          <path d="M0.5 5H13M13 5L9 1M13 5L9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                    ) : (
+                      <Link href={bookHref} scroll={false} className="ms-velvet-service-card-cta">
+                        {i18n.nav.bookNow}
+                        <svg className="ms-velvet-service-card-cta-arrow" width="14" height="10" viewBox="0 0 14 10" fill="none" aria-hidden>
+                          <path d="M0.5 5H13M13 5L9 1M13 5L9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </article>
             );

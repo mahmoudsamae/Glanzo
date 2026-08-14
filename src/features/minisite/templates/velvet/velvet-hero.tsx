@@ -134,6 +134,9 @@ export function VelvetHeroSection({ data, bookHref, preview = false, i18n }: Vel
       aria-label="Hero"
     >
       {/* ── Background media ── */}
+      {/* NOTE: Replace cover_video_path with a watermark-free export before launch.
+          Watermarks (e.g. pixverse.ai) are clearly visible on the hero and destroy
+          the premium feel. Export the final video without branding overlays. */}
       {videoUrl ? (
         <video
           className="ms-velvet-hero-bg-video"
