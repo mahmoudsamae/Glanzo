@@ -2,7 +2,17 @@ function rgbHex(r: number, g: number, b: number): string {
   return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
 }
 
+const FORGE_OXBLOOD_RGB = [154, 43, 41] as const;
+
+/** Default Forge accent — matches the oxblood logo. */
+export const FORGE_DEFAULT_ACCENT_HEX = rgbHex(
+  FORGE_OXBLOOD_RGB[0],
+  FORGE_OXBLOOD_RGB[1],
+  FORGE_OXBLOOD_RGB[2],
+);
+
 const PRESET_RGB = [
+  { label: "Weinrot", rgb: FORGE_OXBLOOD_RGB },
   { label: "Brass", rgb: [176, 141, 74] as const },
   { label: "Copper", rgb: [196, 92, 62] as const },
   { label: "Forest", rgb: [45, 106, 79] as const },

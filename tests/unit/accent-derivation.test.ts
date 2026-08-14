@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   contrastRatio,
+  deriveAccentCssVars,
   deriveAccentPalette,
   relativeLuminance,
 } from "@/lib/color/accent";
@@ -53,5 +54,13 @@ describe("deriveAccentPalette", () => {
   it("hover differs from base accent", () => {
     const palette = deriveAccentPalette("#b08d4a", "midnight");
     expect(palette.accentHover).not.toBe(palette.accent);
+  });
+
+  it("maps forge accent onto copper tokens used by the theme", () => {
+    const palette = deriveAccentPalette("#9A2B29", "forge");
+    const vars = deriveAccentCssVars("#9A2B29", "forge");
+    expect(vars["--ms-forge-copper"]).toBe(palette.accent);
+    expect(vars["--ms-forge-copper-bright"]).toBe(palette.accentHover);
+    expect(vars["--ms-accent"]).toBe(palette.accent);
   });
 });

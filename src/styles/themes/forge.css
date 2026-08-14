@@ -1,13 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
 
-/* Forge — heavy masculine barbershop: void black, warm copper, Syne display */
+/* Forge — heavy masculine barbershop: void black, oxblood accent, Syne display */
 
 .theme-forge {
   --ms-forge-void: #070605;
   --ms-forge-surface: #11100e;
   --ms-forge-elevated: #1a1815;
-  --ms-forge-copper: #c47a2c;
-  --ms-forge-copper-bright: #e09545;
+  --ms-accent: #9A2B29;
+  --ms-accent-hover: color-mix(in oklch, var(--ms-accent) 78%, white);
+  --ms-accent-on-bg: var(--ms-accent);
+  --ms-on-accent: #ede6dc;
+  --ms-forge-copper: var(--ms-accent);
+  --ms-forge-copper-bright: var(--ms-accent-hover);
   --ms-forge-cream: #ede6dc;
   --ms-forge-muted: #8f867c;
   --ms-forge-border: #2a2622;

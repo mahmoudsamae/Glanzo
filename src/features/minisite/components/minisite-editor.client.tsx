@@ -10,8 +10,9 @@ import {
 } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { buildShopMinisiteUrl } from "@/lib/dashboard/minisite-url";
+import { FORGE_DEFAULT_ACCENT_HEX } from "@/lib/minisite/accent-presets";
 import type { MinisiteSaveInput, ShopMediaKind } from "@/lib/validations/minisite-editor";
-import type { MinisiteContent } from "@/lib/validations/public-shop";
+import type { MinisiteContent, MinisiteTemplate } from "@/lib/validations/public-shop";
 import type { MinisiteEditorData } from "@/lib/minisite/editor-types";
 import { patchNicolesNewsItem } from "@/lib/minisite/nicoles-sections";
 
@@ -219,6 +220,13 @@ export function MinisiteEditor({
   };
   const canPickTemplate = isAdmin || initial.allowedTemplates.length > 1;
 
+  function handleTemplateChange(next: MinisiteTemplate) {
+    setTemplate(next);
+    if (next === "forge") {
+      setAccentHex(FORGE_DEFAULT_ACCENT_HEX);
+    }
+  }
+
   const formPane = (
     <MinisiteSectionsPanel
       shopName={initial.publicData.shop.name}
@@ -230,7 +238,7 @@ export function MinisiteEditor({
       draft={draft}
       uploading={uploading}
       onAccentChange={setAccentHex}
-      onTemplateChange={canPickTemplate ? setTemplate : undefined}
+      onTemplateChange={canPickTemplate ? handleTemplateChange : undefined}
       onContentChange={setContent}
       onUpload={(kind, file) => void handleUpload(kind, file)}
       onSectionImageUpload={(target, file) => void handleSectionImageUpload(target, file)}

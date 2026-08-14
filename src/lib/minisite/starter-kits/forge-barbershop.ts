@@ -1,5 +1,6 @@
 import type { StarterKitDefinition } from "./types";
 import { defaultNicolesAboutBlocks } from "@/lib/minisite/nicoles-about-blocks";
+import { FORGE_DEFAULT_ACCENT_HEX } from "@/lib/minisite/accent-presets";
 import {
   DEFAULT_NICOLES_PRICE_SECTIONS,
   DEFAULT_NICOLES_SERVICE_CARDS,
@@ -21,11 +22,11 @@ export const FORGE_BARBERSHOP_KIT: StarterKitDefinition = {
   id: "forge-barbershop",
   tier: "free",
   label: "Forge Barbershop",
-  tagline: "Schwer · Kupfer · Syne",
+  tagline: "Schwer · Weinrot · Syne",
   description:
     "Flagship Barbershop-Website: dunkler Hero, Leistungen, Team, Aktionen und Buchung — mit Premium-Scroll-Animationen.",
   template: "forge",
-  accentHex: "#C47A2C",
+  accentHex: FORGE_DEFAULT_ACCENT_HEX,
   content: {
     hero_headline: "Cut. Style. Attitude.",
     about: FORGE_ABOUT,

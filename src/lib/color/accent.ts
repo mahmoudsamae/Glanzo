@@ -227,13 +227,23 @@ export function deriveAccentPalette(
   return { accent, accentHover, accentOnBg, onAccent };
 }
 
-export function accentPaletteToCssVars(palette: AccentPalette): Record<string, string> {
-  return {
+export function accentPaletteToCssVars(
+  palette: AccentPalette,
+  template?: MinisiteTemplate,
+): Record<string, string> {
+  const vars: Record<string, string> = {
     "--ms-accent": palette.accent,
     "--ms-accent-hover": palette.accentHover,
     "--ms-accent-on-bg": palette.accentOnBg,
     "--ms-on-accent": palette.onAccent,
   };
+
+  if (template === "forge") {
+    vars["--ms-forge-copper"] = palette.accent;
+    vars["--ms-forge-copper-bright"] = palette.accentHover;
+  }
+
+  return vars;
 }
 
 export function deriveAccentCssVars(
@@ -241,5 +251,8 @@ export function deriveAccentCssVars(
   template: MinisiteTemplate,
   backgroundOverride?: string,
 ): Record<string, string> {
-  return accentPaletteToCssVars(deriveAccentPalette(accentHex, template, backgroundOverride));
+  return accentPaletteToCssVars(
+    deriveAccentPalette(accentHex, template, backgroundOverride),
+    template,
+  );
 }
