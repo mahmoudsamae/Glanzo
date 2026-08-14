@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { normalizeRootDomain } from "@/lib/tenant";
+
 /** Empty or whitespace env values → undefined (optional secrets in dev). */
 function optionalNonEmptyString(minLength = 1) {
   return z.preprocess(
@@ -36,7 +38,15 @@ const serverEnvSchema = z.object({
 const clientEnvSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  NEXT_PUBLIC_ROOT_DOMAIN: z.string().min(1).default("glanzo.app"),
+  NEXT_PUBLIC_ROOT_DOMAIN: z.preprocess(
+    (val) => {
+      if (typeof val !== "string" || !val.trim()) {
+        return undefined;
+      }
+      return normalizeRootDomain(val);
+    },
+    z.string().min(1).default("glanzo.app"),
+  ),
   NEXT_PUBLIC_AUTH_GOOGLE_ENABLED: z
     .enum(["true", "false"])
     .default("false")

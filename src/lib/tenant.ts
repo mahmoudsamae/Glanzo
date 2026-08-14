@@ -35,12 +35,29 @@ export type ResolveTenantOptions = {
 
 const VERCEL_PREVIEW_SUFFIX = ".vercel.app";
 
+/** Host[:port] only — strips `https://`, paths, and trailing slashes from env values. */
+export function normalizeRootDomain(rootDomain: string): string {
+  const trimmed = rootDomain.trim();
+  if (!trimmed) {
+    return trimmed;
+  }
+
+  try {
+    const candidate = /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)
+      ? trimmed
+      : `https://${trimmed}`;
+    return new URL(candidate).host.toLowerCase();
+  } catch {
+    return trimmed
+      .replace(/^[a-z][a-z0-9+.-]*:\/\//i, "")
+      .replace(/\/.*$/, "")
+      .toLowerCase();
+  }
+}
+
 /** Path-based mini-sites (`/s/{slug}`) — localhost dev and Vercel default domains (no wildcard DNS). */
 export function allowsDirectTenantPaths(rootDomain: string): boolean {
-  const normalized = rootDomain.trim().toLowerCase();
-  const hostname = normalized.includes("]")
-    ? normalized
-    : normalized.replace(/:\d+$/, "");
+  const hostname = normalizeRootDomain(rootDomain);
   return hostname.includes("localhost") || hostname.endsWith(VERCEL_PREVIEW_SUFFIX);
 }
 
@@ -110,7 +127,7 @@ function validateTenantSlug(slug: string): TenantResolution {
  * Pure host → tenant resolution. All host parsing for Glanzo lives here.
  */
 export function resolveTenant(host: string, options: ResolveTenantOptions = {}): TenantResolution {
-  const rootDomain = options.rootDomain ?? "glanzo.app";
+  const rootDomain = normalizeRootDomain(options.rootDomain ?? "glanzo.app");
   const nodeEnv = options.nodeEnv ?? "development";
 
   const { hostname, port } = parseHostParts(host);

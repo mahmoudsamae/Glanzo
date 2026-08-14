@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { allowsDirectTenantPaths, pathnameForTenantRewrite, resolveTenant } from "@/lib/tenant";
+import {
+  allowsDirectTenantPaths,
+  normalizeRootDomain,
+  pathnameForTenantRewrite,
+  resolveTenant,
+} from "@/lib/tenant";
 
 const ROOT = "localhost:3000";
 const PROD_ROOT = "glanzo.app";
@@ -86,6 +91,7 @@ describe("resolveTenant", () => {
     expect(allowsDirectTenantPaths("glanzo.vercel.app")).toBe(true);
     expect(allowsDirectTenantPaths("glanzo-git-main-acme.vercel.app")).toBe(true);
     expect(allowsDirectTenantPaths("glanzo.app")).toBe(false);
+    expect(allowsDirectTenantPaths("https://glanzo-63fx.vercel.app/")).toBe(true);
   });
 
   it("rejects slug that is too short", () => {
@@ -133,5 +139,13 @@ describe("pathnameForTenantRewrite", () => {
     expect(pathnameForTenantRewrite("demo-shop", "/")).toBe("/");
     expect(pathnameForTenantRewrite("demo-shop", "/about")).toBe("/about");
     expect(pathnameForTenantRewrite("demo-shop", "/s/other-shop/about")).toBe("/s/other-shop/about");
+  });
+});
+
+describe("normalizeRootDomain", () => {
+  it("strips protocol, path, and trailing slash", () => {
+    expect(normalizeRootDomain("https://glanzo-63fx.vercel.app/")).toBe("glanzo-63fx.vercel.app");
+    expect(normalizeRootDomain("https://glanzo.app")).toBe("glanzo.app");
+    expect(normalizeRootDomain("localhost:3000")).toBe("localhost:3000");
   });
 });
