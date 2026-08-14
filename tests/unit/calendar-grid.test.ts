@@ -18,6 +18,7 @@ import {
   weekDatesFromAnchor,
   yToTime,
 } from "@/features/calendar/grid";
+import { clampDateToHorizon, horizonDates } from "@/features/calendar/horizon";
 
 const TZ = "Europe/Berlin";
 const DATE = "2026-06-12";
@@ -151,5 +152,20 @@ describe("DST edge rendering", () => {
     expect(window).not.toBeNull();
     const minutes = minutesBetween(window!.startMs, window!.endMs);
     expect(minutes).toBeGreaterThan(500);
+  });
+});
+
+describe("calendar horizon", () => {
+  it("builds 14 dates starting from today", () => {
+    const dates = horizonDates("2026-08-14");
+    expect(dates).toHaveLength(14);
+    expect(dates[0]).toBe("2026-08-14");
+    expect(dates[13]).toBe("2026-08-27");
+  });
+
+  it("clamps dates outside the horizon to the start", () => {
+    expect(clampDateToHorizon("2026-08-10", "2026-08-14")).toBe("2026-08-14");
+    expect(clampDateToHorizon("2026-08-20", "2026-08-14")).toBe("2026-08-20");
+    expect(clampDateToHorizon("2026-09-01", "2026-08-14")).toBe("2026-08-14");
   });
 });

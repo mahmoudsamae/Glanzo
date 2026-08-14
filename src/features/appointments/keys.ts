@@ -16,6 +16,14 @@ export function appointmentsWeekKey(
   return shopQueryKey(shopId, "appointments-week", params);
 }
 
+/** [shopId, 'appointments-horizon', { startDate, barber? }] */
+export function appointmentsHorizonKey(
+  shopId: string,
+  params: { startDate: string; barberId?: string | null },
+) {
+  return shopQueryKey(shopId, "appointments-horizon", params);
+}
+
 /** [shopId, 'today', date] */
 export function todayKey(shopId: string, date: string) {
   return shopQueryKey(shopId, "today", { date });

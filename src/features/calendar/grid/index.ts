@@ -1,4 +1,6 @@
 export { DEFAULT_PX_PER_MINUTE, GRID_PADDING_MIN } from "./constants";
+export { computeGaps } from "./gaps";
+export type { Gap } from "./gaps";
 export { assignOverlapLanes, laneWidthPercent } from "./lanes";
 export {
   columnOffsetPx,

@@ -1,8 +1,6 @@
 import type { AppointmentListItem } from "@/server/modules/appointments/appointments.types";
 import type { GridWindow } from "../grid";
-import { timeToY, blockHeightPx } from "../grid";
-
-const GAP_MIN_MS = 30 * 60_000;
+import { computeGaps, timeToY, blockHeightPx } from "../grid";
 
 type GapHatchLayerProps = {
   appointments: AppointmentListItem[];
@@ -18,24 +16,7 @@ export function GapHatchLayer({
   pxPerMinute,
   columnWidthPx,
 }: GapHatchLayerProps) {
-  const active = appointments
-    .filter((item) => item.status === "booked")
-    .sort(
-      (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
-    );
-
-  const gaps: Array<{ startMs: number; endMs: number }> = [];
-  let cursor = window.startMs;
-  for (const appointment of active) {
-    const startMs = new Date(appointment.startsAt).getTime();
-    if (startMs - cursor >= GAP_MIN_MS) {
-      gaps.push({ startMs: cursor, endMs: startMs });
-    }
-    cursor = Math.max(cursor, new Date(appointment.endsAt).getTime());
-  }
-  if (window.endMs - cursor >= GAP_MIN_MS) {
-    gaps.push({ startMs: cursor, endMs: window.endMs });
-  }
+  const gaps = computeGaps(appointments, window);
 
   return (
     <>

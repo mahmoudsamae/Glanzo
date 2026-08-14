@@ -6,7 +6,7 @@ import type { DayAppointmentsPayload } from "@/server/modules/appointments/appoi
 import type { MoveAppointmentInput } from "@/lib/validations/appointment";
 
 import { moveAppointmentAction } from "../api";
-import { appointmentsDayKey, appointmentsWeekKey, todayKey } from "../keys";
+import { appointmentsDayKey, appointmentsHorizonKey, appointmentsWeekKey, todayKey } from "../keys";
 import { useOptimisticAppointmentMutation } from "./use-appointment-mutation";
 
 export function useMoveAppointmentMutation(
@@ -14,10 +14,15 @@ export function useMoveAppointmentMutation(
   date: string,
   barberId?: string | null,
   onErrorCode?: (code: string) => void,
+  horizonStartDate?: string,
 ) {
   const queryClient = useQueryClient();
   const dayKey = appointmentsDayKey(shopId, { date, barberId });
   const weekKey = appointmentsWeekKey(shopId, { anchorDate: date, barberId });
+  const horizonKey = appointmentsHorizonKey(shopId, {
+    startDate: horizonStartDate ?? date,
+    barberId,
+  });
   const todayQueryKey = todayKey(shopId, date);
 
   return useOptimisticAppointmentMutation<
@@ -26,7 +31,7 @@ export function useMoveAppointmentMutation(
     DayAppointmentsPayload
   >({
     mutationFn: moveAppointmentAction,
-    queryKeys: [dayKey, weekKey, todayQueryKey],
+    queryKeys: [dayKey, weekKey, horizonKey, todayQueryKey],
     getCache: (key) => queryClient.getQueryData<DayAppointmentsPayload>(key),
     setCache: (key, value) => queryClient.setQueryData(key, value),
     onOptimisticUpdate: (cache, input) => ({

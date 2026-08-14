@@ -10,6 +10,7 @@ import {
 import { getActor } from "@/server/modules/auth/get-actor";
 import {
   loadDayAppointments,
+  loadHorizonAppointments,
   loadTodayPage,
   loadWeekAppointments,
 } from "@/server/modules/appointments/appointments.loader";
@@ -64,6 +65,27 @@ export async function fetchWeekAppointmentsAction(input: {
     ctx.actor,
     ctx.shopId,
     input.anchorDate,
+    input.barberId,
+  );
+  if (!data) {
+    return { ok: false as const, code: "NOT_FOUND" };
+  }
+  return { ok: true as const, data };
+}
+
+export async function fetchHorizonAppointmentsAction(input: {
+  startDate: string;
+  barberId?: string | null;
+}) {
+  const ctx = await dashboardActor();
+  if (!ctx) {
+    return { ok: false as const, code: "FORBIDDEN" };
+  }
+
+  const data = await loadHorizonAppointments(
+    ctx.actor,
+    ctx.shopId,
+    input.startDate,
     input.barberId,
   );
   if (!data) {

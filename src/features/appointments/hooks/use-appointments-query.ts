@@ -1,16 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { CALENDAR_POLL_INTERVAL_MS, TODAY_POLL_INTERVAL_MS } from "@/lib/query/client-config";
 import type { DayAppointmentsPayload, TodaySummary } from "@/server/modules/appointments/appointments.types";
 
 import {
   fetchDayAppointmentsAction,
+  fetchHorizonAppointmentsAction,
   fetchTodaySummaryAction,
   fetchWeekAppointmentsAction,
 } from "../api";
-import { appointmentsDayKey, appointmentsWeekKey, todayKey } from "../keys";
+import { appointmentsDayKey, appointmentsHorizonKey, appointmentsWeekKey, todayKey } from "../keys";
 
 export function useDayAppointmentsQuery(
   shopId: string,
@@ -34,6 +35,7 @@ export function useWeekAppointmentsQuery(
   shopId: string,
   anchorDate: string,
   barberId?: string | null,
+  enabled = true,
 ) {
   return useQuery({
     queryKey: appointmentsWeekKey(shopId, { anchorDate, barberId }),
@@ -45,6 +47,27 @@ export function useWeekAppointmentsQuery(
       return result.data;
     },
     refetchInterval: CALENDAR_POLL_INTERVAL_MS,
+    enabled,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useHorizonAppointmentsQuery(
+  shopId: string,
+  startDate: string,
+  barberId?: string | null,
+) {
+  return useQuery({
+    queryKey: appointmentsHorizonKey(shopId, { startDate, barberId }),
+    queryFn: async () => {
+      const result = await fetchHorizonAppointmentsAction({ startDate, barberId });
+      if (!result.ok) {
+        throw new Error(result.code);
+      }
+      return result.data;
+    },
+    refetchInterval: CALENDAR_POLL_INTERVAL_MS,
+    placeholderData: keepPreviousData,
   });
 }
 

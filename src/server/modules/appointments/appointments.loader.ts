@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { requireShopMember } from "@/server/modules/auth/assert-shop-access";
 import type { Actor } from "@/server/modules/auth/types";
 
+import { datesFromStart } from "@/lib/datetime/iso-date";
 import { weekDatesFromAnchor } from "@/server/modules/availability/time-windows";
 
 import {
@@ -99,6 +100,58 @@ export async function loadWeekAppointments(
 
   return {
     date: anchorDate,
+    timezone: context.timezone,
+    barbers: visibleBarbers,
+    appointments,
+    slotGranularityMin: context.slotGranularityMin,
+    openingHours: context.openingHours,
+  };
+}
+
+export async function loadHorizonAppointments(
+  actor: Actor,
+  shopId: string,
+  startDate: string,
+  membershipFilter?: string | null,
+  dayCount = 14,
+): Promise<DayAppointmentsPayload | null> {
+  requireShopMember(actor, shopId);
+  const membership = actor.memberships.find((m) => m.shopId === shopId);
+  if (!membership) {
+    return null;
+  }
+
+  const scopedMembershipId =
+    membership.role === "barber" ? membership.id : membershipFilter ?? null;
+
+  const supabase = await createServerSupabaseClient();
+  const context = await getShopCalendarContext(supabase, shopId);
+  if (!context) {
+    return null;
+  }
+
+  const dates = datesFromStart(startDate, dayCount);
+  const firstDay = dates[0];
+  const lastDay = dates[dates.length - 1];
+  if (!firstDay || !lastDay) {
+    return null;
+  }
+
+  const { startIso } = dayRangeIso(firstDay, context.timezone);
+  const { endIso } = dayRangeIso(lastDay, context.timezone);
+
+  const [barbers, appointments] = await Promise.all([
+    listShopBarbers(supabase, shopId),
+    listAppointmentsInRange(supabase, shopId, startIso, endIso, scopedMembershipId),
+  ]);
+
+  const visibleBarbers =
+    membership.role === "barber"
+      ? barbers.filter((barber) => barber.membershipId === membership.id)
+      : barbers;
+
+  return {
+    date: startDate,
     timezone: context.timezone,
     barbers: visibleBarbers,
     appointments,

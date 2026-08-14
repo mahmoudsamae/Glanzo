@@ -29,6 +29,7 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
     date: today,
     view: "day",
     barber: membership.role === "barber" ? membership.id : undefined,
+    mode: "grid",
   });
 
   const { services, barbers } = await loadServicesCatalog(actor, membership.shopId);
@@ -40,9 +41,10 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
         shopSlug={membership.shopSlug}
         role={membership.role}
         actorMembershipId={membership.id}
-        initialDate={urlState.date}
+        initialDate={today}
         initialView={urlState.view}
         initialBarberId={urlState.barber}
+        initialMode={urlState.mode}
         services={services}
         serviceBarbers={barbers}
       />

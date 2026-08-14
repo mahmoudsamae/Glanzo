@@ -6,9 +6,13 @@ import { useSearchParams } from "next/navigation";
 import { ToastBanner } from "@/components/shared/toast-banner.client";
 import { CalendarShell, parseCalendarSearchParams } from "@/features/calendar";
 import {
+  clampDateToHorizon,
+  sliceDayFromHorizon,
+} from "@/features/calendar/horizon";
+import {
   createWalkInAppointmentAction,
   updateAppointmentStatusAction,
-  useDayAppointmentsQuery,
+  useHorizonAppointmentsQuery,
   useMoveAppointmentMutation,
   useWeekAppointmentsQuery,
 } from "@/features/appointments";
@@ -24,6 +28,7 @@ type CalendarClientProps = {
   initialDate: string;
   initialView: "day" | "week";
   initialBarberId?: string;
+  initialMode: "grid" | "agenda";
   services: ServiceCatalogItem[];
   serviceBarbers: BarberOption[];
 };
@@ -36,11 +41,13 @@ export function CalendarClient({
   initialDate,
   initialView,
   initialBarberId,
+  initialMode,
   services,
   serviceBarbers,
 }: CalendarClientProps) {
   const searchParams = useSearchParams();
   const [toast, setToast] = useState<string | null>(null);
+  const horizonStartDate = initialDate;
 
   const urlState = useMemo(
     () =>
@@ -51,21 +58,32 @@ export function CalendarClient({
     [searchParams, initialDate, initialView, initialBarberId],
   );
 
+  const selectedDate = clampDateToHorizon(urlState.date, horizonStartDate);
   const barberFilter = role === "barber" ? undefined : urlState.barber ?? null;
 
-  const dayQuery = useDayAppointmentsQuery(shopId, urlState.date, barberFilter);
-  const weekQuery = useWeekAppointmentsQuery(shopId, urlState.date, barberFilter);
-  const activeQuery = urlState.view === "week" ? weekQuery : dayQuery;
+  const horizonQuery = useHorizonAppointmentsQuery(shopId, horizonStartDate, barberFilter);
+  const weekQuery = useWeekAppointmentsQuery(
+    shopId,
+    selectedDate,
+    barberFilter,
+    urlState.view === "week",
+  );
+  const dayData = useMemo(
+    () => (horizonQuery.data ? sliceDayFromHorizon(horizonQuery.data, selectedDate) : undefined),
+    [horizonQuery.data, selectedDate],
+  );
+  const activeQuery = urlState.view === "week" ? weekQuery : horizonQuery;
 
   const moveMutation = useMoveAppointmentMutation(
     shopId,
-    urlState.date,
+    selectedDate,
     barberFilter,
     (code) => {
       setToast(
         isBookingErrorCode(code) ? bookingErrorMessage(code) : `Verschieben fehlgeschlagen: ${code}`,
       );
     },
+    horizonStartDate,
   );
 
   const handleStatusUpdate = useCallback(
@@ -98,10 +116,10 @@ export function CalendarClient({
           code: isBookingErrorCode(result.code) ? bookingErrorMessage(result.code) : result.code,
         };
       }
-      await activeQuery.refetch();
+      await Promise.all([horizonQuery.refetch(), weekQuery.refetch()]);
       return { ok: true };
     },
-    [activeQuery],
+    [horizonQuery, weekQuery],
   );
 
   return (
@@ -110,15 +128,22 @@ export function CalendarClient({
         role={role}
         actorMembershipId={actorMembershipId}
         shopSlug={shopSlug}
-        initialDate={initialDate}
+        initialDate={horizonStartDate}
         initialView={initialView}
         initialBarberId={initialBarberId}
+        initialMode={initialMode}
         services={services}
         serviceBarbers={serviceBarbers}
-        data={activeQuery.data}
+        data={urlState.view === "week" ? weekQuery.data : dayData}
+        dayData={dayData}
+        weekAppointments={horizonQuery.data?.appointments ?? weekQuery.data?.appointments}
+        horizonStartDate={horizonStartDate}
         isLoading={activeQuery.isLoading}
         isError={activeQuery.isError}
-        onRefetch={() => void activeQuery.refetch()}
+        onRefetch={() => {
+          void horizonQuery.refetch();
+          void weekQuery.refetch();
+        }}
         onStatusUpdate={handleStatusUpdate}
         onMoveAppointment={handleMove}
         movePending={moveMutation.isPending}

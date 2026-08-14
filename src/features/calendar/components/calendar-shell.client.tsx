@@ -12,6 +12,7 @@ import type { NavRole } from "@/components/layout/nav";
 import type { BarberOption, ServiceCatalogItem } from "@/lib/services/catalog";
 
 import { buildCalendarSearchParams, parseCalendarSearchParams } from "../url-state";
+import { clampDateToHorizon } from "../horizon";
 import { filterNewLandingIds, mergeSeenIds } from "@/lib/appointments/lands-animation";
 import { CalendarSkeleton } from "./calendar-skeleton";
 import { CalendarToolbar } from "./calendar-toolbar.client";
@@ -37,6 +38,16 @@ const CalendarWeekGrid = dynamic(
   { ssr: false, loading: () => <CalendarSkeleton /> },
 );
 
+const CalendarAgendaView = dynamic(
+  () => import("./calendar-agenda-view.client").then((mod) => mod.CalendarAgendaView),
+  { ssr: false, loading: () => <CalendarSkeleton /> },
+);
+
+const CalendarMobileAgenda = dynamic(
+  () => import("./calendar-mobile-agenda.client").then((mod) => mod.CalendarMobileAgenda),
+  { ssr: false },
+);
+
 type StatusUpdateInput = {
   appointmentId: string;
   status: "completed" | "no_show" | "cancelled";
@@ -49,9 +60,13 @@ type CalendarShellProps = {
   initialDate: string;
   initialView: "day" | "week";
   initialBarberId?: string;
+  initialMode: "grid" | "agenda";
   services: ServiceCatalogItem[];
   serviceBarbers: BarberOption[];
   data: DayAppointmentsPayload | undefined;
+  dayData: DayAppointmentsPayload | undefined;
+  weekAppointments: AppointmentListItem[] | undefined;
+  horizonStartDate: string;
   isLoading: boolean;
   isError: boolean;
   onRefetch: () => void;
@@ -78,9 +93,13 @@ export function CalendarShell({
   initialDate,
   initialView,
   initialBarberId,
+  initialMode,
   services,
   serviceBarbers,
   data,
+  dayData,
+  weekAppointments,
+  horizonStartDate,
   isLoading,
   isError,
   onRefetch,
@@ -102,9 +121,9 @@ export function CalendarShell({
     () =>
       parseCalendarSearchParams(
         Object.fromEntries(searchParams.entries()),
-        { date: initialDate, view: initialView, barber: initialBarberId },
+        { date: initialDate, view: initialView, barber: initialBarberId, mode: initialMode },
       ),
-    [searchParams, initialDate, initialView, initialBarberId],
+    [searchParams, initialDate, initialView, initialBarberId, initialMode],
   );
 
   const appointmentIds = useMemo(
@@ -138,16 +157,34 @@ export function CalendarShell({
   }, [appointmentIds]);
 
   const setUrl = useCallback(
-    (patch: Partial<{ date: string; view: "day" | "week"; barber?: string | null }>) => {
+    (
+      patch: Partial<{
+        date: string;
+        view: "day" | "week";
+        barber?: string | null;
+        mode: "grid" | "agenda";
+      }>,
+    ) => {
+      const nextDate = patch.date
+        ? clampDateToHorizon(patch.date, horizonStartDate)
+        : urlState.date;
       const qs = buildCalendarSearchParams({
-        date: patch.date ?? urlState.date,
+        date: nextDate,
         view: patch.view ?? urlState.view,
         barber: patch.barber !== undefined ? patch.barber : urlState.barber,
+        mode: patch.mode ?? urlState.mode,
       });
-      router.replace(`/d/calendar?${qs}`);
+      router.replace(`/d/calendar?${qs}`, { scroll: false });
     },
-    [router, urlState.barber, urlState.date, urlState.view],
+    [horizonStartDate, router, urlState.barber, urlState.date, urlState.view, urlState.mode],
   );
+
+  useEffect(() => {
+    const clamped = clampDateToHorizon(urlState.date, horizonStartDate);
+    if (clamped !== urlState.date) {
+      setUrl({ date: clamped });
+    }
+  }, [horizonStartDate, setUrl, urlState.date]);
 
   if (isLoading && !data) {
     return <CalendarSkeleton />;
@@ -176,59 +213,91 @@ export function CalendarShell({
 
   return (
     <div className="relative flex min-h-[calc(100dvh-4.5rem)] flex-col lg:min-h-[100dvh]">
-      <CalendarToolbar
-        date={urlState.date}
-        timezone={data.timezone}
-        view={urlState.view}
-        barberId={urlState.barber}
-        barbers={data.barbers}
-        role={role}
-        showCancelled={showCancelled}
-        onDateChange={(date) => setUrl({ date })}
-        onViewChange={(view) => setUrl({ view })}
-        onBarberChange={(barber) => setUrl({ barber })}
-        onToggleCancelled={() => setShowCancelled((value) => !value)}
-      />
-
-      {showEmptyDay ? (
-        <EmptyState
-          title="Keine Termine an diesem Tag."
-          actionLabel="Laufkundschaft"
-          onAction={() => setWalkInOpen(true)}
-        />
-      ) : urlState.view === "week" && weekBarber ? (
-        <CalendarWeekGrid
-          anchorDate={urlState.date}
-          timezone={data.timezone}
-          openingHours={data.openingHours}
-          barber={weekBarber}
-          appointments={data.appointments}
-          slotGranularityMin={data.slotGranularityMin}
-          nowMs={now.getTime()}
-          role={role}
-          actorMembershipId={actorMembershipId}
-          landingIds={landingIds}
-          showCancelled={showCancelled}
-          onSelectAppointment={setSelected}
-          onMoveAppointment={onMoveAppointment}
-        />
-      ) : (
-        <CalendarDayGrid
+      <div className="hidden lg:block">
+        <CalendarToolbar
           date={urlState.date}
           timezone={data.timezone}
-          openingHours={data.openingHours}
+          view={urlState.view}
+          mode={urlState.mode}
+          barberId={urlState.barber}
           barbers={data.barbers}
-          appointments={data.appointments}
-          slotGranularityMin={data.slotGranularityMin}
-          nowMs={now.getTime()}
-          showCancelled={showCancelled}
-          landingIds={landingIds}
           role={role}
-          actorMembershipId={actorMembershipId}
-          onSelectAppointment={setSelected}
-          onMoveAppointment={onMoveAppointment}
+          showCancelled={showCancelled}
+          onDateChange={(date) => setUrl({ date })}
+          onViewChange={(view) => setUrl({ view })}
+          onModeChange={(mode) => setUrl({ mode })}
+          onBarberChange={(barber) => setUrl({ barber })}
+          onToggleCancelled={() => setShowCancelled((value) => !value)}
         />
-      )}
+
+        {urlState.mode === "agenda" ? (
+          dayData ? (
+            <CalendarAgendaView
+              role={role}
+              data={dayData}
+              weekAppointments={weekAppointments ?? []}
+              horizonStartDate={horizonStartDate}
+              now={now}
+              onDateChange={(date) => setUrl({ date })}
+              onSelectAppointment={setSelected}
+              onOpenWalkIn={() => setWalkInOpen(true)}
+            />
+          ) : null
+        ) : showEmptyDay ? (
+          <EmptyState
+            title="Keine Termine an diesem Tag."
+            actionLabel="Laufkundschaft"
+            onAction={() => setWalkInOpen(true)}
+          />
+        ) : urlState.view === "week" && weekBarber ? (
+          <CalendarWeekGrid
+            anchorDate={urlState.date}
+            timezone={data.timezone}
+            openingHours={data.openingHours}
+            barber={weekBarber}
+            appointments={data.appointments}
+            slotGranularityMin={data.slotGranularityMin}
+            nowMs={now.getTime()}
+            role={role}
+            actorMembershipId={actorMembershipId}
+            landingIds={landingIds}
+            showCancelled={showCancelled}
+            onSelectAppointment={setSelected}
+            onMoveAppointment={onMoveAppointment}
+          />
+        ) : (
+          <CalendarDayGrid
+            date={urlState.date}
+            timezone={data.timezone}
+            openingHours={data.openingHours}
+            barbers={data.barbers}
+            appointments={data.appointments}
+            slotGranularityMin={data.slotGranularityMin}
+            nowMs={now.getTime()}
+            showCancelled={showCancelled}
+            landingIds={landingIds}
+            role={role}
+            actorMembershipId={actorMembershipId}
+            onSelectAppointment={setSelected}
+            onMoveAppointment={onMoveAppointment}
+          />
+        )}
+      </div>
+
+      {dayData ? (
+        <div className="flex flex-1 flex-col overflow-hidden lg:hidden">
+          <CalendarMobileAgenda
+            role={role}
+            data={dayData}
+            weekAppointments={weekAppointments ?? []}
+            horizonStartDate={horizonStartDate}
+            now={now}
+            onDateChange={(date) => setUrl({ date })}
+            onSelectAppointment={setSelected}
+            onOpenWalkIn={() => setWalkInOpen(true)}
+          />
+        </div>
+      ) : null}
 
       <Button
         type="button"
