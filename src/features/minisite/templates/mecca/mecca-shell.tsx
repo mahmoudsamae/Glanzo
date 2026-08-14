@@ -63,7 +63,6 @@ export function MeccaShell({ data, shopSlug, preview = false }: MeccaShellProps)
         content={content}
         bookHref={bookHref}
         preview={preview}
-        basePath={preview ? undefined : `/s/${shopSlug}`}
       />
       <main
         className={`relative z-[1] flex w-full flex-1 flex-col ${

@@ -101,7 +101,7 @@ function resolveAboutStats(content: MinisiteContent): string[] {
   return stats.length > 0 ? stats : [...DEFAULT_STATS];
 }
 
-export function MeccaAboutSection({ data, shopSlug, preview = false }: MeccaAboutSectionProps) {
+export function MeccaAboutSection({ data, preview = false }: MeccaAboutSectionProps) {
   const content = data.minisite.content;
 
   if (content.show?.about === false) {
@@ -122,7 +122,7 @@ export function MeccaAboutSection({ data, shopSlug, preview = false }: MeccaAbou
   const { line1, line2 } = splitAboutHeadline(title, subtitle);
   const imageUrl = resolveAboutImageUrl(content);
   const stats = resolveAboutStats(content);
-  const aboutHref = preview ? `#${MECCA_ABOUT_ID}` : `/s/${shopSlug}/about`;
+  const aboutHref = `#${MECCA_ABOUT_ID}`;
 
   return (
     <section

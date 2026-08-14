@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 
 const REVEAL_SELECTOR = ".ms-mecca-reveal";
-const EASE_MS = 900;
 
 /** Mecca: scroll reveals, hero entrance, smooth in-view motion. */
 export function MeccaAmbient() {
   useEffect(() => {
     const root = document.querySelector(".ms-mecca-root");
     if (!root) return;
+
+    const observerRoot = root.closest(".salon-dash-minisite-preview-scroll");
 
     const markReady = () => {
       root.classList.add("ms-mecca-ready");
@@ -33,7 +34,7 @@ export function MeccaAmbient() {
             revealIo.unobserve(entry.target);
           }
         },
-        { threshold: 0.1, rootMargin: "0px 0px -7% 0px" },
+        { root: observerRoot, threshold: 0.1, rootMargin: "0px 0px -7% 0px" },
       );
 
       root.querySelectorAll(REVEAL_SELECTOR).forEach((el) => revealIo.observe(el));
@@ -55,7 +56,7 @@ export function MeccaAmbient() {
             staggerIo.unobserve(group);
           }
         },
-        { threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
+        { root: observerRoot, threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
       );
 
       staggerGroups.forEach((group) => staggerIo.observe(group));

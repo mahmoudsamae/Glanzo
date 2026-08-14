@@ -15,6 +15,7 @@ import type { AppointmentListItem } from "@/server/modules/appointments/appointm
 import type { NavRole } from "@/components/layout/nav";
 import { ToastBanner } from "@/components/shared/toast-banner.client";
 import { bookingErrorMessage, isBookingErrorCode } from "@/lib/booking/errors";
+import { appointmentStatusActionMessage } from "@/lib/appointments/status-label";
 import type { OpeningHours } from "@/lib/validations/shop";
 
 const AppointmentDetailSheet = dynamic(
@@ -60,7 +61,10 @@ export function TodayClient({
   const handleStatusUpdate = useCallback(
     async (input: { appointmentId: string; status: "completed" | "no_show" | "cancelled" }) => {
       const result = await updateAppointmentStatusAction(input);
-      return { ok: result.ok };
+      if (!result.ok) {
+        return { ok: false, error: appointmentStatusActionMessage(result.code) };
+      }
+      return { ok: true };
     },
     [],
   );

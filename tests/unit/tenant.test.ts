@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { allowsDirectTenantPaths, resolveTenant } from "@/lib/tenant";
+import { allowsDirectTenantPaths, pathnameForTenantRewrite, resolveTenant } from "@/lib/tenant";
 
 const ROOT = "localhost:3000";
 const PROD_ROOT = "glanzo.app";
@@ -84,6 +84,7 @@ describe("resolveTenant", () => {
   it("allowsDirectTenantPaths for localhost and vercel.app roots", () => {
     expect(allowsDirectTenantPaths("localhost:3000")).toBe(true);
     expect(allowsDirectTenantPaths("glanzo.vercel.app")).toBe(true);
+    expect(allowsDirectTenantPaths("glanzo-git-main-acme.vercel.app")).toBe(true);
     expect(allowsDirectTenantPaths("glanzo.app")).toBe(false);
   });
 
@@ -119,5 +120,18 @@ describe("resolveTenant", () => {
         nodeEnv: "production",
       }),
     ).toEqual({ kind: "root" });
+  });
+});
+
+describe("pathnameForTenantRewrite", () => {
+  it("strips a duplicated /s/{slug} prefix on tenant hosts", () => {
+    expect(pathnameForTenantRewrite("demo-shop", "/s/demo-shop")).toBe("/");
+    expect(pathnameForTenantRewrite("demo-shop", "/s/demo-shop/about")).toBe("/about");
+  });
+
+  it("leaves other paths unchanged", () => {
+    expect(pathnameForTenantRewrite("demo-shop", "/")).toBe("/");
+    expect(pathnameForTenantRewrite("demo-shop", "/about")).toBe("/about");
+    expect(pathnameForTenantRewrite("demo-shop", "/s/other-shop/about")).toBe("/s/other-shop/about");
   });
 });

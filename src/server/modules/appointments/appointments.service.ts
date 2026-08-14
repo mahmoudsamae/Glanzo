@@ -109,6 +109,7 @@ export async function createWalkInAppointment(
     serviceId: input.serviceId,
     date,
     membershipId: input.membershipId,
+    ignoreLeadTime: true,
   });
 
   if (!availability.ok) {
@@ -340,6 +341,8 @@ export async function moveAppointment(
     serviceId: appointment.service_id,
     date,
     membershipId: targetMembershipId,
+    excludeAppointmentId: input.appointmentId,
+    ignoreLeadTime: true,
   });
 
   if (!availability.ok) {

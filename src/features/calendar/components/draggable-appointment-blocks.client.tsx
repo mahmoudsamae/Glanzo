@@ -35,6 +35,7 @@ type DraggableAppointmentBlocksProps = {
 };
 
 const LONG_PRESS_MS = 300;
+const DRAG_THRESHOLD_PX = 8;
 
 export function DraggableAppointmentBlocks({
   appointments,
@@ -91,6 +92,9 @@ export function DraggableAppointmentBlocks({
     (appointment: AppointmentListItem, topPx: number) => {
       const snappedY = snapYToGranularity(topPx, gridWindow, pxPerMinute, granularityMin);
       const startsAt = new Date(yToTime(snappedY, gridWindow, pxPerMinute)).toISOString();
+      if (startsAt === appointment.startsAt) {
+        return;
+      }
       onMove({
         appointmentId: appointment.id,
         startsAt,
@@ -164,7 +168,12 @@ export function DraggableAppointmentBlocks({
               if (event.pointerType === "touch") {
                 pressTimer.current = window.setTimeout(startDrag, LONG_PRESS_MS);
               } else {
-                startDrag();
+                dragState.current = {
+                  appointmentId: appointment.id,
+                  startY: event.clientY,
+                  originTop: baseTopPx,
+                  pointerId: event.pointerId,
+                };
               }
             }}
             onPointerMove={(event) => {
@@ -173,6 +182,13 @@ export function DraggableAppointmentBlocks({
               }
               clearPressTimer();
               const delta = event.clientY - dragState.current.startY;
+              if (draggingId !== appointment.id) {
+                if (Math.abs(delta) < DRAG_THRESHOLD_PX) {
+                  return;
+                }
+                setDraggingId(appointment.id);
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }
               const nextTop = Math.max(
                 0,
                 Math.min(
@@ -187,9 +203,12 @@ export function DraggableAppointmentBlocks({
               if (!dragState.current || dragState.current.appointmentId !== appointment.id) {
                 return;
               }
-              event.currentTarget.releasePointerCapture(event.pointerId);
-              const finalTop = dragTopPx ?? baseTopPx;
-              finishDrag(appointment, finalTop);
+              const didDrag = draggingId === appointment.id;
+              if (didDrag) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+                const finalTop = dragTopPx ?? baseTopPx;
+                finishDrag(appointment, finalTop);
+              }
               dragState.current = null;
               setDraggingId(null);
               setDragTopPx(null);

@@ -298,7 +298,7 @@ export function VelvetNav({
               className="ms-velvet-nav-cta ms-velvet-nav-cta--drawer"
               onClick={() => setOpen(false)}
             >
-              Book Now
+              {i18n.nav.bookNow}
             </Link>
           )}
         </nav>

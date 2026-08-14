@@ -85,7 +85,7 @@ function resolveServicesImage(content: MinisiteContent): string {
   return TEMPLATE_STOCK.services[0];
 }
 
-export function MeccaServicesSection({ data, shopSlug, preview = false }: MeccaServicesSectionProps) {
+export function MeccaServicesSection({ data, preview = false }: MeccaServicesSectionProps) {
   const { minisite, services } = data;
   const content = minisite.content;
 
@@ -107,7 +107,7 @@ export function MeccaServicesSection({ data, shopSlug, preview = false }: MeccaS
   const visibleServices = services.slice(0, PREVIEW_SERVICE_LIMIT) as MeccaService[];
   const hasMore = services.length > PREVIEW_SERVICE_LIMIT;
   const groupedServices = groupServicesByCategory(visibleServices);
-  const leistungenHref = preview ? `#${anchors.prices}` : `/s/${shopSlug}/leistungen`;
+  const leistungenHref = `#${anchors.prices}`;
   const featureImage = resolveFeatureImage(visibleServices, content);
   const servicesWithImages = visibleServices.filter((service) => service.image_path?.trim());
 

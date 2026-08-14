@@ -14,8 +14,12 @@ export function ForgeAmbient() {
     const cleanups: Array<() => void> = [];
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+    const theme = document.querySelector(".theme-forge");
+    const observerRoot = root.closest(".salon-dash-minisite-preview-scroll");
+
     const markReady = () => {
       root.classList.add("ms-forge-ready", "ms-cinema-ready");
+      theme?.classList.add("ms-forge-ready", "ms-cinema-ready");
       document.documentElement.classList.add("ms-forge-ready");
     };
 
@@ -34,7 +38,7 @@ export function ForgeAmbient() {
             revealIo.unobserve(entry.target);
           }
         },
-        { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+        { root: observerRoot, threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
       );
 
       root.querySelectorAll(REVEAL_SELECTOR).forEach((el) => revealIo.observe(el));
@@ -55,7 +59,7 @@ export function ForgeAmbient() {
             staggerIo.unobserve(entry.target);
           }
         },
-        { threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
+        { root: observerRoot, threshold: 0.08, rootMargin: "0px 0px -6% 0px" },
       );
 
       staggerGroups.forEach((group) => staggerIo.observe(group));
@@ -69,7 +73,7 @@ export function ForgeAmbient() {
             sectionIo.unobserve(entry.target);
           }
         },
-        { threshold: 0.1, rootMargin: "0px 0px -6% 0px" },
+        { root: observerRoot, threshold: 0.1, rootMargin: "0px 0px -6% 0px" },
       );
 
       root.querySelectorAll(FORGE_SECTION_SELECTOR).forEach((el) => sectionIo.observe(el));
@@ -104,6 +108,7 @@ export function ForgeAmbient() {
 
     return () => {
       root.classList.remove("ms-forge-ready", "ms-cinema-ready");
+      theme?.classList.remove("ms-forge-ready", "ms-cinema-ready");
       document.documentElement.classList.remove("ms-forge-ready");
       cleanups.forEach((fn) => fn());
     };

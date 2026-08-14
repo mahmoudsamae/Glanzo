@@ -266,7 +266,10 @@ html:has(.ms-forge-root) {
 }
 
 .theme-forge.ms-forge-ready .ms-nicoles-section.ms-cinema-section--visible,
-.theme-forge.ms-cinema-ready .ms-nicoles-section.ms-cinema-section--visible {
+.theme-forge.ms-cinema-ready .ms-nicoles-section.ms-cinema-section--visible,
+.ms-forge-root.ms-forge-ready .ms-nicoles-section.ms-cinema-section--visible,
+.ms-forge-root.ms-cinema-ready .ms-nicoles-section.ms-cinema-section--visible,
+.minisite-preview .theme-forge .ms-nicoles-section.ms-cinema-section {
   opacity: 1;
   transform: none;
 }
@@ -853,7 +856,10 @@ html:has(.ms-forge-root) {
 }
 
 .theme-forge.ms-forge-ready .ms-forge-section.ms-cinema-section--visible,
-.theme-forge.ms-cinema-ready .ms-forge-section.ms-cinema-section--visible {
+.theme-forge.ms-cinema-ready .ms-forge-section.ms-cinema-section--visible,
+.ms-forge-root.ms-forge-ready .ms-forge-section.ms-cinema-section--visible,
+.ms-forge-root.ms-cinema-ready .ms-forge-section.ms-cinema-section--visible,
+.minisite-preview .ms-forge-section {
   opacity: 1;
   transform: none;
 }

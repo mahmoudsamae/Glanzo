@@ -1,3 +1,4 @@
+import { allowsDirectTenantPaths } from "@/lib/tenant";
 import type { OpeningHours, WeekdayKey } from "@/lib/validations/shop";
 import { WEEKDAY_ORDER } from "@/lib/validations/shop";
 import type { ShopPublicData } from "@/lib/validations/public-shop";
@@ -37,8 +38,18 @@ function openingHoursSpecification(hours: OpeningHours) {
   return specs;
 }
 
+function publicShopUrl(siteOrigin: string, slug: string): string {
+  const origin = siteOrigin.replace(/\/$/, "");
+  const host = origin.replace(/^https?:\/\//, "");
+  if (allowsDirectTenantPaths(host)) {
+    return `${origin}/s/${slug}`;
+  }
+  const protocol = origin.startsWith("http://") ? "http" : "https";
+  return `${protocol}://${slug}.${host}`;
+}
+
 export function buildShopJsonLd(data: ShopPublicData, siteOrigin: string) {
-  const url = `${siteOrigin.replace(/\/$/, "")}/s/${data.shop.slug}`;
+  const url = publicShopUrl(siteOrigin, data.shop.slug);
   const address = data.minisite.content.address?.trim();
   const sameAs = linksToSameAs(
     resolveMinisiteLinks(data.minisite.content.links, data.minisite.content.instagram),

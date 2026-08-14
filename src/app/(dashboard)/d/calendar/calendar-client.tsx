@@ -4,11 +4,12 @@ import { useCallback, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { ToastBanner } from "@/components/shared/toast-banner.client";
-import { CalendarShell, parseCalendarSearchParams } from "@/features/calendar";
 import {
+  CalendarShell,
   clampDateToHorizon,
+  parseCalendarSearchParams,
   sliceDayFromHorizon,
-} from "@/features/calendar/horizon";
+} from "@/features/calendar";
 import {
   createWalkInAppointmentAction,
   updateAppointmentStatusAction,
@@ -17,6 +18,7 @@ import {
   useWeekAppointmentsQuery,
 } from "@/features/appointments";
 import { bookingErrorMessage, isBookingErrorCode } from "@/lib/booking/errors";
+import { appointmentStatusActionMessage } from "@/lib/appointments/status-label";
 import type { BarberOption, ServiceCatalogItem } from "@/lib/services/catalog";
 import type { NavRole } from "@/components/layout/nav";
 
@@ -89,7 +91,10 @@ export function CalendarClient({
   const handleStatusUpdate = useCallback(
     async (input: { appointmentId: string; status: "completed" | "no_show" | "cancelled" }) => {
       const result = await updateAppointmentStatusAction(input);
-      return { ok: result.ok };
+      if (!result.ok) {
+        return { ok: false, error: appointmentStatusActionMessage(result.code) };
+      }
+      return { ok: true };
     },
     [],
   );

@@ -12,6 +12,7 @@ export function VelvetAmbient() {
     const root = document.querySelector(".ms-velvet-root");
     if (!root) return;
 
+    const observerRoot = root.closest(".salon-dash-minisite-preview-scroll");
     const markReady = () => root.classList.add("ms-velvet-ready");
     if (document.readyState === "complete") {
       markReady();
@@ -31,7 +32,7 @@ export function VelvetAmbient() {
             entry.target.classList.toggle("is-inview", entry.isIntersecting);
           }
         },
-        { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
+        { root: observerRoot, threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
       );
 
       root.querySelectorAll(REVEAL_SELECTOR).forEach((el) => revealIo.observe(el));
@@ -50,7 +51,7 @@ export function VelvetAmbient() {
             });
           }
         },
-        { threshold: 0.06, rootMargin: "0px 0px -6% 0px" },
+        { root: observerRoot, threshold: 0.06, rootMargin: "0px 0px -6% 0px" },
       );
 
       staggerGroups.forEach((g) => staggerIo.observe(g));

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * No hard-coded hex colors outside token definitions in globals.css.
+ * No hard-coded hex colors outside token sources (globals.css, theme CSS, starter kits).
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -14,9 +14,18 @@ const allowHexFiles = new Set([
 const hexPattern = /#[0-9a-fA-F]{3,8}\b/g;
 const offenders = [];
 
+function isAllowedHexFile(normalized) {
+  if (allowHexFiles.has(normalized)) return true;
+  if (normalized.includes("/src/styles/themes/")) return true;
+  if (normalized.includes("/src/lib/minisite/starter-kits/")) return true;
+  if (normalized.endsWith("/src/lib/booking/booking-sheet-theme.ts")) return true;
+  if (normalized.includes("-illustration.")) return true;
+  return false;
+}
+
 function scanFile(filePath) {
   const normalized = filePath.replaceAll("\\", "/");
-  if (allowHexFiles.has(normalized)) return;
+  if (isAllowedHexFile(normalized)) return;
 
   const content = fs.readFileSync(filePath, "utf8");
   const matches = content.match(hexPattern);

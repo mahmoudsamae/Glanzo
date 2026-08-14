@@ -32,6 +32,8 @@ export async function fetchAvailabilityForShop(input: {
   date: string;
   membershipId?: string | null;
   now?: Date;
+  excludeAppointmentId?: string | null;
+  ignoreLeadTime?: boolean;
 }): Promise<AvailabilityServiceResult> {
   const supabase = createServiceRoleClient();
   const shop = await getShopSchedulingContextBySlug(supabase, input.slug);
@@ -55,6 +57,7 @@ export async function fetchAvailabilityForShop(input: {
     input.serviceId,
     input.date,
     input.membershipId,
+    input.excludeAppointmentId,
   );
 
   if (barbers.length === 0) {
@@ -65,7 +68,7 @@ export async function fetchAvailabilityForShop(input: {
     timezone: shop.timezone,
     date: input.date,
     serviceDurationMin: service.durationMin,
-    bookingLeadTimeMin: shop.bookingLeadTimeMin,
+    bookingLeadTimeMin: input.ignoreLeadTime ? 0 : shop.bookingLeadTimeMin,
     slotGranularityMin: shop.slotGranularityMin,
     openingHours: shop.openingHours,
     now: input.now ?? new Date(),

@@ -20,6 +20,7 @@ import "@/styles/themes/nicoles.css";
 import "@/styles/themes/flux.css";
 import "@/styles/themes/mecca.css";
 import "@/styles/themes/velvet.css";
+import "@/styles/themes/forge.css";
 
 type MinisitePreviewPaneProps = {
   shopSlug: string;

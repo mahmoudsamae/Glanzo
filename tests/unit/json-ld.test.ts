@@ -38,7 +38,7 @@ describe("buildShopJsonLd", () => {
 
     expect(json["@type"]).toBe("HairSalon");
     expect(json.name).toBe("Test Salon");
-    expect(json.url).toBe("https://glanzo.app/s/test-salon");
+    expect(json.url).toBe("https://test-salon.glanzo.app");
     expect(json.address).toBe("Hauptstr. 1");
     expect(json.openingHoursSpecification).toEqual([
       {
@@ -48,5 +48,10 @@ describe("buildShopJsonLd", () => {
         closes: "18:00",
       },
     ]);
+  });
+
+  it("keeps path-based URLs on localhost origins", () => {
+    const json = buildShopJsonLd(BASE, "http://localhost:3000");
+    expect(json.url).toBe("http://localhost:3000/s/test-salon");
   });
 });

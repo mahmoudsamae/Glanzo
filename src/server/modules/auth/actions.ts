@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { clientEnv } from "@/lib/env";
+import { siteOrigin } from "@/lib/site-origin";
 import { establishSessionAfterSignUp } from "@/lib/auth/establish-session";
 import { authFlowLog } from "@/lib/auth/flow-log";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -81,7 +82,7 @@ export async function loginWithPassword(formData: FormData): Promise<AuthActionR
     }
 
     revalidateAuthShell();
-    redirect(redirectTo);
+    return { ok: true, redirectTo };
   } catch (error) {
     if (isSupabaseTransportError(error)) {
       return supabaseTransportErrorResult();
@@ -165,7 +166,7 @@ export async function registerWithPassword(formData: FormData): Promise<AuthActi
     });
 
     revalidateAuthShell();
-    redirect(redirectTo);
+    return { ok: true, redirectTo };
   } catch (error) {
     if (isSupabaseTransportError(error)) {
       return supabaseTransportErrorResult();
@@ -186,7 +187,7 @@ export async function requestPasswordReset(formData: FormData): Promise<AuthActi
   }
 
   const supabase = await createServerSupabaseClient();
-  const redirectTo = `http://${clientEnv.NEXT_PUBLIC_ROOT_DOMAIN}/update-password`;
+  const redirectTo = `${siteOrigin()}/auth/callback?next=${encodeURIComponent("/update-password")}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
 
@@ -229,16 +230,19 @@ export async function updatePassword(formData: FormData): Promise<AuthActionResu
   }
 
   revalidateAuthShell();
-  redirect(resolvePostAuthRedirect(state.actor));
+  return { ok: true, redirectTo: resolvePostAuthRedirect(state.actor) };
 }
 
-export async function signInWithGoogle(): Promise<void> {
+export async function signInWithGoogle(next?: string): Promise<void> {
   if (!clientEnv.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED) {
     return;
   }
 
   const supabase = await createServerSupabaseClient();
-  const redirectTo = `http://${clientEnv.NEXT_PUBLIC_ROOT_DOMAIN}/auth/callback`;
+  const nextPath = safeInternalRedirect(next ?? "");
+  const redirectTo = nextPath
+    ? `${siteOrigin()}/auth/callback?next=${encodeURIComponent(nextPath)}`
+    : `${siteOrigin()}/auth/callback`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

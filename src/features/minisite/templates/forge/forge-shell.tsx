@@ -57,7 +57,7 @@ export function ForgeShell({ data, shopSlug, preview = false }: ForgeShellProps)
 
   return (
     <div className="ms-forge-root relative flex min-h-full flex-1 flex-col">
-      {preview ? null : <ForgeAmbient />}
+      <ForgeAmbient />
       <NicolesNav
         shopName={data.shop.name}
         content={content}

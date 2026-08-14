@@ -209,19 +209,26 @@ async function listAppointmentsForMemberships(
   membershipIds: string[],
   dayStartIso: string,
   dayEndIso: string,
+  excludeAppointmentId?: string | null,
 ): Promise<Map<string, AppointmentBlock[]>> {
   const map = new Map<string, AppointmentBlock[]>();
   if (membershipIds.length === 0) {
     return map;
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("appointments")
     .select("membership_id, starts_at, ends_at, status")
     .eq("shop_id", shopId)
     .in("membership_id", membershipIds)
     .lt("starts_at", dayEndIso)
     .gt("ends_at", dayStartIso);
+
+  if (excludeAppointmentId) {
+    query = query.neq("id", excludeAppointmentId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -276,6 +283,7 @@ export async function loadBarberAvailabilityInputs(
   serviceId: string,
   date: string,
   membershipId?: string | null,
+  excludeAppointmentId?: string | null,
 ): Promise<BarberAvailabilityInput[]> {
   const membershipIds = await listServiceMembershipIds(
     supabase,
@@ -290,7 +298,14 @@ export async function loadBarberAvailabilityInputs(
   const [hoursByMember, timeOffByMember, appointmentsByMember] = await Promise.all([
     listStaffHoursForMemberships(supabase, shop.id, membershipIds),
     listTimeOffForMemberships(supabase, shop.id, membershipIds, dayStartIso, dayEndIso),
-    listAppointmentsForMemberships(supabase, shop.id, membershipIds, dayStartIso, dayEndIso),
+    listAppointmentsForMemberships(
+      supabase,
+      shop.id,
+      membershipIds,
+      dayStartIso,
+      dayEndIso,
+      excludeAppointmentId,
+    ),
   ]);
 
   return membershipIds.map((id) => ({

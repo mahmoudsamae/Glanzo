@@ -1,6 +1,7 @@
 export { CalendarShell } from "./components/calendar-shell.client";
 export { CalendarSkeleton } from "./components/calendar-skeleton";
 export { parseCalendarSearchParams, buildCalendarSearchParams } from "./url-state";
+export { clampDateToHorizon, sliceDayFromHorizon } from "./horizon";
 export {
   filterNewLandingIds,
   mergeSeenIds,

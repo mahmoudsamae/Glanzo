@@ -27,7 +27,7 @@ type AppointmentDetailSheetProps = {
   nowMs: number;
   onClose: () => void;
   onUpdated: () => void;
-  onStatusUpdate: (input: StatusUpdateInput) => Promise<{ ok: boolean }>;
+  onStatusUpdate: (input: StatusUpdateInput) => Promise<{ ok: boolean; error?: string }>;
   onMoveAppointment: (input: {
     appointmentId: string;
     startsAt: string;
@@ -72,6 +72,7 @@ export function AppointmentDetailSheet({
   const [isPending, startTransition] = useTransition();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   if (!appointment) {
     return null;
@@ -86,6 +87,7 @@ export function AppointmentDetailSheet({
     (role === "owner" || active.membershipId === actorMembershipId);
 
   function runStatus(status: "completed" | "no_show" | "cancelled") {
+    setStatusError(null);
     startTransition(async () => {
       const result = await onStatusUpdate({
         appointmentId: active.id,
@@ -94,7 +96,9 @@ export function AppointmentDetailSheet({
       if (result.ok) {
         onUpdated();
         onClose();
+        return;
       }
+      setStatusError(result.error ?? "Status konnte nicht aktualisiert werden.");
     });
   }
 
@@ -127,6 +131,7 @@ export function AppointmentDetailSheet({
               tone={active.source === "walk_in" ? "barber" : "owner"}
             />
             <p className="text-sm text-muted-foreground">{appointmentSourceLabel(active.source)}</p>
+            {statusError ? <p className="text-sm text-destructive">{statusError}</p> : null}
           </div>
           {active.status === "booked" ? (
             <div className="flex flex-col gap-[var(--space-2)]">

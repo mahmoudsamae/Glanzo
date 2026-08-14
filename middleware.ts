@@ -6,6 +6,7 @@ import {
   buildTenantRewritePath,
   isDirectTenantPath,
   allowsDirectTenantPaths,
+  pathnameForTenantRewrite,
   resolveTenant,
   TENANT_NOT_FOUND_SLUG,
   TENANT_PATH_FORBIDDEN_SLUG,
@@ -27,7 +28,8 @@ function resolveTenantResponse(request: NextRequest): NextResponse {
     isProduction &&
     resolution.kind === "root" &&
     isDirectTenantPath(pathname) &&
-    !allowsDirectTenantPaths(clientEnv.NEXT_PUBLIC_ROOT_DOMAIN)
+    !allowsDirectTenantPaths(clientEnv.NEXT_PUBLIC_ROOT_DOMAIN) &&
+    !allowsDirectTenantPaths(host)
   ) {
     const url = request.nextUrl.clone();
     url.pathname = buildTenantRewritePath(TENANT_PATH_FORBIDDEN_SLUG, "/");
@@ -42,7 +44,10 @@ function resolveTenantResponse(request: NextRequest): NextResponse {
 
   if (resolution.kind === "tenant") {
     const url = request.nextUrl.clone();
-    url.pathname = buildTenantRewritePath(resolution.slug, pathname);
+    url.pathname = buildTenantRewritePath(
+      resolution.slug,
+      pathnameForTenantRewrite(resolution.slug, pathname),
+    );
     return NextResponse.rewrite(url);
   }
 

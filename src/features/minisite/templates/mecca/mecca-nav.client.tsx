@@ -74,7 +74,7 @@ export function MeccaNav({
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const anchors = getMinisiteAnchors("nicoles");
+  const anchors = getMinisiteAnchors("mecca");
   const [active, setActive] = useState<string>(anchors.top);
 
   const links = useMemo(() => {
@@ -83,7 +83,7 @@ export function MeccaNav({
     if (custom.length > 0) {
       return custom;
     }
-    return defaultNavLinksForTemplate("nicoles");
+    return defaultNavLinksForTemplate("mecca");
   }, [content]);
 
   const navLinks = useMemo(() => links.filter((link) => !isTerminNavLink(link)), [links]);

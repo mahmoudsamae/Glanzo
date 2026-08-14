@@ -38,7 +38,10 @@ const VERCEL_PREVIEW_SUFFIX = ".vercel.app";
 /** Path-based mini-sites (`/s/{slug}`) — localhost dev and Vercel default domains (no wildcard DNS). */
 export function allowsDirectTenantPaths(rootDomain: string): boolean {
   const normalized = rootDomain.trim().toLowerCase();
-  return normalized.includes("localhost") || normalized.endsWith(VERCEL_PREVIEW_SUFFIX);
+  const hostname = normalized.includes("]")
+    ? normalized
+    : normalized.replace(/:\d+$/, "");
+  return hostname.includes("localhost") || hostname.endsWith(VERCEL_PREVIEW_SUFFIX);
 }
 
 function isVercelPreviewHost(hostname: string, rootHostname: string): boolean {
@@ -169,6 +172,22 @@ export const TENANT_PATH_FORBIDDEN_SLUG = "__tenant-path-forbidden__";
 export function buildTenantRewritePath(slug: string, pathname: string): string {
   const suffix = pathname === "/" ? "" : pathname;
   return `/s/${slug}${suffix}`;
+}
+
+/**
+ * Tenant hosts already identify the shop. Strip a duplicated `/s/{slug}` prefix
+ * so public CTAs that emit internal paths still rewrite to a real page.
+ */
+export function pathnameForTenantRewrite(slug: string, pathname: string): string {
+  const prefix = `/s/${slug}`;
+  if (pathname === prefix) {
+    return "/";
+  }
+  if (pathname.startsWith(`${prefix}/`)) {
+    const rest = pathname.slice(prefix.length);
+    return rest.length > 0 ? rest : "/";
+  }
+  return pathname;
 }
 
 export function isDirectTenantPath(pathname: string): boolean {

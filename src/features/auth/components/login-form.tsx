@@ -25,7 +25,7 @@ type LoginValues = z.infer<typeof loginSchema>;
 
 type LoginFormProps = {
   loginAction: (formData: FormData) => Promise<AuthActionResult>;
-  googleSignInAction?: () => Promise<void>;
+  googleSignInAction?: (next?: string) => Promise<void>;
   nextPath?: string;
 };
 
@@ -114,7 +114,7 @@ export function LoginForm({ loginAction, googleSignInAction, nextPath }: LoginFo
           variant="outline"
           className="salon-auth-secondary w-full"
           disabled={isPending}
-          onClick={() => startTransition(async () => googleSignInAction())}
+          onClick={() => startTransition(async () => googleSignInAction(nextPath))}
         >
           Mit Google fortfahren
         </Button>

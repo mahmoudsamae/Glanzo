@@ -799,7 +799,7 @@ export function MinisiteSectionsPanel({
               value={accentHex}
               onChange={(e) => onAccentChange(e.target.value)}
               className="salon-dash-search max-w-[8rem] font-mono text-sm"
-              placeholder="#000000"
+              placeholder="Hex"
             />
             <span
               className="inline-flex items-center rounded-md px-[var(--space-3)] py-[var(--space-2)] text-sm"

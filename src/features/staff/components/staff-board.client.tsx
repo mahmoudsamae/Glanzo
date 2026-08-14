@@ -16,7 +16,7 @@ import {
   DashboardRowCard,
   DashboardRowList,
 } from "@/components/dashboard";
-import { clientEnv } from "@/lib/env";
+import { siteOrigin } from "@/lib/site-origin";
 import { STAFF_WEEKDAY_LABELS, staffWeekdayIndexToKey } from "@/lib/staff/weekday";
 
 import {
@@ -63,7 +63,7 @@ type StaffBoardProps =
     };
 
 function buildJoinUrl(token: string): string {
-  return `http://${clientEnv.NEXT_PUBLIC_ROOT_DOMAIN}/join/${token}`;
+  return `${siteOrigin()}/join/${token}`;
 }
 
 export function StaffBoard(props: StaffBoardProps) {
